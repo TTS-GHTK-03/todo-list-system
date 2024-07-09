@@ -217,7 +217,7 @@
   <addForeignKeyConstraint baseTableName="sprint_progress" baseColumnNames="sprint_id"
     constraintName="FK_sprint_progress_sprint"
     referencedTableName="sprint" referencedColumnNames="id"/>
-  </changeSet>
+</changeSet>
 
   <changeSet id="20240709-1356-notification-table" author="Gia Linh">
     <createTable tableName="notification">
