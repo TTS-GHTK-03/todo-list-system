@@ -7,7 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@Entity
+@Entity(name = "AuthUser")
 @NoArgsConstructor
 @Table(name = "user")
 public class AuthUser extends BaseEntity {

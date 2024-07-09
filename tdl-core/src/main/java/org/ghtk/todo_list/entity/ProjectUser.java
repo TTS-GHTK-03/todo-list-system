@@ -10,10 +10,12 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
 @Data
-@Table(name = "project")
+@Table(name = "project_user")
 @NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
-public class Project extends BaseEntity {
+public class ProjectUser extends BaseEntity {
 
-  private String title;
+  private String userId;
+  private String projectId;
+  private String role;
 }
