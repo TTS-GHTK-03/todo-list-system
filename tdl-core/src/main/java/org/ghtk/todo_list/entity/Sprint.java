@@ -17,5 +17,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 public class Sprint extends BaseEntity {
 
   private String title;
+  private String status;
+  private LocalDate startDate;
   private LocalDate endDate;
 }

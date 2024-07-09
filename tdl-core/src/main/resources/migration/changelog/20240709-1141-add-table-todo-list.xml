@@ -109,6 +109,8 @@
         <constraints primaryKey="true"/>
       </column>
       <column name="title" type="varchar(255)"/>
+      <column name="status" type="boolean"/>
+      <column name="start_date" type="date"/>
       <column name="end_date" type="date"/>
       <column name="created_at" type="datetime"/>
       <column name="last_updated_at" type="datetime"/>
