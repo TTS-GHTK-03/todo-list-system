@@ -217,6 +217,24 @@
   <addForeignKeyConstraint baseTableName="sprint_progress" baseColumnNames="sprint_id"
     constraintName="FK_sprint_progress_sprint"
     referencedTableName="sprint" referencedColumnNames="id"/>
-</changeSet>
+  </changeSet>
+
+  <changeSet id="20240709-1356-notification-table" author="Gia Linh">
+    <createTable tableName="notification">
+      <column name="id" type="varchar(255)">
+        <constraints primaryKey="true"/>
+      </column>
+      <column name="text" type="varchar(255)"/>
+      <column name="task_id" type="varchar(255)"/>
+      <column name="user_id" type="varchar(255)"/>
+      <column name="created_at" type="datetime"/>
+    </createTable>
+    <addForeignKeyConstraint baseTableName="notification" baseColumnNames="task_id"
+      constraintName="FK_notification_task"
+      referencedTableName="task" referencedColumnNames="id"/>
+    <addForeignKeyConstraint baseTableName="notification" baseColumnNames="user_id"
+      constraintName="FK_notification_user"
+      referencedTableName="user" referencedColumnNames="id"/>
+  </changeSet>
 
 </databaseChangeLog>
