@@ -10,10 +10,12 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
 @Data
-@Table(name = "project")
+@Table(name = "sprint_progress")
 @NoArgsConstructor
 @EntityListeners(AuditingEntityListener.class)
-public class Project extends BaseEntity {
+public class SprintProgress extends BaseEntity {
 
-  private String title;
+  private String sprintId;
+  private Integer totalTask;
+  private Integer completeTask;
 }
