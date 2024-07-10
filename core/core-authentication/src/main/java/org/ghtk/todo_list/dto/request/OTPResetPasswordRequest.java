@@ -13,4 +13,5 @@ public class OTPResetPasswordRequest {
     @ValidateEmail
     private String email;
     private String otp;
+    
 }
