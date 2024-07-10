@@ -19,8 +19,6 @@ public class AuthUserServiceImpl implements AuthUserService {
   @Override
   public AuthUser findById(String id) {
     log.info("(findById)id: {}", id);
-    if (log.isDebugEnabled())
-      log.debug("(findById)id: {}", id);
     return repository.findById(id).orElseGet(() -> {
       log.error("(findById)id: {} not found", id);
       throw new UserNotFoundException();

@@ -9,6 +9,7 @@ application:
 
   i18n:
     resources:
+      - classpath:core-authentication/message
 
 
 spring:
@@ -19,8 +20,8 @@ spring:
     changelog: classpath:/database.migration/master-changelog.xml
   datasource:
     url: jdbc:mysql://localhost:3306/tdl
-    username:
-    password:
+    username: yalynk
+    password: Linh2002@
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   cache:
@@ -34,8 +35,8 @@ spring:
   mail:
     default-encoding: UTF-8
     host: smtp.gmail.com
-    username:
-    password: 
+    username: nhoquenroi2002@gmail.com
+    password: ptmq maaj mrjn hujc
     port: 587
     properties:
       mail:
