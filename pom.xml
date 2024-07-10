@@ -23,6 +23,7 @@
 		<liquibase.version>4.24.0</liquibase.version>
 		<lombok.version>1.18.32</lombok.version>
 		<jedis.version>5.1.2</jedis.version>
+		<jjwt.version>0.9.1</jjwt.version>
 	</properties>
 
 	<dependencies>
@@ -73,6 +74,11 @@
 			<artifactId>jedis</artifactId>
 			<version>${jedis.version}</version>
 			<type>jar</type>
+		</dependency>
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt</artifactId>
+			<version>${jjwt.version}</version>
 		</dependency>
 	</dependencies>
 

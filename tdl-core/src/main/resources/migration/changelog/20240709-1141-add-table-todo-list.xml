@@ -17,6 +17,7 @@
       </column>
       <column name="is_activated" type="boolean"/>
       <column name="is_locked_permanent" type="boolean"/>
+      <column name="is_first_login" type="boolean"/>
       <column name="created_at" type="datetime"/>
       <column name="last_updated_at" type="datetime"/>
     </createTable>

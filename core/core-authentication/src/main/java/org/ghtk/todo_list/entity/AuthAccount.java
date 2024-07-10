@@ -17,5 +17,6 @@ public class AuthAccount extends BaseEntity {
   private String password;
   private Boolean isActivated = false;
   private Boolean isLockedPermanent= false;
+  private Boolean isFirstLogin = true;
 
 }
