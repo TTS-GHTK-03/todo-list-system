@@ -9,10 +9,7 @@ import org.springframework.stereotype.Repository;
 public interface AuthAccountRepository extends JpaRepository<AuthAccount, String> {
 
   Optional<AuthAccount> findFirstByUserId(String userId);
-<<<<<<< HEAD
 
-=======
   boolean existsByUsername(String username);
->>>>>>> feat: add logic api register
 }
 
