@@ -18,12 +18,9 @@ public class AuthAccount extends BaseEntity {
   private Boolean isActivated = false;
   private Boolean isLockedPermanent= false;
   private Boolean isFirstLogin = true;
-<<<<<<< HEAD
-=======
 
   public static AuthAccount of(String username, String password) {
     return AuthAccount.of(username, password, false, false, true);
   }
->>>>>>> feat: add logic api register
 
 }

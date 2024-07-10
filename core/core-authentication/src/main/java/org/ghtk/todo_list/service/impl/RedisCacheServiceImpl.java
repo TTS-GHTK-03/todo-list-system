@@ -4,7 +4,9 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import org.ghtk.todo_list.service.RedisCacheService;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.stereotype.Service;
 
+@Service
 public class RedisCacheServiceImpl implements RedisCacheService {
 
   private final RedisTemplate<String, Object> redisTemplate;
