@@ -10,7 +10,6 @@ import org.springframework.context.annotation.Import;
 @Import({
     CoreAuthenticationConfiguration.class,
     WebSecurityConfiguration.class,
-    JpaAuthTransactionConfiguration.class,
     AuthUserController.class,
     RedisConfiguration.class
 })

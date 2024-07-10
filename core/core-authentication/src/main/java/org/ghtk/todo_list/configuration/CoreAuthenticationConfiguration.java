@@ -1,6 +1,5 @@
 package org.ghtk.todo_list.configuration;
 
-import java.util.concurrent.TimeUnit;
 import org.ghtk.todo_list.core_email.configuration.EnableCoreEmail;
 import org.ghtk.todo_list.core_email.helper.EmailHelper;
 import org.ghtk.todo_list.facade.AuthFacadeService;
@@ -15,22 +14,13 @@ import org.ghtk.todo_list.service.RedisCacheService;
 import org.ghtk.todo_list.service.impl.AuthAccountServiceImpl;
 import org.ghtk.todo_list.service.impl.AuthTokenServiceImpl;
 import org.ghtk.todo_list.service.impl.AuthUserServiceImpl;
-import org.ghtk.todo_list.service.impl.OtpServiceImpl;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
-import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
-//@EnableJpaRepositories(
-//    basePackages = {"org.ghtk.todo_list.repository"},
-//    transactionManagerRef = "jpaAuthTransactionManager"
-//)
 @EntityScan(basePackages = {"org.ghtk.todo_list.entity"})
 @EnableCoreEmail
 public class CoreAuthenticationConfiguration {
