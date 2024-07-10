@@ -11,7 +11,8 @@ import org.springframework.context.annotation.Import;
     CoreAuthenticationConfiguration.class,
     WebSecurityConfiguration.class,
     JpaAuthTransactionConfiguration.class,
-    AuthUserController.class
+    AuthUserController.class,
+    RedisConfiguration.class
 })
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)

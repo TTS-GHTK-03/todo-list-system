@@ -4,10 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.ghtk.todo_list.error_handle.AuthenticationErrorHandle;
 import org.ghtk.todo_list.filter.TokenAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -15,14 +13,10 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-@ComponentScan(basePackages = {
-    "org.ghtk.todo_list.filter",
-    "org.ghtk.todo_list.error_handle"
-})
+
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
-@EnableGlobalMethodSecurity(jsr250Enabled = true, securedEnabled = true, prePostEnabled = true)
 public class WebSecurityConfiguration {
 
   private final TokenAuthenticationFilter tokenAuthenticationFilter;
