@@ -1,0 +1,242 @@
+<databaseChangeLog
+  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+   https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+  <changeSet id="20240709-1146-account-table" author="Gia Linh">
+    <createTable tableName="account">
+      <column name="id" type="varchar(255)">
+        <constraints primaryKey="true"/>
+      </column>
+      <column name="username" type="varchar(255)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="password" type="varchar(255)">
+        <constraints nullable="false"/>
+      </column>
+      <column name="is_activated" type="boolean"/>
+      <column name="is_locked_permanent" type="boolean"/>
+      <column name="created_at" type="datetime"/>
+      <column name="last_updated_at" type="datetime"/>
+    </createTable>
+  </changeSet>
+
+  <changeSet id="20240709-1146-user-table" author="Gia Linh">
+    <createTable tableName="user">
+      <column name="id" type="varchar(255)">
+        <constraints primaryKey="true"/>
+      </column>
+      <column name="first_name" type="varchar(255)"/>
+      <column name="middle_name" type="varchar(255)"/>
+      <column name="last_name" type="varchar(255)"/>
+      <column name="email" type="varchar(255)"/>
+      <column name="phone" type="varchar(255)"/>
+      <column name="date_of_birth" type="date"/>
+      <column name="gender" type="varchar(255)"/>
+      <column name="address" type="varchar(255)"/>
+      <column name="account_id" type="varchar(255)"/>
+      <column name="created_at" type="datetime"/>
+      <column name="last_updated_at" type="datetime"/>
+    </createTable>
+    <addForeignKeyConstraint baseTableName="user" baseColumnNames="account_id"
+      constraintName="FK_user_account"
+      referencedTableName="account" referencedColumnNames="id"/>
+  </changeSet>
+
+  <changeSet id="20240709-1153-project-table" author="Gia Linh">
+    <createTable tableName="project">
+      <column name="id" type="varchar(255)">
+        <constraints primaryKey="true"/>
+      </column>
+      <column name="title" type="varchar(255)"/>
+      <column name="created_at" type="datetime"/>
+      <column name="last_updated_at" type="datetime"/>
+    </createTable>
+  </changeSet>
+
+  <changeSet id="20240709-1153-project-user-table" author="Gia Linh">
+    <createTable tableName="project_user">
+      <column name="id" type="varchar(255)">
+        <constraints primaryKey="true"/>
+      </column>
+      <column name="user_id" type="varchar(255)"/>
+      <column name="project_id" type="varchar(255)"/>
+      <column name="role" type="varchar(255)"/>
+      <column name="created_at" type="datetime"/>
+      <column name="last_updated_at" type="datetime"/>
+    </createTable>
+    <addForeignKeyConstraint baseTableName="project_user" baseColumnNames="user_id"
+      constraintName="FK_project_user"
+      referencedTableName="user" referencedColumnNames="id"/>
+    <addForeignKeyConstraint baseTableName="project_user" baseColumnNames="project_id"
+      constraintName="FK_project_user_project"
+      referencedTableName="project" referencedColumnNames="id"/>
+  </changeSet>
+
+  <changeSet id="20240709-1337-board-table" author="Gia Linh">
+    <createTable tableName="board">
+      <column name="id" type="varchar(255)">
+        <constraints primaryKey="true"/>
+      </column>
+      <column name="project_id" type="varchar(255)"/>
+      <column name="created_at" type="datetime"/>
+      <column name="last_updated_at" type="datetime"/>
+    </createTable>
+    <addForeignKeyConstraint baseTableName="board" baseColumnNames="project_id"
+      constraintName="FK_board_project"
+      referencedTableName="project" referencedColumnNames="id"/>
+  </changeSet>
+
+  <changeSet id="20240709-1345-column-table" author="Gia Linh">
+    <createTable tableName="column">
+      <column name="id" type="varchar(255)">
+        <constraints primaryKey="true"/>
+      </column>
+      <column name="name" type="varchar(255)"/>
+      <column name="board_id" type="varchar(255)"/>
+      <column name="created_at" type="datetime"/>
+      <column name="last_updated_at" type="datetime"/>
+    </createTable>
+    <addForeignKeyConstraint baseTableName="column" baseColumnNames="board_id"
+      constraintName="FK_column_board"
+      referencedTableName="board" referencedColumnNames="id"/>
+  </changeSet>
+
+  <changeSet id="20240709-1349-sprint-table" author="Gia Linh">
+    <createTable tableName="sprint">
+      <column name="id" type="varchar(255)">
+        <constraints primaryKey="true"/>
+      </column>
+      <column name="title" type="varchar(255)"/>
+      <column name="status" type="boolean"/>
+      <column name="start_date" type="date"/>
+      <column name="end_date" type="date"/>
+      <column name="created_at" type="datetime"/>
+      <column name="last_updated_at" type="datetime"/>
+    </createTable>
+  </changeSet>
+
+  <changeSet id="20240709-1341-task-table" author="Gia Linh">
+    <createTable tableName="task">
+      <column name="id" type="varchar(255)">
+        <constraints primaryKey="true"/>
+      </column>
+      <column name="title" type="varchar(255)"/>
+      <column name="description" type="varchar(255)"/>
+      <column name="label" type="varchar(255)"/>
+      <column name="point" type="integer"/>
+      <column name="checklist" type="varchar(255)"/>
+      <column name="status" type="varchar(255)"/>
+      <column name="due_date" type="date"/>
+      <column name="sprint_id" type="varchar(255)"/>
+      <column name="user_id" type="varchar(255)"/>
+      <column name="column_id" type="varchar(255)"/>
+      <column name="project_id" type="varchar(255)"/>
+      <column name="created_at" type="datetime"/>
+      <column name="last_updated_at" type="datetime"/>
+    </createTable>
+    <addForeignKeyConstraint baseTableName="task" baseColumnNames="sprint_id"
+      constraintName="FK_task_sprint"
+      referencedTableName="sprint" referencedColumnNames="id"/>
+    <addForeignKeyConstraint baseTableName="task" baseColumnNames="user_id"
+      constraintName="FK_task_user"
+      referencedTableName="user" referencedColumnNames="id"/>
+    <addForeignKeyConstraint baseTableName="task" baseColumnNames="column_id"
+      constraintName="FK_task_column"
+      referencedTableName="column" referencedColumnNames="id"/>
+    <addForeignKeyConstraint baseTableName="task" baseColumnNames="project_id"
+      constraintName="FK_task_project"
+      referencedTableName="project" referencedColumnNames="id"/>
+  </changeSet>
+
+  <changeSet id="20240709-1349-task-assignees-table" author="Gia Linh">
+    <createTable tableName="task_assignees">
+      <column name="id" type="varchar(255)">
+        <constraints primaryKey="true"/>
+      </column>
+      <column name="task_id" type="varchar(255)"/>
+      <column name="user_id" type="varchar(255)"/>
+      <column name="created_at" type="datetime"/>
+      <column name="last_updated_at" type="datetime"/>
+    </createTable>
+    <addForeignKeyConstraint baseTableName="task_assignees" baseColumnNames="task_id"
+      constraintName="FK_task_assignees_task"
+      referencedTableName="task" referencedColumnNames="id"/>
+    <addForeignKeyConstraint baseTableName="task_assignees" baseColumnNames="user_id"
+      constraintName="FK_task_assignees_user"
+      referencedTableName="user" referencedColumnNames="id"/>
+  </changeSet>
+
+  <changeSet id="20240709-1354-comment-table" author="Gia Linh">
+    <createTable tableName="comment">
+      <column name="id" type="varchar(255)">
+        <constraints primaryKey="true"/>
+      </column>
+      <column name="text" type="varchar(255)"/>
+      <column name="task_id" type="varchar(255)"/>
+      <column name="user_id" type="varchar(255)"/>
+      <column name="created_at" type="datetime"/>
+      <column name="last_updated_at" type="datetime"/>
+    </createTable>
+    <addForeignKeyConstraint baseTableName="comment" baseColumnNames="task_id"
+      constraintName="FK_comment_task"
+      referencedTableName="task" referencedColumnNames="id"/>
+    <addForeignKeyConstraint baseTableName="comment" baseColumnNames="user_id"
+      constraintName="FK_comment_user"
+      referencedTableName="user" referencedColumnNames="id"/>
+  </changeSet>
+
+  <changeSet id="20240709-1356-activity-log-table" author="Gia Linh">
+    <createTable tableName="activity_log">
+      <column name="id" type="varchar(255)">
+        <constraints primaryKey="true"/>
+      </column>
+      <column name="action" type="varchar(255)"/>
+      <column name="task_id" type="varchar(255)"/>
+      <column name="user_id" type="varchar(255)"/>
+      <column name="created_at" type="datetime"/>
+    </createTable>
+    <addForeignKeyConstraint baseTableName="activity_log" baseColumnNames="task_id"
+      constraintName="FK_activity_log_task"
+      referencedTableName="task" referencedColumnNames="id"/>
+    <addForeignKeyConstraint baseTableName="activity_log" baseColumnNames="user_id"
+      constraintName="FK_activity_log_user"
+      referencedTableName="user" referencedColumnNames="id"/>
+  </changeSet>
+
+  <changeSet id="20240709-1356-sprint-progress-table" author="Gia Linh">
+  <createTable tableName="sprint_progress">
+    <column name="id" type="varchar(255)">
+      <constraints primaryKey="true"/>
+    </column>
+    <column name="sprint_id" type="varchar(255)"/>
+    <column name="total_task" type="varchar(255)"/>
+    <column name="complete_task" type="varchar(255)"/>
+    <column name="created_at" type="datetime"/>
+    <column name="last_updated_at" type="datetime"/>
+  </createTable>
+  <addForeignKeyConstraint baseTableName="sprint_progress" baseColumnNames="sprint_id"
+    constraintName="FK_sprint_progress_sprint"
+    referencedTableName="sprint" referencedColumnNames="id"/>
+</changeSet>
+
+  <changeSet id="20240709-1356-notification-table" author="Gia Linh">
+    <createTable tableName="notification">
+      <column name="id" type="varchar(255)">
+        <constraints primaryKey="true"/>
+      </column>
+      <column name="text" type="varchar(255)"/>
+      <column name="task_id" type="varchar(255)"/>
+      <column name="user_id" type="varchar(255)"/>
+      <column name="created_at" type="datetime"/>
+    </createTable>
+    <addForeignKeyConstraint baseTableName="notification" baseColumnNames="task_id"
+      constraintName="FK_notification_task"
+      referencedTableName="task" referencedColumnNames="id"/>
+    <addForeignKeyConstraint baseTableName="notification" baseColumnNames="user_id"
+      constraintName="FK_notification_user"
+      referencedTableName="user" referencedColumnNames="id"/>
+  </changeSet>
+
+</databaseChangeLog>
