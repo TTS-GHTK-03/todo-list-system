@@ -10,5 +10,6 @@ public interface AuthAccountRepository extends JpaRepository<AuthAccount, String
 
   Optional<AuthAccount> findFirstByUserId(String userId);
 
+  boolean existsByUsername(String username);
 }
 

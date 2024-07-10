@@ -10,7 +10,7 @@ import java.util.Optional;
 @Repository
 public interface AuthUserRepository extends JpaRepository<AuthUser, String> {
 
-    @Query("SELECT user FROM AuthUser user WHERE user.email = :email")
-    Optional<AuthUser> findByEmail(String email);
+  boolean existsByEmail(String email);
+  boolean existsByAccountId(String accountId);
 
 }

@@ -22,4 +22,11 @@ public class AuthUser extends BaseEntity {
   private String address;
   private String accountId;
 
+  public static AuthUser from(String email, String accountId) {
+    var user = new AuthUser();
+    user.setEmail(email);
+    user.setAccountId(accountId);
+    return user;
+  }
+
 }

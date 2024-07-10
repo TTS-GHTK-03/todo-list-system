@@ -12,5 +12,6 @@ public class OTPResetPasswordRequest {
     @NotBlank(message = "email is required")
     @ValidateEmail
     private String email;
+    @NotBlank(message = "otp is required")
     private String otp;
 }
