@@ -9,6 +9,7 @@ application:
 
   i18n:
     resources:
+      - classpath:core-authentication/message
 
 
 spring:
