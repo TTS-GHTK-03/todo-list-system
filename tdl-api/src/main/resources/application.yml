@@ -20,8 +20,8 @@ spring:
     changelog: classpath:/database.migration/master-changelog.xml
   datasource:
     url: jdbc:mysql://localhost:3306/tdl
-    username: yalynk
-    password: Linh2002@
+    username:
+    password:
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   cache:
@@ -35,8 +35,8 @@ spring:
   mail:
     default-encoding: UTF-8
     host: smtp.gmail.com
-    username: nhoquenroi2002@gmail.com
-    password: ptmq maaj mrjn hujc
+    username:
+    password:
     port: 587
     properties:
       mail:
