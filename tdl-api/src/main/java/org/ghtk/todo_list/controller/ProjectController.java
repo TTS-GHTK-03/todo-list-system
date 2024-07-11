@@ -16,8 +16,6 @@ public class ProjectController {
 
     @Autowired
     private ProjectServiceImpl projectService;
-    private String userId;
-    //tí xóa dòng này
 
     @GetMapping()
     public BaseResponse getAllProject(){
