@@ -34,7 +34,8 @@ public class WebSecurityConfiguration {
     return http.cors(Customizer.withDefaults())
         .csrf(AbstractHttpConfigurer::disable)
         .authorizeHttpRequests(authorize -> authorize
-            .requestMatchers("/api/v1/auth/**").permitAll()
+                .requestMatchers("/api/v1/**").permitAll()
+                .requestMatchers("/api/v1/auth/**").permitAll()
             .anyRequest().authenticated()
         )
         .addFilterBefore(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)

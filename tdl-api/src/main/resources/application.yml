@@ -10,7 +10,7 @@ application:
   i18n:
     resources:
       - classpath:core-authentication/message
-
+      - classpath:tdl-core/message
 
 spring:
   application:
@@ -19,9 +19,9 @@ spring:
   liquibase:
     changelog: classpath:/database.migration/master-changelog.xml
   datasource:
-    url: jdbc:mysql://localhost:3366/tdl
-    username: root
-    password: 123456
+    url: jdbc:mysql://localhost:3306/tdl
+    username:
+    password:
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   cache:
