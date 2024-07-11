@@ -8,9 +8,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.core_email.helper.EmailHelper;
 import org.ghtk.todo_list.dto.request.ForgotPasswordRequest;
-import org.ghtk.todo_list.dto.request.OTPResetPasswordRequest;
+import org.ghtk.todo_list.dto.request.VerifyResetPasswordRequest;
 import org.ghtk.todo_list.dto.request.RegisterRequest;
-import org.ghtk.todo_list.dto.response.OTPResetPasswordResponse;
+import org.ghtk.todo_list.dto.response.VerifyResetPasswordResponse;
 import org.ghtk.todo_list.exception.EmailNotFoundException;
 import org.ghtk.todo_list.exception.InvalidOtpException;
 import org.ghtk.todo_list.exception.OtpNotFoundException;
@@ -70,10 +70,10 @@ public class AuthFacadeServiceImpl implements AuthFacadeService {
       throw new EmailNotFoundException();
     }
     var otp = otpService.generateOtp();
-    var redisKey = request.getEmail() + OTP_ACTIVE_ACCOUNT_KEY;
+    var redisKey = request.getEmail() + RESET_PASSWORD_KEY;
     redisCacheService.save(redisKey, otp, OTP_TTL_MINUTES, TimeUnit.MINUTES);
 
-    String subject = "Your OTP for account activation";
+    String subject = "Your OTP for rest password";
     var param = new HashMap<String, Object>();
     param.put("otp", otp);
     param.put("otp_life", String.valueOf(OTP_TTL_MINUTES));
@@ -82,24 +82,19 @@ public class AuthFacadeServiceImpl implements AuthFacadeService {
   }
 
   @Override
-  public OTPResetPasswordResponse resetPasswordOtpValidate(OTPResetPasswordRequest request) {
+  public VerifyResetPasswordResponse verifyResetPassword(VerifyResetPasswordRequest request) {
     log.info("(resetPasswordOtpValidate)request: {}", request);
     if (!authUserService.existsByEmail(request.getEmail())) {
       log.error("(resetPasswordOtpValidate)email: {}", request.getEmail());
       throw new EmailNotFoundException();
     }
 
-    var redisKey = request.getEmail() + OTP_ACTIVE_ACCOUNT_KEY;
+    var redisKey = request.getEmail() + RESET_PASSWORD_KEY;
     var cachedOtp = redisCacheService.get(redisKey);
 
-    if (cachedOtp.isEmpty()) {
+    if (cachedOtp.isEmpty() || !cachedOtp.get().equals(request.getOtp())) {
       log.error("(resetPasswordOtpValidate) OTP not found for email: {}", request.getEmail());
       throw new OtpNotFoundException();
-    }
-
-    if (!cachedOtp.get().equals(request.getOtp())) {
-      log.error("(resetPasswordOtpValidate) Invalid OTP for email: {}", request.getEmail());
-      throw new InvalidOtpException();
     }
 
     log.info("(resetPasswordOtpValidate) OTP validated successfully for email: {}", request.getEmail());
@@ -109,7 +104,7 @@ public class AuthFacadeServiceImpl implements AuthFacadeService {
     var resetPasswordKeyRedisKey = generateResetPasswordKey(request.getEmail());
     redisCacheService.save(RESET_PASSWORD_KEY, request.getEmail(), resetPasswordKeyRedisKey);
 
-    return OTPResetPasswordResponse.builder()
+    return VerifyResetPasswordResponse.builder()
             .resetPasswordKey(resetPasswordKeyRedisKey)
             .build();
   }

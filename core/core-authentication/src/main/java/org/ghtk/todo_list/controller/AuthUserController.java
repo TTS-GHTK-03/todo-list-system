@@ -5,11 +5,10 @@ import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.dto.request.ForgotPasswordRequest;
-import org.ghtk.todo_list.dto.request.OTPResetPasswordRequest;
+import org.ghtk.todo_list.dto.request.VerifyResetPasswordRequest;
 import org.ghtk.todo_list.dto.request.RegisterRequest;
 import org.ghtk.todo_list.dto.response.BaseResponse;
 import org.ghtk.todo_list.facade.AuthFacadeService;
-import org.ghtk.todo_list.service.AuthUserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -40,17 +39,17 @@ public class AuthUserController {
     log.info("(forgotPassword)request: {}", request);
     authFacadeService.forgotPassword(request);
     return BaseResponse.of(HttpStatus.OK.value(), LocalDateTime.now().toString(),
-            "Otp to activate has been sent to the email");
+            "An OTP for password reset has been sent to your email address. " +
+                    "Please check your inbox to proceed with resetting your password.");
   }
 
   @PostMapping("/reset-password/otp/validate")
   @ResponseStatus(HttpStatus.OK)
-  public BaseResponse resetPasswordOtpValidate(@RequestBody @Valid OTPResetPasswordRequest request) {
-    log.info("(reset-password-otp)request: {}", request);
+  public BaseResponse verifyResetPassword(@RequestBody @Valid VerifyResetPasswordRequest request) {
+    log.info("(verifyResetPassword)request: {}", request);
 
-    var resetPasswordOtpValidate = authFacadeService.resetPasswordOtpValidate(request);
     return BaseResponse.of(HttpStatus.OK.value(), LocalDateTime.now().toString(),
-            resetPasswordOtpValidate);
+            authFacadeService.verifyResetPassword(request));
   }
 
 }

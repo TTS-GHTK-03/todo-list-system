@@ -1,9 +1,9 @@
 package org.ghtk.todo_list.facade;
 
 import org.ghtk.todo_list.dto.request.ForgotPasswordRequest;
-import org.ghtk.todo_list.dto.request.OTPResetPasswordRequest;
+import org.ghtk.todo_list.dto.request.VerifyResetPasswordRequest;
 import org.ghtk.todo_list.dto.request.RegisterRequest;
-import org.ghtk.todo_list.dto.response.OTPResetPasswordResponse;
+import org.ghtk.todo_list.dto.response.VerifyResetPasswordResponse;
 
 public interface AuthFacadeService {
 
@@ -11,5 +11,5 @@ public interface AuthFacadeService {
 
   void forgotPassword (ForgotPasswordRequest request);
 
-  OTPResetPasswordResponse resetPasswordOtpValidate(OTPResetPasswordRequest request);
+  VerifyResetPasswordResponse verifyResetPassword(VerifyResetPasswordRequest request);
 }
