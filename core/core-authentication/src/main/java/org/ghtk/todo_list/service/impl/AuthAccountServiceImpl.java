@@ -1,5 +1,6 @@
 package org.ghtk.todo_list.service.impl;
 
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.entity.AuthAccount;
@@ -34,5 +35,17 @@ public class AuthAccountServiceImpl implements AuthAccountService {
     }
 
     return repository.save(AuthAccount.of(username, password));
+  }
+
+  @Override
+  public Optional<AuthAccount> findByEmail(String email) {
+    log.info("(findByEmail)email: {}", email);
+    return repository.findByEmail(email);
+  }
+
+  @Override
+  public AuthAccount save(AuthAccount authAccount) {
+    log.info("(save)authAccount: {}", authAccount);
+    return repository.save(authAccount);
   }
 }
