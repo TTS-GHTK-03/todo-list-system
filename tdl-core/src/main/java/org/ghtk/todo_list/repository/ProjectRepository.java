@@ -16,7 +16,7 @@ public interface ProjectRepository extends JpaRepository<Project, String> {
             INNER JOIN ProjectUser pu 
             ON p.id = pu.projectId 
             WHERE pu.userId = :userId""")
-    List<Project> getAllProjectByUser(@Param("userId") String userId);
+    List<Project> getAllProject(@Param("userId") String userId);
 
     @Query("""
             SELECT p FROM Project p
@@ -24,5 +24,5 @@ public interface ProjectRepository extends JpaRepository<Project, String> {
             ON p.id = pu.projectId 
             WHERE pu.userId = :userId AND p.id = :projectId
             """)
-    Project getProjectByUser(@Param("userId") String userId, @Param("projectId") String projectId);
+    Project getProject(@Param("userId") String userId, @Param("projectId") String projectId);
 }

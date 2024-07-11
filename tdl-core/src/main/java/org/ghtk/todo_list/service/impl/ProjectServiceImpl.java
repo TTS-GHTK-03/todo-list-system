@@ -1,5 +1,6 @@
 package org.ghtk.todo_list.service.impl;
 
+import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.entity.Project;
 import org.ghtk.todo_list.exception.ProjectNotFoundException;
 import org.ghtk.todo_list.repository.ProjectRepository;
@@ -11,24 +12,24 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Slf4j
 @Service
 public class ProjectServiceImpl implements ProjectService {
-    private static final Logger log = LoggerFactory.getLogger(ProjectServiceImpl.class);
     @Autowired
     private ProjectRepository projectRepository;
 
     @Override
-    public List<Project> getAllProjectByUser(String userId) {
+    public List<Project> getAllProject(String userId) {
         log.info("(getAllProjectByUser)userId: {}", userId);
         //check user exist
 
         //
-        List<Project> projectList = projectRepository.getAllProjectByUser(userId);
+        List<Project> projectList = projectRepository.getAllProject(userId);
         return projectList;
     }
 
     @Override
-    public Project getProjectByUser(String userId, String projectId) {
+    public Project getProject(String userId, String projectId) {
         log.info("(getProjectByUser)user: {}", userId);
         //check user exist
 
@@ -39,7 +40,7 @@ public class ProjectServiceImpl implements ProjectService {
             throw new ProjectNotFoundException();
         }
 
-        Project project = projectRepository.getProjectByUser(userId, projectId);
+        Project project = projectRepository.getProject(userId, projectId);
         return project;
     }
 }
