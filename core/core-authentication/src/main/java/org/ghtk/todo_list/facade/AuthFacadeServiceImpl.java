@@ -1,8 +1,6 @@
 package org.ghtk.todo_list.facade;
 
-import static org.ghtk.todo_list.constant.CacheConstant.OTP_ACTIVE_ACCOUNT_KEY;
-import static org.ghtk.todo_list.constant.CacheConstant.OTP_TTL_MINUTES;
-
+import java.util.Base64;
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
@@ -14,12 +12,16 @@ import org.ghtk.todo_list.dto.request.OTPResetPasswordRequest;
 import org.ghtk.todo_list.dto.request.RegisterRequest;
 import org.ghtk.todo_list.dto.response.OTPResetPasswordResponse;
 import org.ghtk.todo_list.exception.EmailNotFoundException;
+import org.ghtk.todo_list.exception.InvalidOtpException;
+import org.ghtk.todo_list.exception.OtpNotFoundException;
 import org.ghtk.todo_list.exception.PasswordConfirmNotMatchException;
 import org.ghtk.todo_list.service.AuthAccountService;
 import org.ghtk.todo_list.service.AuthUserService;
 import org.ghtk.todo_list.service.OtpService;
 import org.ghtk.todo_list.service.RedisCacheService;
 import org.ghtk.todo_list.util.CryptUtil;
+
+import static org.ghtk.todo_list.constant.CacheConstant.*;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -81,7 +83,39 @@ public class AuthFacadeServiceImpl implements AuthFacadeService {
 
   @Override
   public OTPResetPasswordResponse resetPasswordOtpValidate(OTPResetPasswordRequest request) {
-    return null;
+    log.info("(resetPasswordOtpValidate)request: {}", request);
+    if (!authUserService.existsByEmail(request.getEmail())) {
+      log.error("(resetPasswordOtpValidate)email: {}", request.getEmail());
+      throw new EmailNotFoundException();
+    }
+
+    var redisKey = request.getEmail() + OTP_ACTIVE_ACCOUNT_KEY;
+    var cachedOtp = redisCacheService.get(redisKey);
+
+    if (cachedOtp.isEmpty()) {
+      log.error("(resetPasswordOtpValidate) OTP not found for email: {}", request.getEmail());
+      throw new OtpNotFoundException();
+    }
+
+    if (!cachedOtp.get().equals(request.getOtp())) {
+      log.error("(resetPasswordOtpValidate) Invalid OTP for email: {}", request.getEmail());
+      throw new InvalidOtpException();
+    }
+
+    log.info("(resetPasswordOtpValidate) OTP validated successfully for email: {}", request.getEmail());
+    redisCacheService.delete(redisKey);
+
+
+    var resetPasswordKeyRedisKey = generateResetPasswordKey(request.getEmail());
+    redisCacheService.save(RESET_PASSWORD_KEY, request.getEmail(), resetPasswordKeyRedisKey);
+
+    return OTPResetPasswordResponse.builder()
+            .resetPasswordKey(resetPasswordKeyRedisKey)
+            .build();
+  }
+
+  private String generateResetPasswordKey(String email) {
+    return Base64.getEncoder().encodeToString((email + System.currentTimeMillis()).getBytes());
   }
 
 }

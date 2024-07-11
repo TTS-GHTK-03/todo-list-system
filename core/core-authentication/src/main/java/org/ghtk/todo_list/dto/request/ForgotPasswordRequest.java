@@ -1,12 +1,13 @@
 package org.ghtk.todo_list.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
-import lombok.Builder;
-import lombok.Getter;
+import lombok.*;
 import org.ghtk.todo_list.validation.ValidateEmail;
 
 @Getter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ForgotPasswordRequest {
 
     @NotBlank(message = "email is required")

@@ -37,18 +37,20 @@ public class AuthUserController {
   @PostMapping("/forgot")
   @ResponseStatus(HttpStatus.OK)
   public BaseResponse forgotPassword(@RequestBody @Valid ForgotPasswordRequest request) {
-    log.info("(register)request: {}", request);
+    log.info("(forgotPassword)request: {}", request);
     authFacadeService.forgotPassword(request);
-    return BaseResponse.of(HttpStatus.CREATED.value(), LocalDateTime.now().toString(),
+    return BaseResponse.of(HttpStatus.OK.value(), LocalDateTime.now().toString(),
             "Otp to activate has been sent to the email");
   }
 
   @PostMapping("/reset-password/otp/validate")
   @ResponseStatus(HttpStatus.OK)
   public BaseResponse resetPasswordOtpValidate(@RequestBody @Valid OTPResetPasswordRequest request) {
-    log.info("(register)request: {}", request);
+    log.info("(reset-password-otp)request: {}", request);
 
-    return BaseResponse.of(HttpStatus.CREATED.value(), LocalDateTime.now().toString(),
-            "Otp to activate has been sent to the email");
+    var resetPasswordOtpValidate = authFacadeService.resetPasswordOtpValidate(request);
+    return BaseResponse.of(HttpStatus.OK.value(), LocalDateTime.now().toString(),
+            resetPasswordOtpValidate);
   }
+
 }
