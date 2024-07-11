@@ -2,6 +2,7 @@ package org.ghtk.todo_list.entity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
+import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
 import lombok.Data;
@@ -16,6 +17,8 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @EntityListeners(AuditingEntityListener.class)
 public class Task extends BaseEntity {
 
+  @Id
+  private String id;
   private String title;
   private String description;
   private String label;

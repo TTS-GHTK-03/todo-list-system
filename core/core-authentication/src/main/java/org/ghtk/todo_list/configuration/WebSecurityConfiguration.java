@@ -15,6 +15,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+
 @ComponentScan(basePackages = {
     "org.ghtk.todo_list.filter",
     "org.ghtk.todo_list.error_handle"
@@ -33,6 +34,7 @@ public class WebSecurityConfiguration {
     return http.cors(Customizer.withDefaults())
         .csrf(AbstractHttpConfigurer::disable)
         .authorizeHttpRequests(authorize -> authorize
+                .requestMatchers("/api/v1/projects/**").permitAll()
             .requestMatchers("/api/v1/auth/**").permitAll()
             .anyRequest().authenticated()
         )

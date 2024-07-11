@@ -25,6 +25,16 @@
       <artifactId>spring-boot-starter-validation</artifactId>
       <groupId>org.springframework.boot</groupId>
     </dependency>
+    <dependency>
+      <groupId>org.ghtk.todo_list</groupId>
+      <artifactId>tdl-core</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.ghtk.todo_list</groupId>
+      <artifactId>core-authentication</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
+    </dependency>
   </dependencies>
 
   <build>
