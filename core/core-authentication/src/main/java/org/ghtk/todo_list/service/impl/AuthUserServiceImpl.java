@@ -40,4 +40,10 @@ public class AuthUserServiceImpl implements AuthUserService {
 
     return repository.save(AuthUser.from(email, accountId));
   }
+
+  @Override
+  public boolean existsByEmail(String email) {
+    log.info("(existsByEmail)email: {}", email);
+    return repository.existsByEmail(email);
+  }
 }
