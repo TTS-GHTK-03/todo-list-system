@@ -16,22 +16,22 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 
+@Component
 @Slf4j
 @RequiredArgsConstructor
-@Component
 @Getter
 public class AuthTokenServiceImpl implements AuthTokenService {
 
   @Value("${application.authentication.access_token.jwt_secret:asfasfasfafasfafasf}")
   private String accessTokenSecretKey;
 
-  @Value("${application.authentication.access_token.life_time:4353463}")
+  @Value("${application.authentication.access_token.life_time:435346}")
   private Long accessTokenLifeTime;
 
   @Value("${application.authentication.refresh_token.jwt_secret:twetdhgfjfgjfgjfjt}")
   private String refreshTokenSecretKey;
 
-  @Value("${application.authentication.refresh_token.life_time:5684574}")
+  @Value("${application.authentication.refresh_token.life_time:568457}")
   private Long refreshTokenLifeTime;
 
   @Override
