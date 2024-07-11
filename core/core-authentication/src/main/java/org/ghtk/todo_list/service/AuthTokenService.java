@@ -2,28 +2,17 @@ package org.ghtk.todo_list.service;
 
 public interface AuthTokenService {
 
+  /* ACCESS TOKEN */
+  String generateAccessToken(String userId, String email, String username);
   String getSubjectFromAccessToken(String accessToken);
+  boolean validateAccessToken(String accessToken, String userId);
 
+  /* REFRESH TOKEN */
+  String generateRefreshToken(String userId, String email, String username);
   String getSubjectFromRefreshToken(String refreshToken);
-
-  boolean isExpiredAccessToken(String token);
-
-  boolean isExpiredRefreshToken(String token);
-
-  String generateAccessToken(String username, String email);
-
-  String generateRefreshToken(String username, String email);
-
-  String getAccessTokenSecretKey();
-
-  String getRefreshTokenSecretKey();
-
+  boolean validateRefreshToken(String refreshToken, String userId);
   long getAccessTokenLifeTime();
-
   long getRefreshTokenLifeTime();
 
-  String convertWildcardRequestUri(String uri);
-
-  boolean validateAccessToken(String accessToken, String userId);
 
 }

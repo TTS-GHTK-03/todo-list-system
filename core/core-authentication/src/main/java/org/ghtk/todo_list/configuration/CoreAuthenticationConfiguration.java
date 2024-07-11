@@ -12,7 +12,9 @@ import org.ghtk.todo_list.service.AuthUserService;
 import org.ghtk.todo_list.service.OtpService;
 import org.ghtk.todo_list.service.RedisCacheService;
 import org.ghtk.todo_list.service.impl.AuthAccountServiceImpl;
+import org.ghtk.todo_list.service.impl.AuthTokenServiceImpl;
 import org.ghtk.todo_list.service.impl.AuthUserServiceImpl;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,6 +23,18 @@ import org.springframework.context.annotation.Configuration;
 @EntityScan(basePackages = {"org.ghtk.todo_list.entity"})
 @EnableCoreEmail
 public class CoreAuthenticationConfiguration {
+
+//  @Value("${application.authentication.access_token.jwt_secret:asfasfasfafasfafasf}")
+//  private String accessTokenJwtSecret;
+//
+//  @Value("${application.authentication.access_token.life_time:435346}")
+//  private Long accessTokenLifeTime;
+//
+//  @Value("${application.authentication.refresh_token.jwt_secret:twetdhgfjfgjfgjfjt}")
+//  private String refreshTokenJwtSecret;
+//
+//  @Value("${application.authentication.refresh_token.life_time:568457}")
+//  private Long refreshTokenLifeTime;
 
   @Bean
   public AuthAccountService authAccountService(AuthAccountRepository repository) {
@@ -45,4 +59,14 @@ public class CoreAuthenticationConfiguration {
   public AuthUserService authUserService(AuthUserRepository repository) {
     return new AuthUserServiceImpl(repository);
   }
+
+//  @Bean
+//  public AuthTokenService authTokenService() {
+//    return new AuthTokenServiceImpl(
+//        accessTokenJwtSecret,
+//        accessTokenLifeTime,
+//        refreshTokenJwtSecret,
+//        refreshTokenLifeTime
+//    );
+//  }
 }

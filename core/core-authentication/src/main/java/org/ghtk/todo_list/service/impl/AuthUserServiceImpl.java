@@ -51,6 +51,6 @@ public class AuthUserServiceImpl implements AuthUserService {
   @Override
   public Optional<AuthUser> findByAccountId(String accountId) {
     log.info("(findByAccountId)accountId: {}", accountId);
-    return Optional.empty();
+    return repository.findByAccountId(accountId);
   }
 }

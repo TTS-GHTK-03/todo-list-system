@@ -188,9 +188,9 @@ public class AuthFacadeServiceImpl implements AuthFacadeService {
     redisCacheService.delete(LOGIN_FAILED_ATTEMPT_KEY, user.getEmail());
 
     ActiveLoginResponse loginResponse = new ActiveLoginResponse();
-    loginResponse.setAccessToken(authTokenService.generateAccessToken(account.getUsername(),
+    loginResponse.setAccessToken(authTokenService.generateAccessToken(user.getId(), account.getUsername(),
         user.getEmail()));
-    loginResponse.setRefreshToken(authTokenService.generateRefreshToken(account.getUsername(),
+    loginResponse.setRefreshToken(authTokenService.generateRefreshToken(user.getId(), account.getUsername(),
         user.getEmail()));
     loginResponse.setAccessTokenLifeTime(authTokenService.getAccessTokenLifeTime());
     loginResponse.setRefreshTokenLifeTime(authTokenService.getRefreshTokenLifeTime());
