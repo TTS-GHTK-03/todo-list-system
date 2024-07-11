@@ -70,7 +70,7 @@ public class AuthFacadeServiceImpl implements AuthFacadeService {
       throw new EmailNotFoundException();
     }
     var otp = otpService.generateOtp();
-    var redisKey = request.getEmail() + RESET_PASSWORD_KEY;
+    var redisKey = request.getEmail() + RESET_PASSWORD_OTP_KEY;
     redisCacheService.save(redisKey, otp, OTP_TTL_MINUTES, TimeUnit.MINUTES);
 
     String subject = "Your OTP for rest password";
@@ -89,7 +89,7 @@ public class AuthFacadeServiceImpl implements AuthFacadeService {
       throw new EmailNotFoundException();
     }
 
-    var redisKey = request.getEmail() + RESET_PASSWORD_KEY;
+    var redisKey = request.getEmail() + RESET_PASSWORD_OTP_KEY;
     var cachedOtp = redisCacheService.get(redisKey);
 
     if (cachedOtp.isEmpty() || !cachedOtp.get().equals(request.getOtp())) {
