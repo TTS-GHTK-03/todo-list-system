@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.ghtk.todo_list.dto.request.ActiveAccountRequest;
 import org.ghtk.todo_list.dto.request.ForgotPasswordRequest;
 import org.ghtk.todo_list.dto.request.VerifyResetPasswordRequest;
 import org.ghtk.todo_list.dto.request.RegisterRequest;
@@ -31,6 +32,15 @@ public class AuthUserController {
     authFacadeService.register(request);
     return BaseResponse.of(HttpStatus.CREATED.value(), LocalDateTime.now().toString(),
         "Register success and otp to activate has been sent to the email");
+  }
+
+  @PostMapping("/active")
+  @ResponseStatus(HttpStatus.OK)
+  public BaseResponse activeAccount(@RequestBody @Valid ActiveAccountRequest request) {
+    log.info("(activeAccount)email: {}, otp: {}", request.getEmail(), request.getOtp());
+    authFacadeService.activeAccount(request);
+    return BaseResponse.of(HttpStatus.OK.value(), LocalDateTime.now().toString(),
+        "Active account successfully!!");
   }
 
   @PostMapping("/forgot")

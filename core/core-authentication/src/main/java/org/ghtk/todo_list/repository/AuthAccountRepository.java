@@ -17,5 +17,12 @@ public interface AuthAccountRepository extends JpaRepository<AuthAccount, String
   Optional<AuthAccount> findFirstByUserId(String userId);
 
   boolean existsByUsername(String username);
+
+  @Query("""
+    select a from AuthAccount a
+    join AuthUser au on au.accountId = a.id
+    where au.email = :email
+  """)
+  Optional<AuthAccount> findByEmail(String email);
 }
 
