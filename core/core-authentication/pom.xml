@@ -10,7 +10,6 @@
   </parent>
 
   <artifactId>core-authentication</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
 
   <dependencies>
     <dependency>
@@ -51,6 +50,21 @@
       <groupId>redis.clients</groupId>
       <artifactId>jedis</artifactId>
       <type>jar</type>
+    </dependency>
+    <dependency>
+      <groupId>io.jsonwebtoken</groupId>
+      <artifactId>jjwt</artifactId>
+      <version>0.9.1</version>
+    </dependency>
+    <dependency>
+      <groupId>org.ghtk.todo_list</groupId>
+      <artifactId>core-email</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
+    </dependency>
+    <dependency>
+      <groupId>org.ghtk.todo_list</groupId>
+      <artifactId>core-exception</artifactId>
+      <version>0.0.1-SNAPSHOT</version>
     </dependency>
   </dependencies>
 
