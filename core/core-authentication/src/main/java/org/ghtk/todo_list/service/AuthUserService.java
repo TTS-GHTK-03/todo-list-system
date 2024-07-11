@@ -6,6 +6,5 @@ public interface AuthUserService {
 
   AuthUser findById(String id);
   AuthUser create(String email, String accountId);
-
   boolean existsByEmail(String email);
 }

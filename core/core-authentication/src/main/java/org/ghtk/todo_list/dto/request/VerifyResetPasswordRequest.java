@@ -11,7 +11,7 @@ import org.ghtk.todo_list.validation.ValidateEmail;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class OTPResetPasswordRequest {
+public class VerifyResetPasswordRequest {
 
     @NotBlank(message = "email is required")
     @ValidateEmail
