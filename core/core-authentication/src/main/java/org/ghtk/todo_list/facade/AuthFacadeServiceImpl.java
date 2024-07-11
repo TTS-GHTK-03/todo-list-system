@@ -9,7 +9,12 @@ import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.core_email.helper.EmailHelper;
+import org.ghtk.todo_list.dto.request.ActiveAccountRequest;
 import org.ghtk.todo_list.dto.request.RegisterRequest;
+import org.ghtk.todo_list.entity.AuthAccount;
+import org.ghtk.todo_list.exception.EmailNotFoundException;
+import org.ghtk.todo_list.exception.OTPInvalidException;
+import org.ghtk.todo_list.exception.OTPNotFoundException;
 import org.ghtk.todo_list.exception.PasswordConfirmNotMatchException;
 import org.ghtk.todo_list.service.AuthAccountService;
 import org.ghtk.todo_list.service.AuthUserService;
@@ -54,5 +59,31 @@ public class AuthFacadeServiceImpl implements AuthFacadeService {
     param.put("otp_life", String.valueOf(OTP_TTL_MINUTES));
     emailHelper.send(subject, request.getEmail(), "OTP-template", param);
 
+  }
+
+  @Override
+  public void activeAccount(ActiveAccountRequest request) {
+    log.info("(activeAccount)email: {} otp: {}", request.getEmail(), request.getOtp());
+    var account = authAccountService
+        .findByEmail(request.getEmail())
+        .orElseThrow(() -> {
+          log.error("(activeAccount)email not found : {}", request.getEmail());
+          throw new EmailNotFoundException(request.getEmail());
+        });
+    var redisKey = request.getEmail() + OTP_ACTIVE_ACCOUNT_KEY;
+    var otpCacheOptional = redisCacheService.get(redisKey);
+    if (otpCacheOptional.isEmpty()) {
+      log.error("(invoke)otpCache is null for email: {}", request.getEmail());
+      throw new OTPNotFoundException(request.getEmail());
+    }
+    var otpCache = String.valueOf(otpCacheOptional.get());
+    if (!Objects.equals(otpCache, request.getOtp())) {
+      log.error("(invoke)otp : {}, otpCache : {}", request.getOtp(), otpCache);
+      throw new OTPInvalidException(request.getOtp());
+    }
+
+    account.setIsActivated(true);
+    authAccountService.save(account);
+    redisCacheService.delete(redisKey);
   }
 }
