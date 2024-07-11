@@ -4,10 +4,7 @@ import jakarta.validation.Valid;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.ghtk.todo_list.dto.request.ActiveAccountRequest;
-import org.ghtk.todo_list.dto.request.ForgotPasswordRequest;
-import org.ghtk.todo_list.dto.request.VerifyResetPasswordRequest;
-import org.ghtk.todo_list.dto.request.RegisterRequest;
+import org.ghtk.todo_list.dto.request.*;
 import org.ghtk.todo_list.dto.response.BaseResponse;
 import org.ghtk.todo_list.facade.AuthFacadeService;
 import org.springframework.http.HttpStatus;
@@ -60,6 +57,16 @@ public class AuthUserController {
 
     return BaseResponse.of(HttpStatus.OK.value(), LocalDateTime.now().toString(),
             authFacadeService.verifyResetPassword(request));
+  }
+
+  @PostMapping("/reset-password")
+  @ResponseStatus(HttpStatus.OK)
+  public BaseResponse resetPassword(@RequestBody @Valid ResetPasswordRequest request) {
+    log.info("(resetPassword)request: {}", request);
+    authFacadeService.resetPassword(request);
+
+    return BaseResponse.of(HttpStatus.OK.value(), LocalDateTime.now().toString(),
+            "Reset Password successfully!!");
   }
 
 }
