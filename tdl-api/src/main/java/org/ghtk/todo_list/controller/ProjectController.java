@@ -20,14 +20,14 @@ public class ProjectController {
     private ProjectServiceImpl projectService;
 
     @GetMapping()
-    public BaseResponse getAllProjectByUser(){
+    public BaseResponse getAllProjectUser(){
         log.info("(getAllProjectByUser)");
         String userId = "5df2fe3e-c3d7-4236-8283-e62656a5fd24";
         return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(), projectService.getAllProjectByUser(userId));
     }
 
     @GetMapping("/{project_id}")
-    public BaseResponse getProjectByUser(@PathVariable(name = "project_id") String projectId){
+    public BaseResponse getProjectUser(@PathVariable(name = "project_id") String projectId){
         log.info("(getProjectByUser)projectId: {}", projectId);
         String userId = "5df2fe3e-c3d7-4236-8283-e62656a5fd24";
         return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(), projectService.getProjectByUser(userId, projectId));

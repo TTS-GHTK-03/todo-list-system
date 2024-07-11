@@ -33,12 +33,12 @@ public class ProjectServiceImpl implements ProjectService {
         //check user exist
 
         //
-        //check project exist
+
         if (!projectRepository.existsById(projectId)) {
             log.error("(getProjectByUser)user: {} not found ", projectId);
             throw new ProjectNotFoundException();
         }
-        //
+
         Project project = projectRepository.getProjectByUser(userId, projectId);
         return project;
     }
