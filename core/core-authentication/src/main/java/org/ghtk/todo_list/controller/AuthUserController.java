@@ -4,6 +4,9 @@ import jakarta.validation.Valid;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.ghtk.todo_list.dto.request.ActiveAccountRequest;
+import org.ghtk.todo_list.dto.request.ForgotPasswordRequest;
+import org.ghtk.todo_list.dto.request.VerifyResetPasswordRequest;
 import org.ghtk.todo_list.dto.request.RegisterRequest;
 import org.ghtk.todo_list.dto.response.BaseResponse;
 import org.ghtk.todo_list.facade.AuthFacadeService;
@@ -30,4 +33,33 @@ public class AuthUserController {
     return BaseResponse.of(HttpStatus.CREATED.value(), LocalDateTime.now().toString(),
         "Register success and otp to activate has been sent to the email");
   }
+
+  @PostMapping("/active")
+  @ResponseStatus(HttpStatus.OK)
+  public BaseResponse activeAccount(@RequestBody @Valid ActiveAccountRequest request) {
+    log.info("(activeAccount)email: {}, otp: {}", request.getEmail(), request.getOtp());
+    authFacadeService.activeAccount(request);
+    return BaseResponse.of(HttpStatus.OK.value(), LocalDateTime.now().toString(),
+        "Active account successfully!!");
+  }
+
+  @PostMapping("/forgot")
+  @ResponseStatus(HttpStatus.OK)
+  public BaseResponse forgotPassword(@RequestBody @Valid ForgotPasswordRequest request) {
+    log.info("(forgotPassword)request: {}", request);
+    authFacadeService.forgotPassword(request);
+    return BaseResponse.of(HttpStatus.OK.value(), LocalDateTime.now().toString(),
+            "An OTP for password reset has been sent to your email address. " +
+                    "Please check your inbox to proceed with resetting your password.");
+  }
+
+  @PostMapping("/reset-password/otp/validate")
+  @ResponseStatus(HttpStatus.OK)
+  public BaseResponse verifyResetPassword(@RequestBody @Valid VerifyResetPasswordRequest request) {
+    log.info("(verifyResetPassword)request: {}", request);
+
+    return BaseResponse.of(HttpStatus.OK.value(), LocalDateTime.now().toString(),
+            authFacadeService.verifyResetPassword(request));
+  }
+
 }
