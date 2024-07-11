@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.entity.AuthUser;
 import org.ghtk.todo_list.exception.AccountAlreadyHasUserException;
 import org.ghtk.todo_list.exception.EmailAlreadyExistedException;
-
+import org.ghtk.todo_list.exception.EmailNotFoundException;
 import org.ghtk.todo_list.exception.UserNotFoundException;
 import org.ghtk.todo_list.repository.AuthUserRepository;
 import org.ghtk.todo_list.service.AuthUserService;
