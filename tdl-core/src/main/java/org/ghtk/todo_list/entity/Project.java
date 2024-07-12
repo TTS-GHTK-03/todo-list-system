@@ -16,6 +16,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 public class Project extends BaseEntity {
 
   private String title;
-  private String key;
+  private String keyProject;
   private String role;
 }

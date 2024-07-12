@@ -10,7 +10,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.constant.AccountLockedTime;
 import org.ghtk.todo_list.core_email.helper.EmailHelper;
-import org.ghtk.todo_list.dto.request.ActiveAccountRequest;
+import org.ghtk.todo_list.dto.request.VerifyEmailRequest;
+import org.ghtk.todo_list.dto.request.VerifyRegisterRequest;
 import org.ghtk.todo_list.dto.request.ForgotPasswordRequest;
 import org.ghtk.todo_list.dto.request.LoginRequest;
 import org.ghtk.todo_list.dto.request.VerifyResetPasswordRequest;
@@ -18,6 +19,7 @@ import org.ghtk.todo_list.dto.request.RegisterRequest;
 import org.ghtk.todo_list.dto.response.ActiveLoginResponse;
 import org.ghtk.todo_list.dto.response.LoginResponse;
 import org.ghtk.todo_list.dto.response.UnactiveLoginResponse;
+import org.ghtk.todo_list.dto.response.VerifyRegisterResponse;
 import org.ghtk.todo_list.exception.AccountLockedException;
 import org.ghtk.todo_list.exception.EmailNotFoundException;
 import org.ghtk.todo_list.exception.OTPInvalidException;
@@ -28,6 +30,7 @@ import org.ghtk.todo_list.dto.response.VerifyResetPasswordResponse;
 import org.ghtk.todo_list.exception.OTPNotFoundException;
 import org.ghtk.todo_list.exception.PasswordConfirmNotMatchException;
 import org.ghtk.todo_list.exception.PasswordIncorrectException;
+import org.ghtk.todo_list.exception.RegisterKeyNotFoundException;
 import org.ghtk.todo_list.exception.UserNotFoundException;
 import org.ghtk.todo_list.exception.UsernameNotFoundException;
 import org.ghtk.todo_list.service.AuthAccountService;
@@ -61,48 +64,43 @@ public class AuthFacadeServiceImpl implements AuthFacadeService {
           request.getConfirmPassword());
       throw new PasswordConfirmNotMatchException();
     }
+    var registerKeyCache = redisCacheService.get(REGISTER_KEY, request.getEmail());
+    log.error("(registerKeyCache) registerKeyCache: {}", registerKeyCache);
+
+    if (registerKeyCache.isEmpty() || !registerKeyCache.get().equals(request.getRegisterKey())) {
+      log.error("(register) RegisterKey not found for email: {}", request.getEmail());
+      throw new RegisterKeyNotFoundException(request.getEmail());
+    }
     var authAccount = authAccountService.create(
         request.getUsername(),
         CryptUtil.getPasswordEncoder().encode(request.getPassword())
     );
-    var authUser = authUserService.create(request.getEmail(), authAccount.getId());
-
-    var otp = otpService.generateOtp();
-    var redisKey = request.getEmail() + OTP_ACTIVE_ACCOUNT_KEY;
-    redisCacheService.save(redisKey, otp, OTP_TTL_MINUTES, TimeUnit.MINUTES);
-
-    String subject = "Your OTP for account activation";
-    var param = new HashMap<String, Object>();
-    param.put("otp", otp);
-    param.put("otp_life", String.valueOf(OTP_TTL_MINUTES));
-    emailHelper.send(subject, request.getEmail(), "OTP-template", param);
-
+    authUserService.create(request.getEmail(), authAccount.getId());
+    redisCacheService.delete(REGISTER_KEY, request.getEmail());
   }
 
   @Override
-  public void activeAccount(ActiveAccountRequest request) {
-    log.info("(activeAccount)email: {} otp: {}", request.getEmail(), request.getOtp());
-    var account = authAccountService
-        .findByEmail(request.getEmail())
-        .orElseThrow(() -> {
-          log.error("(activeAccount)email not found : {}", request.getEmail());
-          throw new EmailNotFoundException(request.getEmail());
-        });
-    var redisKey = request.getEmail() + OTP_ACTIVE_ACCOUNT_KEY;
+  public VerifyRegisterResponse verifyRegister(VerifyRegisterRequest request) {
+    log.info("(verifyRegister)email: {} otp: {}", request.getEmail(), request.getOtp());
+    var redisKey = request.getEmail() + OTP_VERIFICATION_ACCOUNT_KEY;
     var otpCacheOptional = redisCacheService.get(redisKey);
     if (otpCacheOptional.isEmpty()) {
-      log.error("(invoke)otpCache is null for email: {}", request.getEmail());
+      log.error("(verifyRegister)otpCache is null for email: {}", request.getEmail());
       throw new OTPNotFoundException(request.getEmail());
     }
     var otpCache = String.valueOf(otpCacheOptional.get());
     if (!Objects.equals(otpCache, request.getOtp())) {
-      log.error("(invoke)otp : {}, otpCache : {}", request.getOtp(), otpCache);
+      log.error("(verifyRegister)otp : {}, otpCache : {}", request.getOtp(), otpCache);
       throw new OTPInvalidException(request.getOtp());
     }
-
-    account.setIsActivated(true);
-    authAccountService.save(account);
     redisCacheService.delete(redisKey);
+
+    var registerRedisKey = generateResetPasswordKey(request.getEmail());
+    redisCacheService.save(REGISTER_KEY, request.getEmail(), registerRedisKey);
+
+    return VerifyRegisterResponse.builder()
+        .registerKey(registerRedisKey)
+        .build();
   }
 
   @Override
@@ -201,6 +199,27 @@ public class AuthFacadeServiceImpl implements AuthFacadeService {
     loginResponse.setRefreshTokenLifeTime(authTokenService.getRefreshTokenLifeTime());
 
     return loginResponse;
+  }
+
+  @Override
+  public String verifyEmail(VerifyEmailRequest request) {
+    log.info("(verifyEmail)email: {}", request.getEmail());
+    if (!authUserService.existsByEmail(request.getEmail())) {
+      log.info("(verifyEmail)email don't registered: {}", request.getEmail());
+      var otp = otpService.generateOtp();
+      var redisKey = request.getEmail() + OTP_VERIFICATION_ACCOUNT_KEY;
+      redisCacheService.save(redisKey, otp, OTP_TTL_MINUTES, TimeUnit.MINUTES);
+
+      String subject = "Your OTP for account verification";
+      var param = new HashMap<String, Object>();
+      param.put("otp", otp);
+      param.put("otp_life", String.valueOf(OTP_TTL_MINUTES));
+      emailHelper.send(subject, request.getEmail(), "OTP-template", param);
+      return "Register success and otp to activate has been sent to the email";
+    } else {
+      log.info("(verifyEmail)email has been registered: {}", request.getEmail());
+      return "Account has been registered";
+    }
   }
 
   private void handleFailedAttempt(String email, String accountId) {
@@ -304,4 +323,5 @@ public class AuthFacadeServiceImpl implements AuthFacadeService {
   private String generateResetPasswordKey(String email) {
     return Base64.getEncoder().encodeToString((email + System.currentTimeMillis()).getBytes());
   }
+
 }

@@ -4,7 +4,8 @@ import jakarta.validation.Valid;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.ghtk.todo_list.dto.request.ActiveAccountRequest;
+import org.ghtk.todo_list.dto.request.VerifyEmailRequest;
+import org.ghtk.todo_list.dto.request.VerifyRegisterRequest;
 import org.ghtk.todo_list.dto.request.ForgotPasswordRequest;
 import org.ghtk.todo_list.dto.request.LoginRequest;
 import org.ghtk.todo_list.dto.request.VerifyResetPasswordRequest;
@@ -33,16 +34,23 @@ public class AuthUserController {
     log.info("(register)request: {}", request);
     authFacadeService.register(request);
     return BaseResponse.of(HttpStatus.CREATED.value(), LocalDateTime.now().toString(),
-        "Register success and otp to activate has been sent to the email");
+        "Register success");
   }
 
-  @PostMapping("/active")
+  @PostMapping("/register/otp/validate")
   @ResponseStatus(HttpStatus.OK)
-  public BaseResponse activeAccount(@RequestBody @Valid ActiveAccountRequest request) {
-    log.info("(activeAccount)email: {}, otp: {}", request.getEmail(), request.getOtp());
-    authFacadeService.activeAccount(request);
+  public BaseResponse verifyRegister(@RequestBody @Valid VerifyRegisterRequest request) {
+    log.info("(verifyRegister)email: {}, otp: {}", request.getEmail(), request.getOtp());
     return BaseResponse.of(HttpStatus.OK.value(), LocalDateTime.now().toString(),
-        "Active account successfully!!");
+        authFacadeService.verifyRegister(request));
+  }
+
+  @PostMapping("/register/email/validate")
+  @ResponseStatus(HttpStatus.OK)
+  public BaseResponse verifyEmail(@RequestBody @Valid VerifyEmailRequest request) {
+    log.info("(verifyEmail)email: {}", request.getEmail());
+    return BaseResponse.of(HttpStatus.CREATED.value(), LocalDateTime.now().toString(),
+        authFacadeService.verifyEmail(request));
   }
 
   @PostMapping("/forgot")
