@@ -191,10 +191,12 @@ public class AuthFacadeServiceImpl implements AuthFacadeService {
     redisCacheService.delete(LOGIN_FAILED_ATTEMPT_KEY, user.getEmail());
 
     ActiveLoginResponse loginResponse = new ActiveLoginResponse();
-    loginResponse.setAccessToken(authTokenService.generateAccessToken(user.getId(), account.getUsername(),
-        user.getEmail()));
-    loginResponse.setRefreshToken(authTokenService.generateRefreshToken(user.getId(), account.getUsername(),
-        user.getEmail()));
+    loginResponse.setAccessToken(
+        authTokenService.generateAccessToken(user.getId(), account.getUsername(),
+            user.getEmail()));
+    loginResponse.setRefreshToken(
+        authTokenService.generateRefreshToken(user.getId(), account.getUsername(),
+            user.getEmail()));
     loginResponse.setAccessTokenLifeTime(authTokenService.getAccessTokenLifeTime());
     loginResponse.setRefreshTokenLifeTime(authTokenService.getRefreshTokenLifeTime());
 
@@ -265,6 +267,39 @@ public class AuthFacadeServiceImpl implements AuthFacadeService {
     authAccountService.save(account);
 
     log.info("(resetPassword) Password reset successfully for email: {}", request.getEmail());
+  }
+
+  @Override
+  public void changePassword(ChangePasswordRequest request) {
+
+    log.info("(changePassword)request: {}", request);
+
+    if (!request.getOldPassword().equals(request.getNewPassword())) {
+      log.error("(changePassword) Old password and new password do not match: {}, {}",
+          request.getOldPassword(),
+          request.getNewPassword());
+      throw new PasswordConfirmNotMatchException();
+    }
+    if (!request.getConfirmPassword().equals(request.getNewPassword())) {
+      log.error("(changePassword) New password and confirmation password do not match: {}, {}",
+          request.getNewPassword(),
+          request.getConfirmPassword());
+      throw new PasswordConfirmNotMatchException();
+    }
+
+    AuthAccount account = authAccountService.findByUserIdWithThrow("userid");
+
+    if (!CryptUtil.getPasswordEncoder().encode(request.getOldPassword())
+        .equals(account.getPassword())) {
+      log.error("(changePassword) Old password and password in database do not match: {}, {}",
+          request.getNewPassword(),
+          request.getConfirmPassword());
+      throw new PasswordConfirmNotMatchException();
+    }
+
+    account.setPassword(CryptUtil.getPasswordEncoder().encode(request.getNewPassword()));
+    authAccountService.save(account);
+    log.info("(changePassword) Password change successfully!!");
   }
 
   private String generateResetPasswordKey(String email) {

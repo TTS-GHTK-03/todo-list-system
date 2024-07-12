@@ -21,4 +21,5 @@ public interface AuthFacadeService {
   LoginResponse login(LoginRequest request);
 
   void resetPassword(ResetPasswordRequest request);
+  void changePassword(ChangePasswordRequest request);
 }
