@@ -28,7 +28,7 @@ public class TaskController {
   @GetMapping("/{project_id}/tasks")
   public BaseResponse getTasksByProjectId(@PathVariable("project_id") String projectId) {
     log.info("(getAllTasks)");
-    List<TaskResponse> tasks = taskServiceImp.getAllTasksByProjectId(projectId);
-    return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(), tasks);
+    return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
+        taskServiceImp.getAllTasksByProjectId(projectId));
   }
 }
