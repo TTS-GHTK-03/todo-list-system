@@ -12,30 +12,15 @@ import org.ghtk.todo_list.service.AuthUserService;
 import org.ghtk.todo_list.service.OtpService;
 import org.ghtk.todo_list.service.RedisCacheService;
 import org.ghtk.todo_list.service.impl.AuthAccountServiceImpl;
-import org.ghtk.todo_list.service.impl.AuthTokenServiceImpl;
 import org.ghtk.todo_list.service.impl.AuthUserServiceImpl;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.redis.core.RedisTemplate;
 
 @Configuration
 @EntityScan(basePackages = {"org.ghtk.todo_list.entity"})
 @EnableCoreEmail
 public class CoreAuthenticationConfiguration {
-
-  @Value("${application.authentication.access_token.jwt_secret:xxx}")
-  private String accessTokenJwtSecret;
-
-  @Value("${application.authentication.access_token.life_time}")
-  private Long accessTokenLifeTime;
-
-  @Value("${application.authentication.refresh_token.jwt_secret:xxx}")
-  private String refreshTokenJwtSecret;
-
-  @Value("${application.authentication.refresh_token.life_time}")
-  private Long refreshTokenLifeTime;
 
   @Bean
   public AuthAccountService authAccountService(AuthAccountRepository repository) {
@@ -48,25 +33,16 @@ public class CoreAuthenticationConfiguration {
       AuthUserService authUserService,
       OtpService otpService,
       RedisCacheService redisCacheService,
-      EmailHelper emailHelper
+      EmailHelper emailHelper,
+      AuthTokenService authTokenService
   ) {
     return new AuthFacadeServiceImpl(
-        authAccountService, authUserService, otpService, redisCacheService, emailHelper);
+        authAccountService, authUserService, otpService, redisCacheService, emailHelper,
+        authTokenService);
   }
 
   @Bean
   public AuthUserService authUserService(AuthUserRepository repository) {
     return new AuthUserServiceImpl(repository);
-  }
-
-  @Bean
-  public AuthTokenService authTokenService(RedisTemplate redisTemplate) {
-    return new AuthTokenServiceImpl(
-        accessTokenJwtSecret,
-        accessTokenLifeTime,
-        refreshTokenJwtSecret,
-        refreshTokenLifeTime,
-        redisTemplate
-    );
   }
 }

@@ -13,4 +13,6 @@ public interface AuthUserRepository extends JpaRepository<AuthUser, String> {
   boolean existsByEmail(String email);
   boolean existsByAccountId(String accountId);
 
+  Optional<AuthUser> findByAccountId(String accountId);
+
 }

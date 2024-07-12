@@ -1,22 +1,33 @@
 package org.ghtk.todo_list.facade;
 
+import java.time.Instant;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.ghtk.todo_list.constant.AccountLockedTime;
 import org.ghtk.todo_list.core_email.helper.EmailHelper;
 import org.ghtk.todo_list.dto.request.ActiveAccountRequest;
 import org.ghtk.todo_list.dto.request.ForgotPasswordRequest;
+import org.ghtk.todo_list.dto.request.LoginRequest;
 import org.ghtk.todo_list.dto.request.VerifyResetPasswordRequest;
 import org.ghtk.todo_list.dto.request.RegisterRequest;
+import org.ghtk.todo_list.dto.response.ActiveLoginResponse;
+import org.ghtk.todo_list.dto.response.LoginResponse;
+import org.ghtk.todo_list.dto.response.UnactiveLoginResponse;
+import org.ghtk.todo_list.exception.AccountLockedException;
 import org.ghtk.todo_list.exception.EmailNotFoundException;
 import org.ghtk.todo_list.exception.OTPInvalidException;
-import org.ghtk.todo_list.exception.OTPNotFoundException;
 import org.ghtk.todo_list.dto.response.VerifyResetPasswordResponse;
+import org.ghtk.todo_list.exception.OTPNotFoundException;
 import org.ghtk.todo_list.exception.PasswordConfirmNotMatchException;
+import org.ghtk.todo_list.exception.PasswordIncorrectException;
+import org.ghtk.todo_list.exception.UserNotFoundException;
+import org.ghtk.todo_list.exception.UsernameNotFoundException;
 import org.ghtk.todo_list.service.AuthAccountService;
+import org.ghtk.todo_list.service.AuthTokenService;
 import org.ghtk.todo_list.service.AuthUserService;
 import org.ghtk.todo_list.service.OtpService;
 import org.ghtk.todo_list.service.RedisCacheService;
@@ -33,6 +44,7 @@ public class AuthFacadeServiceImpl implements AuthFacadeService {
   private final OtpService otpService;
   private final RedisCacheService redisCacheService;
   private final EmailHelper emailHelper;
+  private final AuthTokenService authTokenService;
 
 
   @Override
@@ -134,6 +146,83 @@ public class AuthFacadeServiceImpl implements AuthFacadeService {
     return VerifyResetPasswordResponse.builder()
             .resetPasswordKey(resetPasswordKeyRedisKey)
             .build();
+  }
+
+  @Override
+  public LoginResponse login(LoginRequest request) {
+    log.info("(invoke)username : {}, password : {}", request.getUsername(), request.getPassword());
+    var account = authAccountService.findByUsername(request.getUsername())
+        .orElseThrow(() -> {
+          log.error("Customer have username {} not found", request.getUsername());
+          return new UsernameNotFoundException(request.getUsername());
+        });
+    if (Boolean.TRUE.equals(account.getIsLockedPermanent())) {
+      log.error("(invoke)account has username : {} is locked permanently", account.getUsername());
+      throw new AccountLockedException();
+    }
+
+    if (Boolean.FALSE.equals(account.getIsActivated())) {
+      log.warn("(invoke)account has username : {} is not actived", account.getUsername());
+      return new UnactiveLoginResponse("Your account is not activated");
+    }
+
+    var user = authUserService.findByAccountId(account.getId())
+        .orElseThrow(() -> {
+          log.error("Customer have account id : {} not found", account.getId());
+          return new UserNotFoundException();
+        });
+
+    Long unlockLoginTime = redisCacheService.getOrDefault(LOGIN_UNLOCK_TIME_KEY,
+        user.getEmail(), 0L);
+    if (Instant.now().getEpochSecond() < unlockLoginTime) {
+      log.error("(invoke)account has username : {} is locked temporary", account.getUsername());
+      throw new AccountLockedException();
+    }
+    if (!CryptUtil.getPasswordEncoder().matches(request.getPassword(), account.getPassword())) {
+      handleFailedAttempt(user.getEmail(), account.getId());
+      log.error("(invoke)account has username : {} is have wrong password", account.getUsername());
+      throw new PasswordIncorrectException();
+    }
+
+    redisCacheService.delete(LOGIN_UNLOCK_TIME_KEY, user.getEmail());
+    redisCacheService.delete(LOGIN_FAILED_ATTEMPT_KEY, user.getEmail());
+
+    ActiveLoginResponse loginResponse = new ActiveLoginResponse();
+    loginResponse.setAccessToken(authTokenService.generateAccessToken(user.getId(), account.getUsername(),
+        user.getEmail()));
+    loginResponse.setRefreshToken(authTokenService.generateRefreshToken(user.getId(), account.getUsername(),
+        user.getEmail()));
+    loginResponse.setAccessTokenLifeTime(authTokenService.getAccessTokenLifeTime());
+    loginResponse.setRefreshTokenLifeTime(authTokenService.getRefreshTokenLifeTime());
+
+    return loginResponse;
+  }
+
+  private void handleFailedAttempt(String email, String accountId) {
+    log.info("(handleFailedAttempt) email: {}", email);
+    Integer attempts = redisCacheService.getOrDefault(LOGIN_FAILED_ATTEMPT_KEY, email,
+        0);
+    attempts++;
+    redisCacheService.save(LOGIN_FAILED_ATTEMPT_KEY, email, attempts);
+
+    if (attempts.equals(AccountLockedTime.FIVE.getAttempts())) {
+      redisCacheService.save(LOGIN_UNLOCK_TIME_KEY,
+          email, Instant.now().getEpochSecond() + AccountLockedTime.FIVE.getCooldownTime());
+      log.info("Account locked for 5 failed attempts for email: {}", email);
+    }
+    if (attempts.equals(AccountLockedTime.TEN.getAttempts())) {
+      redisCacheService.save(LOGIN_UNLOCK_TIME_KEY,
+          email, Instant.now().getEpochSecond() + AccountLockedTime.TEN.getCooldownTime());
+      log.info("Account locked for 10 failed attempts for email: {}", email);
+    }
+    if (attempts.equals(AccountLockedTime.FIFTEEN.getAttempts())) {
+      authAccountService.updateLockPermanentById(accountId, true);
+      redisCacheService.delete(LOGIN_UNLOCK_TIME_KEY, email);
+      redisCacheService.delete(LOGIN_FAILED_ATTEMPT_KEY, email);
+      log.info("Account locked for 15 failed attempts for email: {}", email);
+    }
+    log.info("(handleFailedAttempt)Customer have email : {} have {} failed attempts", email,
+        attempts);
   }
 
   private String generateResetPasswordKey(String email) {

@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.dto.request.ActiveAccountRequest;
 import org.ghtk.todo_list.dto.request.ForgotPasswordRequest;
+import org.ghtk.todo_list.dto.request.LoginRequest;
 import org.ghtk.todo_list.dto.request.VerifyResetPasswordRequest;
 import org.ghtk.todo_list.dto.request.RegisterRequest;
 import org.ghtk.todo_list.dto.response.BaseResponse;
@@ -60,6 +61,13 @@ public class AuthUserController {
 
     return BaseResponse.of(HttpStatus.OK.value(), LocalDateTime.now().toString(),
             authFacadeService.verifyResetPassword(request));
+  }
+
+  @PostMapping("/login")
+  @ResponseStatus(HttpStatus.OK)
+  public BaseResponse login(@Valid @RequestBody LoginRequest request) {
+    log.info("(login)request: {}", request);
+    return BaseResponse.of(HttpStatus.OK.value(), LocalDateTime.now().toString(),authFacadeService.login(request));
   }
 
 }

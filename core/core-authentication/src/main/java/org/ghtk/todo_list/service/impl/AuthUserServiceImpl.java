@@ -1,5 +1,6 @@
 package org.ghtk.todo_list.service.impl;
 
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.entity.AuthUser;
@@ -45,5 +46,11 @@ public class AuthUserServiceImpl implements AuthUserService {
   public boolean existsByEmail(String email) {
     log.info("(existsByEmail)email: {}", email);
     return repository.existsByEmail(email);
+  }
+
+  @Override
+  public Optional<AuthUser> findByAccountId(String accountId) {
+    log.info("(findByAccountId)accountId: {}", accountId);
+    return repository.findByAccountId(accountId);
   }
 }
