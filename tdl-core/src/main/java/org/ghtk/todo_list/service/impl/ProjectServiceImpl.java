@@ -43,4 +43,10 @@ public class ProjectServiceImpl implements ProjectService {
         Project project = projectRepository.getProject(userId, projectId);
         return project;
     }
+
+    @Override
+    public boolean existById(String id) {
+        log.info("(existById)id: {}", id);
+        return projectRepository.existsById(id);
+    }
 }

@@ -1,8 +1,7 @@
 package org.ghtk.todo_list.service.impl;
 
 import org.ghtk.todo_list.entity.Task;
-import org.ghtk.todo_list.exception.ProjectNotFoundException;
-import org.ghtk.todo_list.facade.imp.TDLFacadeService;
+import org.ghtk.todo_list.facade.imp.TDLFacadeServiceImpl;
 import org.ghtk.todo_list.repository.TaskRepository;
 import org.ghtk.todo_list.service.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,9 +18,6 @@ public class TaskServiceImp implements TaskService {
 
   @Override
   public List<Task> getAllTasksByProjectId(String projectId) {
-    TDLFacadeService facadeService = new TDLFacadeService();
-    facadeService.existsByProjectId(taskRepo, projectId);
-
     return taskRepo.getAllTasksByProjectId(projectId);
   }
 }
