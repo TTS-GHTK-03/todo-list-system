@@ -10,5 +10,7 @@ public interface ProjectService {
 
   Project getProject(String userId, String projectId);
 
+  boolean existById(String id);
+
   Project createProject(String userId, String title, String role);
 }

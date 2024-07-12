@@ -5,12 +5,9 @@ import lombok.Data;
 import org.ghtk.todo_list.validation.ValidateEmail;
 
 @Data
-public class ActiveAccountRequest {
+public class VerifyEmailRequest {
 
   @NotBlank(message = "Email is required")
   @ValidateEmail
   private String email;
-
-  @NotBlank(message = "Otp is required")
-  private String otp;
 }

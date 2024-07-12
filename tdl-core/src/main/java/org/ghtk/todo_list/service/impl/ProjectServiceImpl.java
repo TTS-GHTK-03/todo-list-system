@@ -71,6 +71,7 @@ public class ProjectServiceImpl implements ProjectService {
     try {
       RoleProject.valueOf(role.toUpperCase());
     }
+
     catch (IllegalArgumentException e){
       log.error("(createProject)project: {} role not existed ", role);
       throw new RoleProjectNotFoundException(role);
@@ -102,5 +103,11 @@ public class ProjectServiceImpl implements ProjectService {
     Board board = boardService.createBoard(projectSaved.getId(), LocalDateTime.now(), LocalDateTime.now());
 
     return projectSaved;
+  }
+
+  @Override
+  public boolean existById(String id) {
+    log.info("(existById)id: {}", id);
+    return projectRepository.existsById(id);
   }
 }
