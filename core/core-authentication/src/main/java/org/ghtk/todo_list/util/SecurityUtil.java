@@ -11,6 +11,7 @@ public class SecurityUtil {
     if (SecurityContextHolder.getContext().getAuthentication() == null) {
       return "SYSTEM_ID";
     }
+    log.info("(getUserId)id:{}", SecurityContextHolder.getContext().getAuthentication().getCredentials().toString());
     return SecurityContextHolder.getContext().getAuthentication().getCredentials().toString();
   }
 }
