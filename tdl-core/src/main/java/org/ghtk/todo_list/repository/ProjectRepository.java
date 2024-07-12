@@ -1,5 +1,7 @@
 package org.ghtk.todo_list.repository;
 
+import jakarta.transaction.Transactional;
+import java.time.LocalDateTime;
 import org.ghtk.todo_list.entity.Project;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -20,17 +22,12 @@ public interface ProjectRepository extends JpaRepository<Project, String> {
 
   @Query("""
       SELECT p FROM Project p
-      INNER JOIN ProjectUser pu 
-      ON p.id = pu.projectId 
+      INNER JOIN ProjectUser pu
+      ON p.id = pu.projectId
       WHERE pu.userId = :userId AND p.id = :projectId
       """)
   Project getProject(@Param("userId") String userId, @Param("projectId") String projectId);
 
   Project findByTitle(String title);
-
-//  @Query("""
-//      INSERT INTO Project p (title, createdAt, lastUpdatedAt, key, role)
-//      VALUES (:title, :createdAt, lastUpdatedAt, key, role)
-//      """)
-//  int createProject(@Param());
+  Project findByKeyProject(String keyProject);
 }

@@ -5,7 +5,11 @@ import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.dto.request.ActiveAccountRequest;
+import org.ghtk.todo_list.dto.request.ForgotPasswordRequest;
+import org.ghtk.todo_list.dto.request.LoginRequest;
+import org.ghtk.todo_list.dto.request.VerifyResetPasswordRequest;
 import org.ghtk.todo_list.dto.request.RegisterRequest;
+import org.ghtk.todo_list.dto.request.*;
 import org.ghtk.todo_list.dto.response.BaseResponse;
 import org.ghtk.todo_list.facade.AuthFacadeService;
 import org.springframework.http.HttpStatus;
@@ -40,4 +44,41 @@ public class AuthUserController {
     return BaseResponse.of(HttpStatus.OK.value(), LocalDateTime.now().toString(),
         "Active account successfully!!");
   }
+
+  @PostMapping("/forgot")
+  @ResponseStatus(HttpStatus.OK)
+  public BaseResponse forgotPassword(@RequestBody @Valid ForgotPasswordRequest request) {
+    log.info("(forgotPassword)request: {}", request);
+    authFacadeService.forgotPassword(request);
+    return BaseResponse.of(HttpStatus.OK.value(), LocalDateTime.now().toString(),
+            "An OTP for password reset has been sent to your email address. " +
+                    "Please check your inbox to proceed with resetting your password.");
+  }
+
+  @PostMapping("/reset-password/otp/validate")
+  @ResponseStatus(HttpStatus.OK)
+  public BaseResponse verifyResetPassword(@RequestBody @Valid VerifyResetPasswordRequest request) {
+    log.info("(verifyResetPassword)request: {}", request);
+
+    return BaseResponse.of(HttpStatus.OK.value(), LocalDateTime.now().toString(),
+            authFacadeService.verifyResetPassword(request));
+  }
+
+  @PostMapping("/login")
+  @ResponseStatus(HttpStatus.OK)
+  public BaseResponse login(@Valid @RequestBody LoginRequest request) {
+    log.info("(login)request: {}", request);
+    return BaseResponse.of(HttpStatus.OK.value(), LocalDateTime.now().toString(),authFacadeService.login(request));
+  }
+
+  @PostMapping("/reset-password")
+  @ResponseStatus(HttpStatus.OK)
+  public BaseResponse resetPassword(@RequestBody @Valid ResetPasswordRequest request) {
+    log.info("(resetPassword)request: {}", request);
+    authFacadeService.resetPassword(request);
+
+    return BaseResponse.of(HttpStatus.OK.value(), LocalDateTime.now().toString(),
+            "Reset Password successfully!!");
+  }
+
 }

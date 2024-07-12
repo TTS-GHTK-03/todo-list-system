@@ -1,5 +1,7 @@
 package org.ghtk.todo_list.controller;
 
+import static org.ghtk.todo_list.util.SecurityUtil.getUserId;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.dto.response.BaseResponse;
@@ -21,7 +23,7 @@ public class ProjectController {
   @GetMapping()
   public BaseResponse getAllProject() {
     log.info("(getAllProject)");
-    String userId = "5df2fe3e-c3d7-4236-8283-e62656a5fd24";
+    String userId = "58ba2b2c-fa18-4443-bcb5-ea24ad60b319";
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         projectService.getAllProject(userId));
   }
@@ -29,7 +31,7 @@ public class ProjectController {
   @GetMapping("/{project_id}")
   public BaseResponse getProject(@PathVariable(name = "project_id") String projectId) {
     log.info("(getProject)projectId: {}", projectId);
-    String userId = "5df2fe3e-c3d7-4236-8283-e62656a5fd24";
+    String userId = "58ba2b2c-fa18-4443-bcb5-ea24ad60b319";
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         projectService.getProject(userId, projectId));
   }
@@ -37,8 +39,9 @@ public class ProjectController {
   @PostMapping()
   public BaseResponse createProject(@RequestBody CreateProjectRequest createProjectRequest) {
     log.info("(createProject)project: {}", createProjectRequest);
-    String userId = "5df2fe3e-c3d7-4236-8283-e62656a5fd24";
+    String userId = "58ba2b2c-fa18-4443-bcb5-ea24ad60b319";
     return BaseResponse.of(HttpStatus.CREATED.value(), LocalDate.now().toString(),
-        projectService.createProject(userId, createProjectRequest.getTitle(), createProjectRequest.getRole()));
+        projectService.createProject(userId, createProjectRequest.getTitle(),
+            createProjectRequest.getRole()));
   }
 }
