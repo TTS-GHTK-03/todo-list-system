@@ -7,6 +7,8 @@ import org.ghtk.todo_list.dto.request.LoginRequest;
 import org.ghtk.todo_list.dto.request.VerifyResetPasswordRequest;
 import org.ghtk.todo_list.dto.request.RegisterRequest;
 import org.ghtk.todo_list.dto.response.LoginResponse;
+import org.ghtk.todo_list.dto.request.*;
+import org.ghtk.todo_list.entity.AuthAccount;
 import org.ghtk.todo_list.dto.response.VerifyRegisterResponse;
 import org.ghtk.todo_list.dto.response.VerifyResetPasswordResponse;
 
@@ -17,5 +19,7 @@ public interface AuthFacadeService {
   void forgotPassword (ForgotPasswordRequest request);
   VerifyResetPasswordResponse verifyResetPassword(VerifyResetPasswordRequest request);
   LoginResponse login(LoginRequest request);
+
+  void resetPassword(ResetPasswordRequest request);
   String verifyEmail(VerifyEmailRequest request);
 }
