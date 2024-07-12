@@ -10,7 +10,7 @@ application:
   i18n:
     resources:
       - classpath:core-authentication/message
-
+      - classpath:tdl-core/message
 
 spring:
   application:
