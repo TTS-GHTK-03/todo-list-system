@@ -3,6 +3,7 @@ package org.ghtk.todo_list.service.impl;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.entity.Task;
+import org.ghtk.todo_list.exception.TaskNotFoundException;
 import org.ghtk.todo_list.model.response.TaskResponse;
 import org.ghtk.todo_list.repository.TaskRepository;
 import org.ghtk.todo_list.service.TaskService;
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
 @Slf4j
 @Service
 public class TaskServiceImp implements TaskService {
@@ -26,5 +28,17 @@ public class TaskServiceImp implements TaskService {
         .map(task -> new TaskResponse(task.getId(), task.getTitle()))
         .collect(Collectors.toList());
 
+  }
+
+  @Override
+  public TaskResponse getTaskByTaskId(String taskId) {
+    log.info("(getTaskByTaskId)projectId: {}", taskId);
+    Task task = taskRepo.getTaskByTaskId(taskId);
+    return new TaskResponse(task.getId(), task.getTitle());
+  }
+
+  @Override
+  public boolean existsById(String taskId) {
+    return taskRepo.existsById(taskId);
   }
 }
