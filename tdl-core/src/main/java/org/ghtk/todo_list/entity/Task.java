@@ -17,7 +17,6 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @EntityListeners(AuditingEntityListener.class)
 public class Task extends BaseEntity {
 
-  @Id
   private String id;
   private String title;
   private String description;
