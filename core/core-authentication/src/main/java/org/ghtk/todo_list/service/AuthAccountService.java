@@ -9,4 +9,6 @@ public interface AuthAccountService {
   AuthAccount create(String username, String password);
   Optional<AuthAccount> findByEmail(String email);
   AuthAccount save(AuthAccount authAccount);
+  Optional<AuthAccount> findByUsername(String username);
+  void updateLockPermanentById(String id, boolean isLockPermanent);
 }

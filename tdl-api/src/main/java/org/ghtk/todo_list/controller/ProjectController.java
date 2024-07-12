@@ -20,12 +20,12 @@ public class ProjectController {
     @GetMapping()
     public BaseResponse getAllProject(){
         log.info("(getAllProject)");
-        return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(), projectService.getAllProject(userId));
+        return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(), projectService.getAllProject("userId"));
     }
 
     @GetMapping("/{project_id}")
     public BaseResponse getProject(@PathVariable(name = "project_id") String projectId){
         log.info("(getProject)projectId: {}", projectId);
-        return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(), projectService.getProject(userId, projectId));
+        return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(), projectService.getProject("userId", projectId));
     }
 }
