@@ -51,8 +51,8 @@ public class AuthUserController {
     log.info("(forgotPassword)request: {}", request);
     authFacadeService.forgotPassword(request);
     return BaseResponse.of(HttpStatus.OK.value(), LocalDateTime.now().toString(),
-            "An OTP for password reset has been sent to your email address. " +
-                    "Please check your inbox to proceed with resetting your password.");
+        "An OTP for password reset has been sent to your email address. " +
+            "Please check your inbox to proceed with resetting your password.");
   }
 
   @PostMapping("/reset-password/otp/validate")
@@ -61,14 +61,15 @@ public class AuthUserController {
     log.info("(verifyResetPassword)request: {}", request);
 
     return BaseResponse.of(HttpStatus.OK.value(), LocalDateTime.now().toString(),
-            authFacadeService.verifyResetPassword(request));
+        authFacadeService.verifyResetPassword(request));
   }
 
   @PostMapping("/login")
   @ResponseStatus(HttpStatus.OK)
   public BaseResponse login(@Valid @RequestBody LoginRequest request) {
     log.info("(login)request: {}", request);
-    return BaseResponse.of(HttpStatus.OK.value(), LocalDateTime.now().toString(),authFacadeService.login(request));
+    return BaseResponse.of(HttpStatus.OK.value(), LocalDateTime.now().toString(),
+        authFacadeService.login(request));
   }
 
   @PostMapping("/reset-password")
@@ -78,7 +79,7 @@ public class AuthUserController {
     authFacadeService.resetPassword(request);
 
     return BaseResponse.of(HttpStatus.OK.value(), LocalDateTime.now().toString(),
-            "Reset Password successfully!!");
+        "Reset Password successfully!!");
   }
 
 }

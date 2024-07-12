@@ -270,16 +270,10 @@ public class AuthFacadeServiceImpl implements AuthFacadeService {
   }
 
   @Override
-  public void changePassword(ChangePasswordRequest request) {
+  public void changePassword(ChangePasswordRequest request, String userId) {
 
     log.info("(changePassword)request: {}", request);
 
-    if (!request.getOldPassword().equals(request.getNewPassword())) {
-      log.error("(changePassword) Old password and new password do not match: {}, {}",
-          request.getOldPassword(),
-          request.getNewPassword());
-      throw new PasswordConfirmNotMatchException();
-    }
     if (!request.getConfirmPassword().equals(request.getNewPassword())) {
       log.error("(changePassword) New password and confirmation password do not match: {}, {}",
           request.getNewPassword(),
@@ -287,14 +281,19 @@ public class AuthFacadeServiceImpl implements AuthFacadeService {
       throw new PasswordConfirmNotMatchException();
     }
 
-    AuthAccount account = authAccountService.findByUserIdWithThrow("userid");
+    AuthAccount account = authAccountService.findByUserIdWithThrow(
+        "738dced1-8761-4768-914a-d052c9420a6b");
 
-    if (!CryptUtil.getPasswordEncoder().encode(request.getOldPassword())
-        .equals(account.getPassword())) {
-      log.error("(changePassword) Old password and password in database do not match: {}, {}",
-          request.getNewPassword(),
-          request.getConfirmPassword());
-      throw new PasswordConfirmNotMatchException();
+    if (!CryptUtil.getPasswordEncoder().matches(request.getOldPassword(), account.getPassword())) {
+      log.error("(changePassword) Old password and password in database do not match: {}",
+          request.getOldPassword());
+      throw new PasswordDatabaseNotMatchException();
+    }
+
+    if (CryptUtil.getPasswordEncoder().matches(request.getNewPassword(), account.getPassword())) {
+      log.error("(changePassword) New password and password in database are the same: {}",
+          request.getNewPassword());
+      throw new PasswordNewDatabaseException();
     }
 
     account.setPassword(CryptUtil.getPasswordEncoder().encode(request.getNewPassword()));
