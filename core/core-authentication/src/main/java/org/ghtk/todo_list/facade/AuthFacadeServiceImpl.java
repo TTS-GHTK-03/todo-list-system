@@ -5,6 +5,7 @@ import java.util.Base64;
 import java.util.HashMap;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.constant.AccountLockedTime;
@@ -20,6 +21,9 @@ import org.ghtk.todo_list.dto.response.UnactiveLoginResponse;
 import org.ghtk.todo_list.exception.AccountLockedException;
 import org.ghtk.todo_list.exception.EmailNotFoundException;
 import org.ghtk.todo_list.exception.OTPInvalidException;
+import org.ghtk.todo_list.dto.request.*;
+import org.ghtk.todo_list.entity.AuthAccount;
+import org.ghtk.todo_list.exception.*;
 import org.ghtk.todo_list.dto.response.VerifyResetPasswordResponse;
 import org.ghtk.todo_list.exception.OTPNotFoundException;
 import org.ghtk.todo_list.exception.PasswordConfirmNotMatchException;
@@ -61,7 +65,7 @@ public class AuthFacadeServiceImpl implements AuthFacadeService {
         request.getUsername(),
         CryptUtil.getPasswordEncoder().encode(request.getPassword())
     );
-    var authUser = authUserService.create(request.getEmail(), authAccount. getId());
+    var authUser = authUserService.create(request.getEmail(), authAccount.getId());
 
     var otp = otpService.generateOtp();
     var redisKey = request.getEmail() + OTP_ACTIVE_ACCOUNT_KEY;
@@ -104,7 +108,7 @@ public class AuthFacadeServiceImpl implements AuthFacadeService {
   @Override
   public void forgotPassword(ForgotPasswordRequest request) {
     log.info("(forgotPassword)request: {}", request);
-    if(!authUserService.existsByEmail(request.getEmail())) {
+    if (!authUserService.existsByEmail(request.getEmail())) {
       log.error("(forgotPassword)email: {}", request.getEmail());
       throw new EmailNotFoundException(request.getEmail());
     }
@@ -122,9 +126,9 @@ public class AuthFacadeServiceImpl implements AuthFacadeService {
 
   @Override
   public VerifyResetPasswordResponse verifyResetPassword(VerifyResetPasswordRequest request) {
-    log.info("(resetPasswordOtpValidate)request: {}", request);
+    log.info("(verifyResetPassword)request: {}", request);
     if (!authUserService.existsByEmail(request.getEmail())) {
-      log.error("(resetPasswordOtpValidate)email: {}", request.getEmail());
+      log.error("(verifyResetPassword)email: {}", request.getEmail());
       throw new EmailNotFoundException(request.getEmail());
     }
 
@@ -132,20 +136,19 @@ public class AuthFacadeServiceImpl implements AuthFacadeService {
     var cachedOtp = redisCacheService.get(redisKey);
 
     if (cachedOtp.isEmpty() || !cachedOtp.get().equals(request.getOtp())) {
-      log.error("(resetPasswordOtpValidate) OTP not found for email: {}", request.getEmail());
+      log.error("(verifyResetPassword) OTP not found for email: {}", request.getEmail());
       throw new OTPNotFoundException(request.getEmail());
     }
 
-    log.info("(resetPasswordOtpValidate) OTP validated successfully for email: {}", request.getEmail());
+    log.info("(verifyResetPassword) OTP validated successfully for email: {}", request.getEmail());
     redisCacheService.delete(redisKey);
-
 
     var resetPasswordKeyRedisKey = generateResetPasswordKey(request.getEmail());
     redisCacheService.save(RESET_PASSWORD_KEY, request.getEmail(), resetPasswordKeyRedisKey);
 
     return VerifyResetPasswordResponse.builder()
-            .resetPasswordKey(resetPasswordKeyRedisKey)
-            .build();
+        .resetPasswordKey(resetPasswordKeyRedisKey)
+        .build();
   }
 
   @Override
@@ -225,8 +228,46 @@ public class AuthFacadeServiceImpl implements AuthFacadeService {
         attempts);
   }
 
+  @Override
+  public void resetPassword(ResetPasswordRequest request) {
+    log.info("(resetPassword)request: {}", request);
+
+    if (!request.getPassword().equals(request.getConfirmPassword())) {
+      log.error("(resetPassword) Password and confirmation password do not match: {} {}",
+          request.getPassword(),
+          request.getConfirmPassword());
+      throw new PasswordConfirmNotMatchException();
+    }
+
+    if (!authUserService.existsByEmail(request.getEmail())) {
+      log.error("(resetPassword)email: {}", request.getEmail());
+      throw new EmailNotFoundException(request.getEmail());
+    }
+
+    var resetPasswordKey = redisCacheService.get(RESET_PASSWORD_KEY, request.getEmail());
+    if (resetPasswordKey.isEmpty() ||
+        !resetPasswordKey.get().equals(request.getResetPasswordKey())) {
+      log.error("(resetPassword) Reset Password Key not found: {}", request.getResetPasswordKey());
+      throw new ResetPasswordKeyNotFoundException();
+    }
+
+    redisCacheService.delete(RESET_PASSWORD_KEY, request.getEmail());
+
+    AuthAccount account = authAccountService
+        .findByEmail(request.getEmail())
+        .orElseThrow(() -> {
+          log.error("(resetPassword)email not found : {}", request.getEmail());
+          throw new EmailNotFoundException(request.getEmail());
+        });
+
+    account.setPassword(CryptUtil.getPasswordEncoder().encode(request.getPassword()));
+
+    authAccountService.save(account);
+
+    log.info("(resetPassword) Password reset successfully for email: {}", request.getEmail());
+  }
+
   private String generateResetPasswordKey(String email) {
     return Base64.getEncoder().encodeToString((email + System.currentTimeMillis()).getBytes());
   }
-
 }
