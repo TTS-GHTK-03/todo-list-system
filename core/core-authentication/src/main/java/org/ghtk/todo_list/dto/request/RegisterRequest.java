@@ -9,6 +9,8 @@ import org.ghtk.todo_list.validation.ValidatePassword;
 @Data
 public class RegisterRequest {
 
+  @NotBlank
+  private String registerKey;
   @NotBlank(message = "email is required")
   @ValidateEmail
   private String email;
