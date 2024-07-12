@@ -8,17 +8,19 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
 @Service
 public class TaskServiceImp implements TaskService {
-    @Autowired
-    private TaskRepository taskRepo;
+
+  @Autowired
+  private TaskRepository taskRepo;
 
 
-    @Override
-    public List<Task> getAllTasks(String projectId) {
-        if(!taskRepo.existsByProjectId(projectId)) {
-            throw new ProjectNotFoundException();
-        }
-        return taskRepo.getAllTask(projectId);
+  @Override
+  public List<Task> getAllTasks(String projectId) {
+    if (!taskRepo.existsByProjectId(projectId)) {
+      throw new ProjectNotFoundException();
     }
+    return taskRepo.getAllTask(projectId);
+  }
 }

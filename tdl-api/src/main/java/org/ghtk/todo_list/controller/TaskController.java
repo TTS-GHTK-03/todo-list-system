@@ -20,21 +20,22 @@ import java.util.Map;
 @Slf4j
 @RequiredArgsConstructor
 public class TaskController {
-    @Autowired
-    private TaskServiceImp taskServiceImp;
 
-    @GetMapping("/{project_id}/tasks")
-    public Map<String, Object> getTasksByProjectId(@PathVariable("project_id") String projectId) {
-        List<Task> tasks = taskServiceImp.getAllTasks(projectId);
+  @Autowired
+  private TaskServiceImp taskServiceImp;
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("code", "200");
-        response.put("timestamp", Instant.now().toEpochMilli());
-        response.put("data", tasks);
+  @GetMapping("/{project_id}/tasks")
+  public Map<String, Object> getTasksByProjectId(@PathVariable("project_id") String projectId) {
+    List<Task> tasks = taskServiceImp.getAllTasks(projectId);
 
-        return response;
+    Map<String, Object> response = new HashMap<>();
+    response.put("code", "200");
+    response.put("timestamp", Instant.now().toEpochMilli());
+    response.put("data", tasks);
 
-        //return taskServiceImp.getAllTasks(projectId);
-    }
+    return response;
+
+    //return taskServiceImp.getAllTasks(projectId);
+  }
 
 }
