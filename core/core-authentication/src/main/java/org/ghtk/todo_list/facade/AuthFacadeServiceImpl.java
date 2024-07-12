@@ -29,7 +29,6 @@ import org.ghtk.todo_list.exception.*;
 import org.ghtk.todo_list.dto.response.VerifyResetPasswordResponse;
 import org.ghtk.todo_list.exception.OTPNotFoundException;
 import org.ghtk.todo_list.exception.PasswordConfirmNotMatchException;
-import org.ghtk.todo_list.exception.PasswordIncorrectException;
 import org.ghtk.todo_list.exception.RegisterKeyNotFoundException;
 import org.ghtk.todo_list.exception.UserNotFoundException;
 import org.ghtk.todo_list.exception.UsernameNotFoundException;
@@ -300,19 +299,25 @@ public class AuthFacadeServiceImpl implements AuthFacadeService {
       throw new PasswordConfirmNotMatchException();
     }
 
+    if(request.getOldPassword().equals(request.getNewPassword())) {
+      log.error("(changePassword) New password and Old password are the same: {}, {}",
+          request.getNewPassword(), request.getOldPassword());
+      throw new PasswordSimilarException();
+    }
+
     AuthAccount account = authAccountService.findByUserIdWithThrow(
         "738dced1-8761-4768-914a-d052c9420a6b");
 
     if (!CryptUtil.getPasswordEncoder().matches(request.getOldPassword(), account.getPassword())) {
-      log.error("(changePassword) Old password and password in database do not match: {}",
+      log.error("(changePassword) Your password is incorrect: {}",
           request.getOldPassword());
-      throw new PasswordDatabaseNotMatchException();
+      throw new PasswordIncorrectException();
     }
 
     if (CryptUtil.getPasswordEncoder().matches(request.getNewPassword(), account.getPassword())) {
       log.error("(changePassword) New password and password in database are the same: {}",
           request.getNewPassword());
-      throw new PasswordNewDatabaseException();
+      throw new PasswordSimilarException();
     }
 
     account.setPassword(CryptUtil.getPasswordEncoder().encode(request.getNewPassword()));
