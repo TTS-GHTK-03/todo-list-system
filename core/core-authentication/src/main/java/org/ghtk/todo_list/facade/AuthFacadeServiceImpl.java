@@ -291,7 +291,7 @@ public class AuthFacadeServiceImpl implements AuthFacadeService {
   @Override
   public void changePassword(ChangePasswordRequest request, String userId) {
 
-    log.info("(changePassword)request: {}", request);
+    log.info("(changePassword)request: {}, userId: {}", request, userId);
 
     if (!request.getConfirmPassword().equals(request.getNewPassword())) {
       log.error("(changePassword) New password and confirmation password do not match: {}, {}",
