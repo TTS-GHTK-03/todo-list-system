@@ -9,6 +9,7 @@ import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.constant.AccountLockedTime;
+import org.ghtk.todo_list.constant.ResendOtpType;
 import org.ghtk.todo_list.core_email.helper.EmailHelper;
 import org.ghtk.todo_list.dto.request.VerifyEmailRequest;
 import org.ghtk.todo_list.dto.request.VerifyRegisterRequest;
@@ -299,7 +300,7 @@ public class AuthFacadeServiceImpl implements AuthFacadeService {
       throw new PasswordConfirmNotMatchException();
     }
 
-    if(request.getOldPassword().equals(request.getNewPassword())) {
+    if (request.getOldPassword().equals(request.getNewPassword())) {
       log.error("(changePassword) New password and Old password are the same: {}, {}",
           request.getNewPassword(), request.getOldPassword());
       throw new PasswordSimilarException();
@@ -323,6 +324,41 @@ public class AuthFacadeServiceImpl implements AuthFacadeService {
     account.setPassword(CryptUtil.getPasswordEncoder().encode(request.getNewPassword()));
     authAccountService.save(account);
     log.info("(changePassword) Password change successfully!!");
+  }
+
+  @Override
+  public void resendOtp(ResendOtpRequest request) {
+    log.info("(resendOtp)request: {}", request);
+
+    if (!authUserService.existsByEmail(request.getEmail())) {
+      log.error("(resendOtp)email: {}", request.getEmail());
+      throw new EmailNotFoundException(request.getEmail());
+    }
+
+    String type = request.getType().trim().toUpperCase();
+
+    if (type.equals(ResendOtpType.FORGOT.toString())) {
+      resend(request.getEmail(), RESET_PASSWORD_OTP_KEY);
+    } else if (type.equals(ResendOtpType.REGISTER.toString())) {
+      resend(request.getEmail(), REGISTER_KEY);
+    } else {
+      throw new EmailNotFoundException(request.getEmail());
+    }
+  }
+
+  private void resend(String email, String otpKey) {
+    log.info("(resend)email {}, otpKey {}", email, otpKey);
+    var redisKey = email + otpKey;
+    redisCacheService.delete(redisKey);
+
+    var otp = otpService.generateOtp();
+    redisCacheService.save(redisKey, otp, OTP_TTL_MINUTES, TimeUnit.MINUTES);
+
+    String subject = "Your OTP for password reset";
+    var param = new HashMap<String, Object>();
+    param.put("otp", otp);
+    param.put("otp_life", String.valueOf(OTP_TTL_MINUTES));
+    emailHelper.send(subject, email, "OTP-template", param);
   }
 
   private String generateResetPasswordKey(String email) {
