@@ -1,8 +1,11 @@
 package org.ghtk.todo_list.service.impl;
 
+import java.time.LocalDate;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.ghtk.todo_list.dto.request.UpdateInformationRequest;
+import org.ghtk.todo_list.dto.response.AuthUserResponse;
 import org.ghtk.todo_list.entity.AuthUser;
 import org.ghtk.todo_list.exception.AccountAlreadyHasUserException;
 import org.ghtk.todo_list.exception.EmailAlreadyExistedException;
@@ -52,5 +55,31 @@ public class AuthUserServiceImpl implements AuthUserService {
   public Optional<AuthUser> findByAccountId(String accountId) {
     log.info("(findByAccountId)accountId: {}", accountId);
     return repository.findByAccountId(accountId);
+  }
+
+  @Override
+  public AuthUserResponse updateUserDetail(String userId, UpdateInformationRequest request) {
+    log.info("(updateUserDetail)userId: {}, request: {}", userId, request);
+    var user = repository
+        .findById(userId)
+        .orElseThrow(() -> {
+          log.error("(updateUserDetail)userId: {} not found", userId);
+          throw new UserNotFoundException();
+        });
+
+    user.setFirstName(request.getFirstName());
+    user.setMiddleName(request.getMiddleName());
+    user.setLastName(request.getLastName());
+    user.setPhone(request.getPhone());
+    if (request.getDateOfBirth() != null && !request.getDateOfBirth().trim().isEmpty()) {
+      user.setDateOfBirth(LocalDate.parse(request.getDateOfBirth()));
+    } else {
+      user.setDateOfBirth(null);
+    }
+    user.setGender(request.getGender());
+    user.setAddress(request.getAddress());
+    repository.save(user);
+
+    return AuthUserResponse.from(user);
   }
 }
