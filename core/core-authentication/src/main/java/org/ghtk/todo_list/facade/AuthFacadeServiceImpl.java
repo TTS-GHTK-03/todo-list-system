@@ -342,7 +342,8 @@ public class AuthFacadeServiceImpl implements AuthFacadeService {
     } else if (type.equals(ResendOtpType.REGISTER.toString())) {
       resend(request.getEmail(), REGISTER_KEY);
     } else {
-      throw new EmailNotFoundException(request.getEmail());
+      log.error("(resendOtp) Invalid resend type {} value", request.getType());
+      throw new TypeResendInvalidException(request.getType());
     }
   }
 
