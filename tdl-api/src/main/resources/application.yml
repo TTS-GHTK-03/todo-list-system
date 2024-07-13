@@ -19,7 +19,7 @@ spring:
   liquibase:
     changelog: classpath:/database.migration/master-changelog.xml
   datasource:
-    url: jdbc:mysql://localhost:3306/tdl
+    url: jdbc:mysql://localhost:3307/tdl
     username:
     password:
     driver-class-name: com.mysql.cj.jdbc.Driver
