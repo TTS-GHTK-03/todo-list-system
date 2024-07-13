@@ -9,3 +9,4 @@ public class PasswordIncorrectException extends BadRequestException {
     setCode("org.ghtk.todo_list.exception.PasswordIncorrectException");
   }
 }
+

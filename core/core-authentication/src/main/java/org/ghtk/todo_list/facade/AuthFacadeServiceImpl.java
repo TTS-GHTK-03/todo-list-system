@@ -29,7 +29,6 @@ import org.ghtk.todo_list.exception.*;
 import org.ghtk.todo_list.dto.response.VerifyResetPasswordResponse;
 import org.ghtk.todo_list.exception.OTPNotFoundException;
 import org.ghtk.todo_list.exception.PasswordConfirmNotMatchException;
-import org.ghtk.todo_list.exception.PasswordIncorrectException;
 import org.ghtk.todo_list.exception.RegisterKeyNotFoundException;
 import org.ghtk.todo_list.exception.UserNotFoundException;
 import org.ghtk.todo_list.exception.UsernameNotFoundException;
@@ -189,10 +188,12 @@ public class AuthFacadeServiceImpl implements AuthFacadeService {
     redisCacheService.delete(LOGIN_FAILED_ATTEMPT_KEY, user.getEmail());
 
     ActiveLoginResponse loginResponse = new ActiveLoginResponse();
-    loginResponse.setAccessToken(authTokenService.generateAccessToken(user.getId(), account.getUsername(),
-        user.getEmail()));
-    loginResponse.setRefreshToken(authTokenService.generateRefreshToken(user.getId(), account.getUsername(),
-        user.getEmail()));
+    loginResponse.setAccessToken(
+        authTokenService.generateAccessToken(user.getId(), account.getUsername(),
+            user.getEmail()));
+    loginResponse.setRefreshToken(
+        authTokenService.generateRefreshToken(user.getId(), account.getUsername(),
+            user.getEmail()));
     loginResponse.setAccessTokenLifeTime(authTokenService.getAccessTokenLifeTime());
     loginResponse.setRefreshTokenLifeTime(authTokenService.getRefreshTokenLifeTime());
 
@@ -284,6 +285,44 @@ public class AuthFacadeServiceImpl implements AuthFacadeService {
     authAccountService.save(account);
 
     log.info("(resetPassword) Password reset successfully for email: {}", request.getEmail());
+  }
+
+  @Override
+  public void changePassword(ChangePasswordRequest request, String userId) {
+
+    log.info("(changePassword)request: {}", request);
+
+    if (!request.getConfirmPassword().equals(request.getNewPassword())) {
+      log.error("(changePassword) New password and confirmation password do not match: {}, {}",
+          request.getNewPassword(),
+          request.getConfirmPassword());
+      throw new PasswordConfirmNotMatchException();
+    }
+
+    if(request.getOldPassword().equals(request.getNewPassword())) {
+      log.error("(changePassword) New password and Old password are the same: {}, {}",
+          request.getNewPassword(), request.getOldPassword());
+      throw new PasswordSimilarException();
+    }
+
+    AuthAccount account = authAccountService.findByUserIdWithThrow(
+        "738dced1-8761-4768-914a-d052c9420a6b");
+
+    if (!CryptUtil.getPasswordEncoder().matches(request.getOldPassword(), account.getPassword())) {
+      log.error("(changePassword) Your password is incorrect: {}",
+          request.getOldPassword());
+      throw new PasswordIncorrectException();
+    }
+
+    if (CryptUtil.getPasswordEncoder().matches(request.getNewPassword(), account.getPassword())) {
+      log.error("(changePassword) New password and password in database are the same: {}",
+          request.getNewPassword());
+      throw new PasswordSimilarException();
+    }
+
+    account.setPassword(CryptUtil.getPasswordEncoder().encode(request.getNewPassword()));
+    authAccountService.save(account);
+    log.info("(changePassword) Password change successfully!!");
   }
 
   private String generateResetPasswordKey(String email) {

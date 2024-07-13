@@ -22,4 +22,5 @@ public interface AuthFacadeService {
 
   void resetPassword(ResetPasswordRequest request);
   String verifyEmail(VerifyEmailRequest request);
+  void changePassword(ChangePasswordRequest request, String userId);
 }
