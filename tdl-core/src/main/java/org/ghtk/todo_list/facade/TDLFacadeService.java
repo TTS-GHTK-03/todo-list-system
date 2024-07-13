@@ -7,4 +7,6 @@ import org.ghtk.todo_list.model.response.TaskResponse;
 public interface TDLFacadeService {
 
   List<TaskResponse> getAllTaskByProjectId(String projectId);
+
+  TaskResponse getTaskByTaskId(String projectId, String taskId);
 }

@@ -12,5 +12,5 @@ public interface TaskRepository extends JpaRepository<Task, String> {
   @Query(value = "SELECT t FROM Task t WHERE t.projectId = :projectId")
   List<Task> getAllTasksByProjectId(String projectId);
 
-  boolean existsByProjectId(String projectId);
+  boolean existsById(String id);
 }
