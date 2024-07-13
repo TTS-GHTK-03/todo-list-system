@@ -190,11 +190,11 @@ public class AuthFacadeServiceImpl implements AuthFacadeService {
 
     ActiveLoginResponse loginResponse = new ActiveLoginResponse();
     loginResponse.setAccessToken(
-        authTokenService.generateAccessToken(user.getId(), account.getUsername(),
-            user.getEmail()));
+        authTokenService.generateAccessToken(user.getId(), user.getEmail(),
+            account.getUsername()));
     loginResponse.setRefreshToken(
-        authTokenService.generateRefreshToken(user.getId(), account.getUsername(),
-            user.getEmail()));
+        authTokenService.generateRefreshToken(user.getId(), user.getEmail(),
+            account.getUsername()));
     loginResponse.setAccessTokenLifeTime(authTokenService.getAccessTokenLifeTime());
     loginResponse.setRefreshTokenLifeTime(authTokenService.getRefreshTokenLifeTime());
 
