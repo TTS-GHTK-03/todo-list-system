@@ -36,14 +36,10 @@ public class TDLFacadeServiceImpl implements TDLFacadeService {
 
   @Override
   public TaskResponse getTaskByTaskId(String projectId, String taskId) {
-    log.info("(getTaskByTaskId)taskId: {}", taskId);
+    log.info("(getTaskByTaskId)taskId: {},projectId: {}", taskId, projectId);
     if (!projectService.existById(projectId)) {
       throw new ProjectNotFoundException();
     }
-    if (!taskService.existsById(taskId)) {
-      throw new TaskNotFoundException();
-    }
-
-    return taskService.getTaskByTaskId(taskId);
+    return taskService.findById(taskId);
   }
 }

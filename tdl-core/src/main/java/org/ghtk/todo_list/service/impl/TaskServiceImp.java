@@ -31,14 +31,13 @@ public class TaskServiceImp implements TaskService {
   }
 
   @Override
-  public TaskResponse getTaskByTaskId(String taskId) {
+  public TaskResponse findById(String taskId) {
     log.info("(getTaskByTaskId)projectId: {}", taskId);
-    Task task = taskRepo.getTaskByTaskId(taskId);
+    var task = taskRepo.findById(taskId).orElseThrow(() -> {
+      throw new TaskNotFoundException();
+    });
+
     return new TaskResponse(task.getId(), task.getTitle());
   }
 
-  @Override
-  public boolean existsById(String taskId) {
-    return taskRepo.existsById(taskId);
-  }
 }

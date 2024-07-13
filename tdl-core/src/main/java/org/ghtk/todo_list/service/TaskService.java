@@ -8,7 +8,6 @@ public interface TaskService {
 
   List<TaskResponse> getAllTasksByProjectId(String projectId);
 
-  TaskResponse getTaskByTaskId(String taskId);
+  TaskResponse findById(String taskId);
 
-  boolean existsById(String taskId);
 }
