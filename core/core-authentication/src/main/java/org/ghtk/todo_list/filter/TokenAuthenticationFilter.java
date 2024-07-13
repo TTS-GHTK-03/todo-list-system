@@ -5,6 +5,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Objects;
@@ -61,7 +62,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
       if(authTokenService.validateAccessToken(jwtToken, userId)) {
         var usernamePasswordAuthToken =
             new UsernamePasswordAuthenticationToken(
-                account.getUsername(), user.getId(), null);
+                account.getUsername(), user.getId(), new ArrayList<>());
         usernamePasswordAuthToken.setDetails(user);
         SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthToken);
       }
