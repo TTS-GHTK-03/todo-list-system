@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.entity.ProjectUser;
+import org.ghtk.todo_list.exception.ProjectNotFoundException;
+import org.ghtk.todo_list.exception.ProjectUserNotFoundException;
 import org.ghtk.todo_list.mapper.ProjectUserMapper;
 import org.ghtk.todo_list.repository.ProjectUserRepository;
 import org.ghtk.todo_list.service.ProjectUserService;
@@ -25,7 +27,11 @@ public class ProjectUserServiceImpl implements ProjectUserService {
 
   @Override
   public String getRoleProjectUser(String userId, String projectId) {
-    log.info("(getRoleProjectUser)project user: {}", userId);
+    log.info("(getRoleProjectUser)user: {}, project: {}", userId, projectId);
+    if(projectUserRepository.existByUserIdAndProjectId(userId, projectId) == null){
+      log.error("(getProjectInformation)project: {}", projectId);
+      throw new ProjectUserNotFoundException();
+    }
     return projectUserRepository.getRoleProjectUser(userId, projectId);
   }
 }
