@@ -350,7 +350,7 @@ public class AuthFacadeServiceImpl implements AuthFacadeService {
   private void resend(String email, String otpKey) {
     log.info("(resend)email {}, otpKey {}", email, otpKey);
     var redisKey = email + otpKey;
-    redisCacheService.delete(redisKey);
+    //redisCacheService.delete(redisKey);
 
     var otp = otpService.generateOtp();
     redisCacheService.save(redisKey, otp, OTP_TTL_MINUTES, TimeUnit.MINUTES);
