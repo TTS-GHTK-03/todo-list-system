@@ -25,4 +25,10 @@ public interface AuthUserRepository extends JpaRepository<AuthUser, String> {
       WHERE pu.role = 'ADMIN' AND pu.projectId = :projectId
       """)
   List<UserNameResponse> getNameUser(String projectId);
+  @Query("""
+    select new org.ghtk.todo_list.repository.UserProjection(a.firstName, a.middleName, a.lastName, a.email) from AuthUser a 
+    where a.id = :userId
+  """)
+  Optional<UserProjection> findByUserId(String userId);
+
 }
