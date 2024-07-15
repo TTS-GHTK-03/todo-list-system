@@ -14,6 +14,7 @@ import org.ghtk.todo_list.service.AuthUserService;
 import org.ghtk.todo_list.util.SecurityUtil;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -46,6 +47,14 @@ public class UserController {
   public BaseResponse updateInformation(@RequestBody @Valid UpdateInformationRequest request) {
     log.info("(updateInformation)request: {}", request.toString());
     return BaseResponse.of(HttpStatus.OK.value(), LocalDateTime.now().toString(),
-        authUserService.updateUserDetail("bcc59df0-a14b-4090-bac9-ee12e58f7d87", request));
+        authUserService.updateUserDetail(getUserId(), request));
+  }
+
+  @GetMapping()
+  @ResponseStatus(HttpStatus.OK)
+  public BaseResponse getDetail() {
+    log.info("(getDetail)");
+    return BaseResponse.of(HttpStatus.OK.value(), LocalDateTime.now().toString(),
+        authUserService.getDetail(getUserId()));
   }
 }

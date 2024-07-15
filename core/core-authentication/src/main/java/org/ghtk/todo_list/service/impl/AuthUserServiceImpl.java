@@ -9,7 +9,6 @@ import org.ghtk.todo_list.dto.response.AuthUserResponse;
 import org.ghtk.todo_list.entity.AuthUser;
 import org.ghtk.todo_list.exception.AccountAlreadyHasUserException;
 import org.ghtk.todo_list.exception.EmailAlreadyExistedException;
-import org.ghtk.todo_list.exception.EmailNotFoundException;
 import org.ghtk.todo_list.exception.UserNotFoundException;
 import org.ghtk.todo_list.repository.AuthUserRepository;
 import org.ghtk.todo_list.service.AuthUserService;
@@ -76,10 +75,21 @@ public class AuthUserServiceImpl implements AuthUserService {
     } else {
       user.setDateOfBirth(null);
     }
-    user.setGender(request.getGender());
+    user.setGender(request.getGender().toUpperCase());
     user.setAddress(request.getAddress());
     repository.save(user);
 
     return AuthUserResponse.from(user);
+  }
+
+  @Override
+  public AuthUserResponse getDetail(String userId) {
+    log.info("(getDetail)userId: {}", userId);
+    return AuthUserResponse.from(repository
+        .findById(userId)
+        .orElseThrow(() -> {
+          log.error("(getDetail)userId: {} not found", userId);
+          throw new UserNotFoundException();
+        }));
   }
 }
