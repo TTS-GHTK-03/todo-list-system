@@ -3,6 +3,7 @@ package org.ghtk.todo_list.service.impl;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.entity.Task;
+import org.ghtk.todo_list.entity.TaskAssignees;
 import org.ghtk.todo_list.exception.TaskNotFoundException;
 import org.ghtk.todo_list.model.response.TaskResponse;
 import org.ghtk.todo_list.repository.TaskRepository;
@@ -40,11 +41,15 @@ public class TaskServiceImp implements TaskService {
   }
 
   @Override
-  public TaskResponse taskAgile(String userId, String title) {
+  public TaskResponse createTask(String userId, String title) {
     log.info("(createTask)user: {}", userId);
 
     Task task = new Task();
     task.setTitle(title);
+
+    TaskAssignees taskAssignees = new TaskAssignees();
+    taskAssignees.setTaskId(task.getId());
+    taskAssignees.setUserId(userId);
 
     Task taskSaved = taskRepo.save(task);
     return new TaskResponse(taskSaved.getId(), taskSaved.getTitle());

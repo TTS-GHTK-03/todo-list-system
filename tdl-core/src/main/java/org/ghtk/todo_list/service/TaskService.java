@@ -10,6 +10,6 @@ public interface TaskService {
 
   TaskResponse findById(String taskId);
 
-  TaskResponse taskAgile(String userId, String title);
+  TaskResponse createTask(String userId, String title);
 
 }

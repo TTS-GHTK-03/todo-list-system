@@ -46,9 +46,10 @@ public class TDLFacadeServiceImpl implements TDLFacadeService {
         projectId,
         userId);
     if (!projectService.existById(projectId)) {
+      log.info("Project with ID {} does not exist.", projectId );
       throw new ProjectNotFoundException();
     }
-    return taskService.taskAgile(userId, title);
+    return taskService.createTask(userId, title);
   }
 
 }
