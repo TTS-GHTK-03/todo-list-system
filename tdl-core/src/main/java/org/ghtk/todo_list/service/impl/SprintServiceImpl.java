@@ -1,5 +1,6 @@
 package org.ghtk.todo_list.service.impl;
 
+import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.constant.SprintStatus;
@@ -36,5 +37,12 @@ public class SprintServiceImpl implements SprintService {
         .id(sprint.getId())
         .title(sprint.getTitle())
         .build();
+  }
+
+  @Override
+  public CreateSprintResponse startSprint(String projectId, String sprintId, LocalDate startDate,
+      LocalDate endDate) {
+
+    return null;
   }
 }

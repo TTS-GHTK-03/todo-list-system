@@ -1,13 +1,16 @@
 package org.ghtk.todo_list.controller;
 
+import jakarta.validation.Valid;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.dto.response.BaseResponse;
+import org.ghtk.todo_list.model.request.StartSprintRequest;
 import org.ghtk.todo_list.service.SprintService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -24,5 +27,12 @@ public class SprintController {
     log.info("(createSprintByProject) project {}", projectId);
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         sprintService.createSprintByProject(projectId));
+  }
+
+  @PostMapping("/{project_id}/start/{sprint_id}")
+  public BaseResponse startSprint(@RequestBody @Valid StartSprintRequest request,  @PathVariable("project_id") String projectId, @PathVariable("sprint_id") String sprintId) {
+    log.info("(startSprint) projectId {}, sprintId {}", projectId, sprintId);
+    return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
+        sprintService.startSprint(projectId, sprintId, request.getStartDate(), request.getEndDate()));
   }
 }
