@@ -9,11 +9,10 @@ import org.springframework.stereotype.Component;
 public class ProjectMapperImpl implements ProjectMapper {
 
   @Override
-  public Project toProject(String title, String role, String key, LocalDateTime createdAt,
+  public Project toProject(String title, String key, LocalDateTime createdAt,
       LocalDateTime lastUpdatedAt) {
     Project project = new Project();
     project.setTitle(title);
-    project.setRole(role);
     project.setKeyProject(key);
     project.setCreatedAt(createdAt);
     project.setLastUpdatedAt(lastUpdatedAt);
