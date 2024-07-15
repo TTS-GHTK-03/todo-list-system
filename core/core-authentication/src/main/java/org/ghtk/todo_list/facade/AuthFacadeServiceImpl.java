@@ -337,8 +337,10 @@ public class AuthFacadeServiceImpl implements AuthFacadeService {
     String type = request.getType().trim().toUpperCase();
 
     if (type.equals(ResendOtpType.FORGOT.toString())) {
+      log.info("(resendOtp) come forgot");
       resend(request.getEmail(), RESET_PASSWORD_OTP_KEY);
     } else if (type.equals(ResendOtpType.REGISTER.toString())) {
+      log.info("(resendOtp) come register");
       resend(request.getEmail(), REGISTER_KEY);
     } else {
       log.error("(resendOtp) Invalid resend type {} value", request.getType());
