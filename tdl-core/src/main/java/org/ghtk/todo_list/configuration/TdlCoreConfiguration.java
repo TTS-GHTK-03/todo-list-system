@@ -1,11 +1,13 @@
 package org.ghtk.todo_list.configuration;
 
 import org.ghtk.todo_list.mapper.BoardMapper;
+import org.ghtk.todo_list.mapper.ProjectInformationResponseMapper;
 import org.ghtk.todo_list.mapper.ProjectMapper;
 import org.ghtk.todo_list.mapper.ProjectUserMapper;
 import org.ghtk.todo_list.repository.BoardRepository;
 import org.ghtk.todo_list.repository.ProjectRepository;
 import org.ghtk.todo_list.repository.ProjectUserRepository;
+import org.ghtk.todo_list.service.AuthUserService;
 import org.ghtk.todo_list.service.BoardService;
 import org.ghtk.todo_list.service.ProjectService;
 import org.ghtk.todo_list.service.ProjectUserService;
@@ -28,8 +30,11 @@ public class TdlCoreConfiguration {
 
   @Bean
   public ProjectService projectService(ProjectRepository projectRepository,
-      ProjectMapper projectMapper, ProjectUserService projectUserService, BoardService boardService) {
-    return new ProjectServiceImpl(projectRepository, projectMapper, projectUserService, boardService);
+      ProjectUserService projectUserService, BoardService boardService,
+      AuthUserService authUserService, ProjectMapper projectMapper,
+      ProjectInformationResponseMapper projectInformationResponseMapper) {
+    return new ProjectServiceImpl(projectRepository, projectUserService,
+        boardService, authUserService, projectMapper, projectInformationResponseMapper);
   }
 
   @Bean

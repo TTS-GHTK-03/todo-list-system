@@ -4,6 +4,9 @@ import java.time.LocalDateTime;
 import org.ghtk.todo_list.entity.ProjectUser;
 
 public interface ProjectUserService {
+
   ProjectUser createProjectUser(String userId, String projectId, String role,
       LocalDateTime createdAt, LocalDateTime lastUpdatedAt);
+
+  String getRoleProjectUser(String userId, String projectId);
 }
