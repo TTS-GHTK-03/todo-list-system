@@ -10,4 +10,6 @@ public interface TaskService {
 
   TaskResponse findById(String taskId);
 
+  TaskResponse createTask(String userId, String title);
+
 }

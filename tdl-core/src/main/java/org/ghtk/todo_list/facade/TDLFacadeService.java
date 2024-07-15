@@ -9,4 +9,5 @@ public interface TDLFacadeService {
   List<TaskResponse> getAllTaskByProjectId(String projectId);
 
   TaskResponse getTaskByTaskId(String projectId, String taskId);
+  TaskResponse createTask(String projectId, String userId, String title);
 }

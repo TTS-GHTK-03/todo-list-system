@@ -5,10 +5,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.entity.Task;
 import org.ghtk.todo_list.exception.ProjectNotFoundException;
-import org.ghtk.todo_list.exception.TaskNotFoundException;
 import org.ghtk.todo_list.facade.TDLFacadeService;
 import org.ghtk.todo_list.model.response.TaskResponse;
-import org.ghtk.todo_list.repository.TaskRepository;
 import org.ghtk.todo_list.service.ProjectService;
 import org.ghtk.todo_list.service.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,4 +40,15 @@ public class TDLFacadeServiceImpl implements TDLFacadeService {
     }
     return taskService.findById(taskId);
   }
+
+  public TaskResponse createTask(String projectId, String userId, String title) {
+    log.info("(createTask)projectId: {}, userId: {}",
+        projectId,
+        userId);
+    if (!projectService.existById(projectId)) {
+      throw new ProjectNotFoundException();
+    }
+    return taskService.createTask(userId, title);
+  }
+
 }
