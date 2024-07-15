@@ -9,6 +9,7 @@ import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.constant.AccountLockedTime;
+import org.ghtk.todo_list.constant.ResendOtpType;
 import org.ghtk.todo_list.core_email.helper.EmailHelper;
 import org.ghtk.todo_list.dto.request.VerifyEmailRequest;
 import org.ghtk.todo_list.dto.request.VerifyRegisterRequest;
@@ -29,7 +30,6 @@ import org.ghtk.todo_list.exception.*;
 import org.ghtk.todo_list.dto.response.VerifyResetPasswordResponse;
 import org.ghtk.todo_list.exception.OTPNotFoundException;
 import org.ghtk.todo_list.exception.PasswordConfirmNotMatchException;
-import org.ghtk.todo_list.exception.PasswordIncorrectException;
 import org.ghtk.todo_list.exception.RegisterKeyNotFoundException;
 import org.ghtk.todo_list.exception.UserNotFoundException;
 import org.ghtk.todo_list.exception.UsernameNotFoundException;
@@ -189,10 +189,12 @@ public class AuthFacadeServiceImpl implements AuthFacadeService {
     redisCacheService.delete(LOGIN_FAILED_ATTEMPT_KEY, user.getEmail());
 
     ActiveLoginResponse loginResponse = new ActiveLoginResponse();
-    loginResponse.setAccessToken(authTokenService.generateAccessToken(user.getId(), account.getUsername(),
-        user.getEmail()));
-    loginResponse.setRefreshToken(authTokenService.generateRefreshToken(user.getId(), account.getUsername(),
-        user.getEmail()));
+    loginResponse.setAccessToken(
+        authTokenService.generateAccessToken(user.getId(), user.getEmail(),
+            account.getUsername()));
+    loginResponse.setRefreshToken(
+        authTokenService.generateRefreshToken(user.getId(), user.getEmail(),
+            account.getUsername()));
     loginResponse.setAccessTokenLifeTime(authTokenService.getAccessTokenLifeTime());
     loginResponse.setRefreshTokenLifeTime(authTokenService.getRefreshTokenLifeTime());
 
@@ -284,6 +286,80 @@ public class AuthFacadeServiceImpl implements AuthFacadeService {
     authAccountService.save(account);
 
     log.info("(resetPassword) Password reset successfully for email: {}", request.getEmail());
+  }
+
+  @Override
+  public void changePassword(ChangePasswordRequest request, String userId) {
+
+    log.info("(changePassword)request: {}, userId: {}", request, userId);
+
+    if (!request.getConfirmPassword().equals(request.getNewPassword())) {
+      log.error("(changePassword) New password and confirmation password do not match: {}, {}",
+          request.getNewPassword(),
+          request.getConfirmPassword());
+      throw new PasswordConfirmNotMatchException();
+    }
+
+    if (request.getOldPassword().equals(request.getNewPassword())) {
+      log.error("(changePassword) New password and Old password are the same: {}, {}",
+          request.getNewPassword(), request.getOldPassword());
+      throw new PasswordSimilarException();
+    }
+
+    AuthAccount account = authAccountService.findByUserIdWithThrow(userId);
+
+    if (!CryptUtil.getPasswordEncoder().matches(request.getOldPassword(), account.getPassword())) {
+      log.error("(changePassword) Your password is incorrect: {}",
+          request.getOldPassword());
+      throw new PasswordIncorrectException();
+    }
+
+    if (CryptUtil.getPasswordEncoder().matches(request.getNewPassword(), account.getPassword())) {
+      log.error("(changePassword) New password and password in database are the same: {}",
+          request.getNewPassword());
+      throw new PasswordSimilarException();
+    }
+
+    account.setPassword(CryptUtil.getPasswordEncoder().encode(request.getNewPassword()));
+    authAccountService.save(account);
+    log.info("(changePassword) Password change successfully!!");
+  }
+
+  @Override
+  public void resendOtp(ResendOtpRequest request) {
+    log.info("(resendOtp)request: {}", request);
+
+    if (!authUserService.existsByEmail(request.getEmail())) {
+      log.error("(resendOtp)email: {}", request.getEmail());
+      throw new EmailNotFoundException(request.getEmail());
+    }
+
+    String type = request.getType().trim().toUpperCase();
+
+    if (type.equals(ResendOtpType.FORGOT.toString())) {
+      log.info("(resendOtp) come forgot");
+      resend(request.getEmail(), RESET_PASSWORD_OTP_KEY);
+    } else if (type.equals(ResendOtpType.REGISTER.toString())) {
+      log.info("(resendOtp) come register");
+      resend(request.getEmail(), REGISTER_KEY);
+    } else {
+      log.error("(resendOtp) Invalid resend type {} value", request.getType());
+      throw new TypeResendInvalidException(request.getType());
+    }
+  }
+
+  private void resend(String email, String otpKey) {
+    log.info("(resend)email {}, otpKey {}", email, otpKey);
+    var redisKey = email + otpKey;
+
+    var otp = otpService.generateOtp();
+    redisCacheService.save(redisKey, otp, OTP_TTL_MINUTES, TimeUnit.MINUTES);
+
+    String subject = "Your OTP for password reset";
+    var param = new HashMap<String, Object>();
+    param.put("otp", otp);
+    param.put("otp_life", String.valueOf(OTP_TTL_MINUTES));
+    emailHelper.send(subject, email, "OTP-template", param);
   }
 
   private String generateResetPasswordKey(String email) {

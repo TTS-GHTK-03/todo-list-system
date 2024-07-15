@@ -8,4 +8,6 @@ public interface TaskService {
 
   List<TaskResponse> getAllTasksByProjectId(String projectId);
 
+  TaskResponse findById(String taskId);
+
 }

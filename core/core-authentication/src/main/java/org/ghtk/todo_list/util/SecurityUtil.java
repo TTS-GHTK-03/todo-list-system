@@ -7,11 +7,11 @@ import org.springframework.security.core.context.SecurityContextHolder;
 public class SecurityUtil {
 
   public static String getUserId() {
-    log.info("(getAccountId)");
+    log.info("(getUserId)");
     if (SecurityContextHolder.getContext().getAuthentication() == null) {
       return "SYSTEM_ID";
     }
-    log.info("(getUserId)id:{}", SecurityContextHolder.getContext().getAuthentication().getCredentials().toString());
+    log.info("(getUserId)id: {}", SecurityContextHolder.getContext().getAuthentication().getCredentials().toString());
     return SecurityContextHolder.getContext().getAuthentication().getCredentials().toString();
   }
 }

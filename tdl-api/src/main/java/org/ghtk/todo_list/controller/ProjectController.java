@@ -23,17 +23,15 @@ public class ProjectController {
   @GetMapping()
   public BaseResponse getAllProject() {
     log.info("(getAllProject)");
-    String userId = "58ba2b2c-fa18-4443-bcb5-ea24ad60b319";
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
-        projectService.getAllProject(userId));
+        projectService.getAllProject(getUserId()));
   }
 
   @GetMapping("/{project_id}")
   public BaseResponse getProject(@PathVariable(name = "project_id") String projectId) {
     log.info("(getProject)projectId: {}", projectId);
-    String userId = "58ba2b2c-fa18-4443-bcb5-ea24ad60b319";
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
-        projectService.getProject(userId, projectId));
+        projectService.getProject(getUserId(), projectId));
   }
 
   @GetMapping("/{project_id}/information")
@@ -47,8 +45,7 @@ public class ProjectController {
   @PostMapping()
   public BaseResponse createProject(@RequestBody CreateProjectRequest createProjectRequest) {
     log.info("(createProject)project: {}", createProjectRequest);
-    String userId = "58ba2b2c-fa18-4443-bcb5-ea24ad60b319";
     return BaseResponse.of(HttpStatus.CREATED.value(), LocalDate.now().toString(),
-        projectService.createProject(userId, createProjectRequest.getTitle()));
+        projectService.createProject(getUserId(), createProjectRequest.getTitle()));
   }
 }
