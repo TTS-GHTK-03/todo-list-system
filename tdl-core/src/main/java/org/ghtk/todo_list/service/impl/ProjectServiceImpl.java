@@ -56,14 +56,14 @@ public class ProjectServiceImpl implements ProjectService {
     //check user exist
 
     //
-    if (!projectRepository.existsById(projectId) ) {
+    if (!projectRepository.existsById(projectId)) {
       log.error("(getProject)user: {} not found ", projectId);
       throw new ProjectNotFoundException();
     }
 
     Project project = projectRepository.getProject(userId, projectId);
 
-    if (project == null){
+    if (project == null) {
       log.error("(getProject)user: {} user doesn't have project", projectId);
       throw new ProjectUserNotFoundException();
     }
@@ -75,7 +75,7 @@ public class ProjectServiceImpl implements ProjectService {
   public ProjectInformationResponse getProjectInformation(String userId, String projectId) {
     log.info("(getProjectInformation)project: {}", projectId);
 
-    if(!projectRepository.existsById(projectId)){
+    if (!projectRepository.existsById(projectId)) {
       log.error("(getProjectInformation)project: {}", projectId);
       throw new ProjectNotFoundException();
     }
@@ -83,7 +83,8 @@ public class ProjectServiceImpl implements ProjectService {
     String roleProjectUser = projectUserService.getRoleProjectUser(userId, projectId);
     List<UserNameResponse> userNameResponseList = authUserService.getNameUser(userId, projectId);
 
-    return projectInformationResponseMapper.toProjectInformationResponse(project, roleProjectUser, userNameResponseList);
+    return projectInformationResponseMapper.toProjectInformationResponse(project, roleProjectUser,
+        userNameResponseList);
   }
 
   @Override
@@ -104,15 +105,17 @@ public class ProjectServiceImpl implements ProjectService {
 
     int count = 1;
     String keyProjectCheck = stringBuilder.toString() + count;
-    while (projectRepository.findByKeyProject(keyProjectCheck) != null){
+    while (projectRepository.findByKeyProject(keyProjectCheck) != null) {
       count++;
       keyProjectCheck = stringBuilder.toString() + count;
     }
 
-    Project project = projectMapper.toProject(title, stringBuilder.append(count).toString(), LocalDateTime.now(), LocalDateTime.now());
+    Project project = projectMapper.toProject(title, stringBuilder.append(count).toString(),
+        LocalDateTime.now(), LocalDateTime.now());
     Project projectSaved = projectRepository.save(project);
 
-    ProjectUser projectUser = projectUserService.createProjectUser(userId, projectSaved.getId(), "ADMIN", LocalDateTime.now(), LocalDateTime.now());
+    ProjectUser projectUser = projectUserService.createProjectUser(userId, projectSaved.getId(),
+        "ADMIN", LocalDateTime.now(), LocalDateTime.now());
 
     return projectSaved;
   }
@@ -121,5 +124,20 @@ public class ProjectServiceImpl implements ProjectService {
   public boolean existById(String id) {
     log.info("(existById)id: {}", id);
     return projectRepository.existsById(id);
+  }
+
+  @Override
+  public Project getProjectById(String projectId) {
+    log.info("(getProjectById)projectId: {}", projectId);
+    return projectRepository.findById(projectId).orElseThrow(() -> {
+      log.error("(getProjectById)projectId: {} not found", projectId);
+      throw new ProjectNotFoundException();
+    });
+  }
+
+  @Override
+  public void updateCountSprint(String projectId, Long countSprint) {
+    log.info("(updateCountSprint)projectId: {}, countSprint: {}", projectId, countSprint);
+    projectRepository.updateCountSprint(projectId, countSprint);
   }
 }

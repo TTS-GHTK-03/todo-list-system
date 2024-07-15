@@ -269,5 +269,10 @@
   <changeSet id="20240715-1438-foreign-key-sprint" author="Han Luan">
     <modifyDataType tableName="sprint" columnName="status" newDataType="varchar(255)"/>
   </changeSet>
+  <changeSet id="20240715-1835-add-column-count-sprint" author="Han Luan">
+    <addColumn tableName="project">
+      <column name="count_sprint" type="bigint"/>
+    </addColumn>
+  </changeSet>
 
 </databaseChangeLog>

@@ -1,5 +1,7 @@
 package org.ghtk.todo_list.configuration;
 
+import org.ghtk.todo_list.facade.SprintFacadeService;
+import org.ghtk.todo_list.facade.imp.SprintFacadeServiceImpl;
 import org.ghtk.todo_list.mapper.BoardMapper;
 import org.ghtk.todo_list.mapper.ProjectInformationResponseMapper;
 import org.ghtk.todo_list.mapper.ProjectMapper;
@@ -40,6 +42,12 @@ public class TdlCoreConfiguration {
     return new ProjectServiceImpl(projectRepository, projectUserService,
         boardService, authUserService, projectMapper, projectInformationResponseMapper);
   }
+  @Bean
+  public SprintFacadeService sprintFacadeService(
+      SprintService sprintService, ProjectService projectService, SprintMapper sprintMapper
+  ) {
+    return new SprintFacadeServiceImpl(sprintService, sprintMapper, projectService);
+  }
 
   @Bean
   public ProjectUserService projectUserService(ProjectUserRepository projectUserRepository,
@@ -53,7 +61,7 @@ public class TdlCoreConfiguration {
   }
 
   @Bean
-  public SprintService sprintService(ProjectRepository projectRepository, SprintRepository sprintRepository, SprintMapper sprintMapper) {
-    return new SprintServiceImpl(sprintRepository, projectRepository, sprintMapper);
+  public SprintService sprintService(SprintRepository sprintRepository) {
+    return new SprintServiceImpl(sprintRepository);
   }
 }
