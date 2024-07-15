@@ -6,6 +6,7 @@ import org.ghtk.todo_list.entity.Task;
 import org.ghtk.todo_list.entity.TaskAssignees;
 import org.ghtk.todo_list.exception.TaskNotFoundException;
 import org.ghtk.todo_list.model.response.TaskResponse;
+import org.ghtk.todo_list.repository.TaskAssigneesRepository;
 import org.ghtk.todo_list.repository.TaskRepository;
 import org.ghtk.todo_list.service.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,8 @@ public class TaskServiceImp implements TaskService {
 
   @Autowired
   private TaskRepository taskRepo;
+  @Autowired
+  private TaskAssigneesRepository taskAssigneesRepository;
 
   @Override
   public List<TaskResponse> getAllTasksByProjectId(String projectId) {
@@ -49,10 +52,12 @@ public class TaskServiceImp implements TaskService {
 
     TaskAssignees taskAssignees = new TaskAssignees();
     taskAssignees.setTaskId(task.getId());
-    taskAssignees.setUserId(userId);
 
-    Task taskSaved = taskRepo.save(task);
-    return new TaskResponse(taskSaved.getId(), taskSaved.getTitle());
+    Task newTask = taskRepo.save(task);
+    taskAssignees.setUserId(newTask.getUserId());
+    TaskAssignees newTaskAssignees = taskAssigneesRepository.save(taskAssignees);
+
+    return new TaskResponse(newTask.getId(), newTask.getTitle());
   }
 
 }
