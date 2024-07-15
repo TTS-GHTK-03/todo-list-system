@@ -16,4 +16,7 @@ public interface ProjectService {
   boolean existById(String id);
 
   Project createProject(String userId, String title);
+
+  Project getProjectById(String projectId);
+  void updateCountSprint(String projectId, Long countSprint);
 }
