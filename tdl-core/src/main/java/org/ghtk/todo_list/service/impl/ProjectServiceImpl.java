@@ -3,31 +3,20 @@ package org.ghtk.todo_list.service.impl;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.ghtk.todo_list.constant.RoleProject;
-import org.ghtk.todo_list.dto.response.UserNameResponse;
-import org.ghtk.todo_list.entity.AuthUser;
-import org.ghtk.todo_list.entity.Board;
 import org.ghtk.todo_list.entity.Project;
 import org.ghtk.todo_list.entity.ProjectUser;
 import org.ghtk.todo_list.exception.ProjectNotFoundException;
 import org.ghtk.todo_list.exception.ProjectTitleAlreadyExistedException;
 import org.ghtk.todo_list.exception.ProjectUserNotFoundException;
-import org.ghtk.todo_list.exception.RoleProjectNotFoundException;
-import org.ghtk.todo_list.mapper.BoardMapper;
 import org.ghtk.todo_list.mapper.ProjectInformationResponseMapper;
 import org.ghtk.todo_list.mapper.ProjectMapper;
-import org.ghtk.todo_list.mapper.ProjectUserMapper;
-import org.ghtk.todo_list.model.response.ProjectInformationResponse;
-import org.ghtk.todo_list.repository.BoardRepository;
 import org.ghtk.todo_list.repository.ProjectRepository;
-import org.ghtk.todo_list.repository.ProjectUserRepository;
 import org.ghtk.todo_list.service.AuthUserService;
 import org.ghtk.todo_list.service.BoardService;
 import org.ghtk.todo_list.service.ProjectService;
 
 import java.util.List;
 import org.ghtk.todo_list.service.ProjectUserService;
-import org.springframework.beans.factory.annotation.Autowired;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -43,19 +32,14 @@ public class ProjectServiceImpl implements ProjectService {
   @Override
   public List<Project> getAllProject(String userId) {
     log.info("(getAllProject)userId: {}", userId);
-    //check user exist
-
-    //
     List<Project> projectList = projectRepository.getAllProject(userId);
     return projectList;
   }
 
   @Override
   public Project getProject(String userId, String projectId) {
-    log.info("(getProject)user: {}", userId);
-    //check user exist
+    log.info("(getProject)user: {}, project: {}", userId, projectId);
 
-    //
     if (!projectRepository.existsById(projectId) ) {
       log.error("(getProject)user: {} not found ", projectId);
       throw new ProjectNotFoundException();
@@ -64,7 +48,7 @@ public class ProjectServiceImpl implements ProjectService {
     Project project = projectRepository.getProject(userId, projectId);
 
     if (project == null){
-      log.error("(getProject)user: {} user doesn't have project", projectId);
+      log.error("(getProject)user: {} doesn't have project {}", userId, projectId);
       throw new ProjectUserNotFoundException();
     }
 
@@ -72,18 +56,14 @@ public class ProjectServiceImpl implements ProjectService {
   }
 
   @Override
-  public ProjectInformationResponse getProjectInformation(String userId, String projectId) {
+  public Project getProjectInformation(String projectId) {
     log.info("(getProjectInformation)project: {}", projectId);
 
     if(!projectRepository.existsById(projectId)){
       log.error("(getProjectInformation)project: {}", projectId);
       throw new ProjectNotFoundException();
     }
-    Project project = projectRepository.findById(projectId).get();
-    String roleProjectUser = projectUserService.getRoleProjectUser(userId, projectId);
-    List<UserNameResponse> userNameResponseList = authUserService.getNameUser(userId, projectId);
-
-    return projectInformationResponseMapper.toProjectInformationResponse(project, roleProjectUser, userNameResponseList);
+    return projectRepository.findById(projectId).get();
   }
 
   @Override
@@ -110,11 +90,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     Project project = projectMapper.toProject(title, stringBuilder.append(count).toString(), LocalDateTime.now(), LocalDateTime.now());
-    Project projectSaved = projectRepository.save(project);
-
-    ProjectUser projectUser = projectUserService.createProjectUser(userId, projectSaved.getId(), "ADMIN", LocalDateTime.now(), LocalDateTime.now());
-
-    return projectSaved;
+    return projectRepository.save(project);
   }
 
   @Override

@@ -53,6 +53,12 @@ public class AuthUserServiceImpl implements AuthUserService {
   }
 
   @Override
+  public boolean existById(String id) {
+    log.info("(existsById)id: {}", id);
+    return repository.existsById(id);
+  }
+
+  @Override
   public Optional<AuthUser> findByAccountId(String accountId) {
     log.info("(findByAccountId)accountId: {}", accountId);
     return repository.findByAccountId(accountId);
@@ -96,8 +102,8 @@ public class AuthUserServiceImpl implements AuthUserService {
   }
 
   @Override
-  public List<UserNameResponse> getNameUser(String userId, String projectId) {
-    log.info("(getNameUser)userId: {}", userId);
+  public List<UserNameResponse> getNameUser(String projectId) {
+    log.info("(getNameUser)projectId: {}", projectId);
     return repository.getNameUser(projectId);
   }
 }
