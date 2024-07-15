@@ -34,11 +34,17 @@ public class ProjectController {
         projectService.getProject(getUserId(), projectId));
   }
 
+  @GetMapping("/{project_id}/information")
+  public BaseResponse getProjectInformation(@PathVariable(name = "project_id") String projectId) {
+    log.info("(getProjectInformation)projectId: {}", projectId);
+    return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
+        projectService.getProjectInformation(getUserId(), projectId));
+  }
+
   @PostMapping()
   public BaseResponse createProject(@RequestBody CreateProjectRequest createProjectRequest) {
     log.info("(createProject)project: {}", createProjectRequest);
     return BaseResponse.of(HttpStatus.CREATED.value(), LocalDate.now().toString(),
-        projectService.createProject(getUserId(), createProjectRequest.getTitle(),
-            createProjectRequest.getRole()));
+        projectService.createProject(getUserId(), createProjectRequest.getTitle()));
   }
 }

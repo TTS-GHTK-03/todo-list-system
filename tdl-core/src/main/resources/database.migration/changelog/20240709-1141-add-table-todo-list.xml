@@ -252,6 +252,9 @@
       newColumnName="key_project"
       columnDataType="varchar(255)"/>
   </changeSet>
+  <changeSet id="20240715-0856-delete-column-project" author="Phan Kieu">
+    <dropColumn tableName="project" columnName="role"/>
+  </changeSet>
 
   <changeSet id="20240715-1145-add-column-project-id" author="Han Luan">
     <addColumn tableName="sprint">
