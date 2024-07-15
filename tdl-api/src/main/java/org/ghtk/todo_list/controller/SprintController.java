@@ -28,6 +28,7 @@ public class SprintController {
   @PostMapping("/{project_id}")
   public BaseResponse createSprintByProject(@PathVariable("project_id") String projectId) {
     log.info("(createSprintByProject) project {}", projectId);
+    getUserId();
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         sprintService.createSprintByProject(projectId));
   }
