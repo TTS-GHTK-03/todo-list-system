@@ -90,4 +90,14 @@ public class AuthUserController {
         "Reset Password successfully!!");
   }
 
+  @PostMapping("/resend/otp")
+  @ResponseStatus(HttpStatus.OK)
+  public BaseResponse resendOtp(@RequestBody @Valid ResendOtpRequest request) {
+    log.info("(resendOtp)request: {}", request);
+    authFacadeService.resendOtp(request);
+
+    return BaseResponse.of(HttpStatus.OK.value(), LocalDateTime.now().toString(),
+        "resend Otp successfully!!");
+  }
+
 }

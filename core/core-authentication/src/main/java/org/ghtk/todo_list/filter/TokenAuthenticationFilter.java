@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.service.AuthAccountService;
 import org.ghtk.todo_list.service.AuthTokenService;
 import org.ghtk.todo_list.service.AuthUserService;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -34,7 +35,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
       FilterChain filterChain) throws ServletException, IOException {
     log.info("(doFilterInternal)request: {}, response: {}, filterChain: {}", request, response, filterChain);
-    final String accessToken = request.getHeader("Authorization");
+    final String accessToken = request.getHeader(HttpHeaders.AUTHORIZATION);
     if (Objects.isNull(accessToken)) {
       filterChain.doFilter(request, response);
       return;
@@ -51,9 +52,8 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
       userId = authTokenService.getSubjectFromAccessToken(jwtToken);
     } catch (Exception ex) {
       log.error("(doFilterInternal)request: {}, response: {}, filterChain: {}", request, response, filterChain);
-      ex.printStackTrace();
       filterChain.doFilter(request, response);
-      return ;
+      return;
     }
 
     if(Objects.nonNull(userId) && Objects.isNull(SecurityContextHolder.getContext().getAuthentication())) {
