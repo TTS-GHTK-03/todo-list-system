@@ -263,5 +263,8 @@
       constraintName="FK_sprint_project"
       referencedTableName="project" referencedColumnNames="id"/>
   </changeSet>
+  <changeSet id="20240715-1438-foreign-key-sprint" author="Han Luan">
+    <modifyDataType tableName="sprint" columnName="status" newDataType="varchar(255)"/>
+  </changeSet>
 
 </databaseChangeLog>
