@@ -6,12 +6,15 @@ import org.ghtk.todo_list.mapper.ProjectUserMapper;
 import org.ghtk.todo_list.repository.BoardRepository;
 import org.ghtk.todo_list.repository.ProjectRepository;
 import org.ghtk.todo_list.repository.ProjectUserRepository;
+import org.ghtk.todo_list.repository.SprintRepository;
 import org.ghtk.todo_list.service.BoardService;
 import org.ghtk.todo_list.service.ProjectService;
 import org.ghtk.todo_list.service.ProjectUserService;
+import org.ghtk.todo_list.service.SprintService;
 import org.ghtk.todo_list.service.impl.BoardServiceImpl;
 import org.ghtk.todo_list.service.impl.ProjectServiceImpl;
 import org.ghtk.todo_list.service.impl.ProjectUserServiceImpl;
+import org.ghtk.todo_list.service.impl.SprintServiceImpl;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -41,5 +44,10 @@ public class TdlCoreConfiguration {
   @Bean
   public BoardService boardService(BoardRepository boardRepository, BoardMapper boardMapper) {
     return new BoardServiceImpl(boardRepository, boardMapper);
+  }
+
+  @Bean
+  public SprintService sprintService(ProjectRepository projectRepository, SprintRepository sprintRepository) {
+    return new SprintServiceImpl(sprintRepository, projectRepository);
   }
 }
