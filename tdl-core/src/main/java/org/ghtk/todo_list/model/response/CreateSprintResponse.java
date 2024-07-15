@@ -12,4 +12,5 @@ import lombok.NoArgsConstructor;
 public class CreateSprintResponse {
   private String id;
   private String title;
+  private String status;
 }

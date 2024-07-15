@@ -35,6 +35,7 @@ public class SprintServiceImpl implements SprintService {
     return CreateSprintResponse.builder()
         .id(sprint.getId())
         .title(sprint.getTitle())
+        .status(sprint.getStatus())
         .build();
   }
 }
