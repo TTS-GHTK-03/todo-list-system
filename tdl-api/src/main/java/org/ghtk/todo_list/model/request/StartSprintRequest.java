@@ -12,14 +12,13 @@ import org.ghtk.todo_list.validation.ValidateLocalDate;
 @AllArgsConstructor
 public class StartSprintRequest {
 
-  @NotBlank(message = "Title is required")
   private String title;
 
   @NotBlank(message = "Start date is required")
   @ValidateLocalDate
-  private LocalDate startDate;
+  private String startDate;
 
   @NotBlank(message = "End date is required")
   @ValidateLocalDate
-  private LocalDate endDate;
+  private String endDate;
 }
