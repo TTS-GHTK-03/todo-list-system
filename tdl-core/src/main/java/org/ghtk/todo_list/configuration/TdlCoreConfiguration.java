@@ -3,6 +3,7 @@ package org.ghtk.todo_list.configuration;
 import org.ghtk.todo_list.mapper.BoardMapper;
 import org.ghtk.todo_list.mapper.ProjectMapper;
 import org.ghtk.todo_list.mapper.ProjectUserMapper;
+import org.ghtk.todo_list.mapper.SprintMapper;
 import org.ghtk.todo_list.repository.BoardRepository;
 import org.ghtk.todo_list.repository.ProjectRepository;
 import org.ghtk.todo_list.repository.ProjectUserRepository;
@@ -47,7 +48,7 @@ public class TdlCoreConfiguration {
   }
 
   @Bean
-  public SprintService sprintService(ProjectRepository projectRepository, SprintRepository sprintRepository) {
-    return new SprintServiceImpl(sprintRepository, projectRepository);
+  public SprintService sprintService(ProjectRepository projectRepository, SprintRepository sprintRepository, SprintMapper sprintMapper) {
+    return new SprintServiceImpl(sprintRepository, projectRepository, sprintMapper);
   }
 }

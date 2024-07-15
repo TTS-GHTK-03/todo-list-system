@@ -6,6 +6,7 @@ import org.ghtk.todo_list.constant.SprintStatus;
 import org.ghtk.todo_list.entity.Project;
 import org.ghtk.todo_list.entity.Sprint;
 import org.ghtk.todo_list.exception.ProjectNotFoundException;
+import org.ghtk.todo_list.mapper.SprintMapper;
 import org.ghtk.todo_list.model.response.CreateSprintResponse;
 import org.ghtk.todo_list.repository.ProjectRepository;
 import org.ghtk.todo_list.repository.SprintRepository;
@@ -17,6 +18,7 @@ public class SprintServiceImpl implements SprintService {
 
   private final SprintRepository sprintRepository;
   private final ProjectRepository projectRepository;
+  private final SprintMapper sprintMapper;
 
   @Override
   public CreateSprintResponse createSprintByProject(String projectId) {
@@ -33,10 +35,6 @@ public class SprintServiceImpl implements SprintService {
     sprint = sprintRepository.save(sprint);
 
     log.info("(createSprintByProject)sprint: {}", sprint);
-    return CreateSprintResponse.builder()
-        .id(sprint.getId())
-        .title(sprint.getTitle())
-        .status(sprint.getStatus())
-        .build();
+    return sprintMapper.toCreateSprintResponse(sprint);
   }
 }
