@@ -6,6 +6,7 @@ import org.ghtk.todo_list.dto.request.UpdateInformationRequest;
 import org.ghtk.todo_list.dto.response.AuthUserResponse;
 import org.ghtk.todo_list.dto.response.UserNameResponse;
 import org.ghtk.todo_list.entity.AuthUser;
+import org.ghtk.todo_list.repository.UserProjection;
 
 public interface AuthUserService {
 
@@ -16,5 +17,6 @@ public interface AuthUserService {
   Optional<AuthUser> findByAccountId(String accountId);
   AuthUserResponse updateUserDetail(String userId, UpdateInformationRequest request);
   AuthUserResponse getDetail(String userId);
+  UserProjection getByUserId(String userId);
   List<UserNameResponse> getNameUser(String projectId);
 }
