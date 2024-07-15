@@ -6,9 +6,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.constant.SprintStatus;
 import org.ghtk.todo_list.entity.Project;
 import org.ghtk.todo_list.entity.Sprint;
+import org.ghtk.todo_list.exception.ProjectIdMismatchException;
 import org.ghtk.todo_list.exception.ProjectNotFoundException;
+import org.ghtk.todo_list.exception.SprintNotFoundException;
 import org.ghtk.todo_list.mapper.SprintMapper;
 import org.ghtk.todo_list.model.response.CreateSprintResponse;
+import org.ghtk.todo_list.model.response.StartSprintResponse;
 import org.ghtk.todo_list.repository.ProjectRepository;
 import org.ghtk.todo_list.repository.SprintRepository;
 import org.ghtk.todo_list.service.SprintService;
@@ -40,9 +43,26 @@ public class SprintServiceImpl implements SprintService {
   }
 
   @Override
-  public CreateSprintResponse startSprint(String projectId, String sprintId, LocalDate startDate,
-      LocalDate endDate) {
+  public StartSprintResponse startSprint(String projectId, String sprintId, String title,
+      LocalDate startDate, LocalDate endDate) {
+    log.info("(startSprint)projectId: {}, sprintId {}", projectId, sprintId);
 
-    return null;
+    Sprint sprint = sprintRepository.findById(sprintId).orElseThrow(() -> {
+      log.error("(startSprint)projectId: {} not found", sprintId);
+      throw new SprintNotFoundException();
+    });
+    if (!sprint.getProjectId().equals(projectId)) {
+      log.error("(startSprint) projectId mismatch: sprintId {}, expected projectId {}, but found projectId {}",
+          sprintId, projectId, sprint.getProjectId());
+      throw new ProjectIdMismatchException();
+    }
+
+    sprint.setStatus(SprintStatus.START.toString());
+    sprint.setTitle(title);
+    sprint.setStartDate(startDate);
+    sprint.setEndDate(endDate);
+    sprintRepository.save(sprint);
+    log.info("(startSprint)sprint: {}", sprint);
+    return sprintMapper.toStartSprintResponse(sprint);
   }
 }
