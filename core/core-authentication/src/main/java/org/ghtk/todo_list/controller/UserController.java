@@ -37,7 +37,7 @@ public class UserController {
   public BaseResponse changePassword(@RequestBody @Valid ChangePasswordRequest request) {
 
     log.info("(changePassword)request: {}", request.toString());
-    authFacadeService.changePassword(request, "");
+    authFacadeService.changePassword(request, SecurityUtil.getUserId());
     return BaseResponse.of(HttpStatus.OK.value(), LocalDateTime.now().toString(),
         "Change Password successfully!!");
   }
