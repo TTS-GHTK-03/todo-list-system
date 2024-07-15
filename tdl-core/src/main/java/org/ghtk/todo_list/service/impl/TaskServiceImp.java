@@ -1,12 +1,9 @@
 package org.ghtk.todo_list.service.impl;
 
-import java.time.LocalDateTime;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
-import org.ghtk.todo_list.entity.Project;
 import org.ghtk.todo_list.entity.Task;
 import org.ghtk.todo_list.exception.TaskNotFoundException;
-import org.ghtk.todo_list.mapper.TaskMapper;
 import org.ghtk.todo_list.model.response.TaskResponse;
 import org.ghtk.todo_list.repository.TaskRepository;
 import org.ghtk.todo_list.service.TaskService;
@@ -21,9 +18,6 @@ public class TaskServiceImp implements TaskService {
 
   @Autowired
   private TaskRepository taskRepo;
-  @Autowired
-  private TaskMapper taskMapper;
-
 
   @Override
   public List<TaskResponse> getAllTasksByProjectId(String projectId) {
@@ -46,10 +40,11 @@ public class TaskServiceImp implements TaskService {
   }
 
   @Override
-  public TaskResponse createTask(String userId, String title) {
+  public TaskResponse taskAgile(String userId, String title) {
     log.info("(createTask)user: {}", userId);
 
-    Task task = taskMapper.toTask(title, LocalDateTime.now(), LocalDateTime.now());
+    Task task = new Task();
+    task.setTitle(title);
 
     Task taskSaved = taskRepo.save(task);
     return new TaskResponse(taskSaved.getId(), taskSaved.getTitle());
