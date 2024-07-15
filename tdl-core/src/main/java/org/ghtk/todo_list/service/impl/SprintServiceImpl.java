@@ -29,6 +29,7 @@ public class SprintServiceImpl implements SprintService {
     Sprint sprint = new Sprint();
     sprint.setTitle(project.getKeyProject() + " Sprint " + 1);
     sprint.setStatus(SprintStatus.TODO.toString());
+    sprint.setProjectId(project.getId());
     sprint = sprintRepository.save(sprint);
 
     log.info("(createSprintByProject)sprint: {}", sprint);

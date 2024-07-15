@@ -252,4 +252,16 @@
       newColumnName="key_project"
       columnDataType="varchar(255)"/>
   </changeSet>
+
+  <changeSet id="20240715-1145-add-column-project-id" author="Han Luan">
+    <addColumn tableName="sprint">
+      <column name="project_id" type="varchar(255)"/>
+    </addColumn>
+  </changeSet>
+  <changeSet id="20240715-1146-foreign-key-sprint" author="Han Luan">
+    <addForeignKeyConstraint baseTableName="sprint" baseColumnNames="project_id"
+      constraintName="FK_sprint_project"
+      referencedTableName="project" referencedColumnNames="id"/>
+  </changeSet>
+
 </databaseChangeLog>
