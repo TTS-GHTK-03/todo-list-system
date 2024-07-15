@@ -11,6 +11,7 @@ import org.ghtk.todo_list.exception.AccountAlreadyHasUserException;
 import org.ghtk.todo_list.exception.EmailAlreadyExistedException;
 import org.ghtk.todo_list.exception.UserNotFoundException;
 import org.ghtk.todo_list.repository.AuthUserRepository;
+import org.ghtk.todo_list.repository.UserProjection;
 import org.ghtk.todo_list.service.AuthUserService;
 
 @Slf4j
@@ -91,5 +92,15 @@ public class AuthUserServiceImpl implements AuthUserService {
           log.error("(getDetail)userId: {} not found", userId);
           throw new UserNotFoundException();
         }));
+  }
+
+  @Override
+  public UserProjection getByUserId(String userId) {
+    log.info("(getByUserId)userId: {}", userId);
+    return repository.findByUserId(userId)
+        .orElseThrow(() -> {
+          log.error("(getByUserId)userId: {} not found", userId);
+          throw new UserNotFoundException();
+        });
   }
 }

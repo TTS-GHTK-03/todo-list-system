@@ -15,4 +15,10 @@ public interface AuthUserRepository extends JpaRepository<AuthUser, String> {
 
   Optional<AuthUser> findByAccountId(String accountId);
 
+  @Query("""
+    select new org.ghtk.todo_list.repository.UserProjection(a.firstName, a.middleName, a.lastName, a.email) from AuthUser a 
+    where a.id = :userId
+  """)
+  Optional<UserProjection> findByUserId(String userId);
+
 }

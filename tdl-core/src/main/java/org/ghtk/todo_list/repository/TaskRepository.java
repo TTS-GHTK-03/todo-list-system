@@ -13,4 +13,13 @@ public interface TaskRepository extends JpaRepository<Task, String> {
   List<Task> getAllTasksByProjectId(String projectId);
 
   boolean existsById(String id);
+
+  @Query("""
+        select ta.userId from TaskAssignees ta
+        join Task t on t.id = ta.taskId
+        WHERE t.id = :taskId
+          """)
+  String getUserIdById(String taskId);
+
+
 }
