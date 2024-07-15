@@ -18,7 +18,14 @@ public class ProjectUserServiceImpl implements ProjectUserService {
   @Override
   public ProjectUser createProjectUser(String userId, String projectId, String role,
       LocalDateTime createdAt, LocalDateTime lastUpdatedAt) {
+    log.info("(createProjectUser)project user: {}", userId);
     ProjectUser projectUser = projectUserMapper.toProjectUser(userId, projectId, role, createdAt, lastUpdatedAt);
     return projectUserRepository.save(projectUser);
+  }
+
+  @Override
+  public String getRoleProjectUser(String userId, String projectId) {
+    log.info("(getRoleProjectUser)project user: {}", userId);
+    return projectUserRepository.getRoleProjectUser(userId, projectId);
   }
 }

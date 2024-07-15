@@ -1,11 +1,13 @@
 package org.ghtk.todo_list.service.impl;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.dto.request.UpdateInformationRequest;
 import org.ghtk.todo_list.dto.response.AuthUserResponse;
+import org.ghtk.todo_list.dto.response.UserNameResponse;
 import org.ghtk.todo_list.entity.AuthUser;
 import org.ghtk.todo_list.exception.AccountAlreadyHasUserException;
 import org.ghtk.todo_list.exception.EmailAlreadyExistedException;
@@ -91,5 +93,11 @@ public class AuthUserServiceImpl implements AuthUserService {
           log.error("(getDetail)userId: {} not found", userId);
           throw new UserNotFoundException();
         }));
+  }
+
+  @Override
+  public List<UserNameResponse> getNameUser(String userId, String projectId) {
+    log.info("(getNameUser)userId: {}", userId);
+    return repository.getNameUser(projectId);
   }
 }

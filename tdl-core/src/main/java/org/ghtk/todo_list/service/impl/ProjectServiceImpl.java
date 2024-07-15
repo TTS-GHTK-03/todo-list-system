@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.constant.RoleProject;
+import org.ghtk.todo_list.dto.response.UserNameResponse;
+import org.ghtk.todo_list.entity.AuthUser;
 import org.ghtk.todo_list.entity.Board;
 import org.ghtk.todo_list.entity.Project;
 import org.ghtk.todo_list.entity.ProjectUser;
@@ -12,11 +14,14 @@ import org.ghtk.todo_list.exception.ProjectTitleAlreadyExistedException;
 import org.ghtk.todo_list.exception.ProjectUserNotFoundException;
 import org.ghtk.todo_list.exception.RoleProjectNotFoundException;
 import org.ghtk.todo_list.mapper.BoardMapper;
+import org.ghtk.todo_list.mapper.ProjectInformationResponseMapper;
 import org.ghtk.todo_list.mapper.ProjectMapper;
 import org.ghtk.todo_list.mapper.ProjectUserMapper;
+import org.ghtk.todo_list.model.response.ProjectInformationResponse;
 import org.ghtk.todo_list.repository.BoardRepository;
 import org.ghtk.todo_list.repository.ProjectRepository;
 import org.ghtk.todo_list.repository.ProjectUserRepository;
+import org.ghtk.todo_list.service.AuthUserService;
 import org.ghtk.todo_list.service.BoardService;
 import org.ghtk.todo_list.service.ProjectService;
 
@@ -29,9 +34,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class ProjectServiceImpl implements ProjectService {
 
   private final ProjectRepository projectRepository;
-  private final ProjectMapper projectMapper;
   private final ProjectUserService projectUserService;
   private final BoardService boardService;
+  private final AuthUserService authUserService;
+  private final ProjectMapper projectMapper;
+  private final ProjectInformationResponseMapper projectInformationResponseMapper;
 
   @Override
   public List<Project> getAllProject(String userId) {
@@ -65,17 +72,23 @@ public class ProjectServiceImpl implements ProjectService {
   }
 
   @Override
-  public Project createProject(String userId, String title, String role) {
+  public ProjectInformationResponse getProjectInformation(String userId, String projectId) {
+    log.info("(getProjectInformation)project: {}", projectId);
+
+    if(!projectRepository.existsById(projectId)){
+      log.error("(getProjectInformation)project: {}", projectId);
+      throw new ProjectNotFoundException();
+    }
+    Project project = projectRepository.findById(projectId).get();
+    String roleProjectUser = projectUserService.getRoleProjectUser(userId, projectId);
+    List<UserNameResponse> userNameResponseList = authUserService.getNameUser(userId, projectId);
+
+    return projectInformationResponseMapper.toProjectInformationResponse(project, roleProjectUser, userNameResponseList);
+  }
+
+  @Override
+  public Project createProject(String userId, String title) {
     log.info("(createProject)user: {}", userId);
-
-    try {
-      RoleProject.valueOf(role.toUpperCase());
-    }
-
-    catch (IllegalArgumentException e){
-      log.error("(createProject)project: {} role not existed ", role);
-      throw new RoleProjectNotFoundException(role);
-    }
 
     if (projectRepository.findByTitle(title) != null) {
       log.error("(createProject)project: {} already has title ", title);
@@ -96,11 +109,10 @@ public class ProjectServiceImpl implements ProjectService {
       keyProjectCheck = stringBuilder.toString() + count;
     }
 
-    Project project = projectMapper.toProject(title, role, stringBuilder.append(count).toString(), LocalDateTime.now(), LocalDateTime.now());
+    Project project = projectMapper.toProject(title, stringBuilder.append(count).toString(), LocalDateTime.now(), LocalDateTime.now());
     Project projectSaved = projectRepository.save(project);
 
     ProjectUser projectUser = projectUserService.createProjectUser(userId, projectSaved.getId(), "ADMIN", LocalDateTime.now(), LocalDateTime.now());
-    Board board = boardService.createBoard(projectSaved.getId(), LocalDateTime.now(), LocalDateTime.now());
 
     return projectSaved;
   }
