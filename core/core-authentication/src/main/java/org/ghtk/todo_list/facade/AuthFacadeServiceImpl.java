@@ -306,8 +306,7 @@ public class AuthFacadeServiceImpl implements AuthFacadeService {
       throw new PasswordSimilarException();
     }
 
-    AuthAccount account = authAccountService.findByUserIdWithThrow(
-        "738dced1-8761-4768-914a-d052c9420a6b");
+    AuthAccount account = authAccountService.findByUserIdWithThrow(userId);
 
     if (!CryptUtil.getPasswordEncoder().matches(request.getOldPassword(), account.getPassword())) {
       log.error("(changePassword) Your password is incorrect: {}",
@@ -350,7 +349,6 @@ public class AuthFacadeServiceImpl implements AuthFacadeService {
   private void resend(String email, String otpKey) {
     log.info("(resend)email {}, otpKey {}", email, otpKey);
     var redisKey = email + otpKey;
-    //redisCacheService.delete(redisKey);
 
     var otp = otpService.generateOtp();
     redisCacheService.save(redisKey, otp, OTP_TTL_MINUTES, TimeUnit.MINUTES);
