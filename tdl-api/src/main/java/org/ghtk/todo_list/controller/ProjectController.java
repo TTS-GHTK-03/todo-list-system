@@ -37,9 +37,8 @@ public class ProjectController {
   @GetMapping("/{project_id}/information")
   public BaseResponse getProjectInformation(@PathVariable(name = "project_id") String projectId) {
     log.info("(getProjectInformation)projectId: {}", projectId);
-    String userId = "58ba2b2c-fa18-4443-bcb5-ea24ad60b319";
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
-        projectService.getProjectInformation(userId, projectId));
+        projectService.getProjectInformation(getUserId(), projectId));
   }
 
   @PostMapping()
