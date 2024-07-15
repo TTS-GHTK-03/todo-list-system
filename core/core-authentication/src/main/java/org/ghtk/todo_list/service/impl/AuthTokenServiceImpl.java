@@ -30,16 +30,16 @@ public class AuthTokenServiceImpl implements AuthTokenService {
 
   private String generateToken(String subject, Map<String, Object> claims, long tokenLifeTime, String jwtSecret) {
     return Jwts.builder()
-        .setSubject(subject)
         .setClaims(claims)
+        .setSubject(subject)
         .setIssuedAt(new Date(System.currentTimeMillis()))
         .setExpiration(new Date(System.currentTimeMillis() + tokenLifeTime))
         .signWith(SignatureAlgorithm.HS256, jwtSecret)
         .compact();
   }
 
-  private boolean isExpiredToken(String token, String secretKey) {
-    return getClaim(token, Claims::getExpiration, secretKey).before(new Date());
+  private boolean isActiveToken(String token, String secretKey) {
+    return getClaim(token, Claims::getExpiration, secretKey).after(new Date());
   }
 
   private <T> T getClaim(String token, Function<Claims, T> claimsResolve, String secretKey) {
@@ -68,7 +68,7 @@ public class AuthTokenServiceImpl implements AuthTokenService {
   @Override
   public boolean validateAccessToken(String accessToken, String userId) {
     log.info("(validateAccessToken)accessToken: {}, userId: {}", accessToken, userId);
-    return getSubjectFromAccessToken(accessToken).equals(userId) && !isExpiredToken(accessToken, accessTokenJwtSecret);
+    return getSubjectFromAccessToken(accessToken).equals(userId) && isActiveToken(accessToken, accessTokenJwtSecret);
   }
 
   @Override
@@ -89,7 +89,7 @@ public class AuthTokenServiceImpl implements AuthTokenService {
   @Override
   public boolean validateRefreshToken(String refreshToken, String userId) {
     log.info("(validateRefreshToken)refreshToken: {}, userId: {}", refreshToken, userId);
-    return getSubjectFromRefreshToken(refreshToken).equals(userId) && !isExpiredToken(refreshToken, refreshTokenJwtSecret);
+    return getSubjectFromRefreshToken(refreshToken).equals(userId) && isActiveToken(refreshToken, refreshTokenJwtSecret);
   }
 
   @Override
