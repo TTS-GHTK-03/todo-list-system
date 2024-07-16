@@ -2,16 +2,20 @@ package org.ghtk.todo_list.facade.imp;
 
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.constant.SprintStatus;
 import org.ghtk.todo_list.entity.Project;
 import org.ghtk.todo_list.entity.Sprint;
 import org.ghtk.todo_list.exception.ProjectIdMismatchException;
+import org.ghtk.todo_list.exception.ProjectNotFoundException;
 import org.ghtk.todo_list.exception.SprintNotFoundException;
+import org.ghtk.todo_list.exception.SprintStatusNotFoundException;
 import org.ghtk.todo_list.facade.SprintFacadeService;
 import org.ghtk.todo_list.mapper.SprintMapper;
 import org.ghtk.todo_list.model.response.CreateSprintResponse;
+import org.ghtk.todo_list.model.response.SprintResponse;
 import org.ghtk.todo_list.model.response.StartSprintResponse;
 import org.ghtk.todo_list.service.ProjectService;
 import org.ghtk.todo_list.service.SprintService;
@@ -64,5 +68,37 @@ public class SprintFacadeServiceImpl implements SprintFacadeService {
     sprintService.save(sprint);
 
     return sprintMapper.toStartSprintResponse(sprint);
+  }
+
+  @Override
+  public List<SprintResponse> getSprints(String projectId) {
+    log.info("(getSprints)");
+
+    if(!projectService.existById(projectId)) {
+      log.error("(getSprints) project not found: projectId {}", projectId);
+      throw new ProjectNotFoundException();
+    }
+    List<Sprint> sprints = sprintService.findSprintsByProjectId(projectId);
+    log.info("(getSprints)sprints: {}", sprints);
+    return sprintMapper.toSprintResponses(sprints);
+
+  }
+
+  @Override
+  public List<SprintResponse> getSprintStatus(String projectId, String status) {
+    log.info("(getSprintStatus)");
+
+    String statusFormat = status.trim().toUpperCase();
+    if(!SprintStatus.isValid(statusFormat)) {
+      log.error("(getSprintStatus) status sprint not found: status {}", status);
+      throw new SprintStatusNotFoundException();
+    }
+    if(!projectService.existById(projectId)) {
+      log.error("(getSprintStatus) project not found: projectId {}", projectId);
+      throw new ProjectNotFoundException();
+    }
+    List<Sprint> sprints = sprintService.findSprintsByProjectIdAndStatus(projectId, statusFormat);
+    log.info("(getSprintStatus)sprints: {}", sprints);
+    return sprintMapper.toSprintResponses(sprints);
   }
 }
