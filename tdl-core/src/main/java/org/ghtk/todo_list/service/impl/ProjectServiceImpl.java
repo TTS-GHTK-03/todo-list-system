@@ -23,11 +23,7 @@ import org.ghtk.todo_list.service.ProjectUserService;
 public class ProjectServiceImpl implements ProjectService {
 
   private final ProjectRepository projectRepository;
-  private final ProjectUserService projectUserService;
-  private final BoardService boardService;
-  private final AuthUserService authUserService;
   private final ProjectMapper projectMapper;
-  private final ProjectInformationResponseMapper projectInformationResponseMapper;
 
   @Override
   public List<Project> getAllProject(String userId) {

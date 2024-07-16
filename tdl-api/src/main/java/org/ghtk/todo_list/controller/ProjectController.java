@@ -48,4 +48,6 @@ public class ProjectController {
     return BaseResponse.of(HttpStatus.CREATED.value(), LocalDate.now().toString(),
         projectService.createProject(getUserId(), createProjectRequest.getTitle()));
   }
+
+
 }

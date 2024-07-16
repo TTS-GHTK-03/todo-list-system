@@ -1,7 +1,10 @@
 package org.ghtk.todo_list.configuration;
 
+import org.ghtk.todo_list.core_email.helper.EmailHelper;
 import org.ghtk.todo_list.facade.ProjectFacadeService;
+import org.ghtk.todo_list.facade.ProjectUserFacadeService;
 import org.ghtk.todo_list.facade.imp.ProjectFacadeServiceImpl;
+import org.ghtk.todo_list.facade.imp.ProjectUserFacadeServiceImpl;
 import org.ghtk.todo_list.mapper.BoardMapper;
 import org.ghtk.todo_list.mapper.ProjectInformationResponseMapper;
 import org.ghtk.todo_list.mapper.ProjectMapper;
@@ -13,6 +16,7 @@ import org.ghtk.todo_list.service.AuthUserService;
 import org.ghtk.todo_list.service.BoardService;
 import org.ghtk.todo_list.service.ProjectService;
 import org.ghtk.todo_list.service.ProjectUserService;
+import org.ghtk.todo_list.service.RedisCacheService;
 import org.ghtk.todo_list.service.impl.BoardServiceImpl;
 import org.ghtk.todo_list.service.impl.ProjectServiceImpl;
 import org.ghtk.todo_list.service.impl.ProjectUserServiceImpl;
@@ -31,18 +35,23 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 public class TdlCoreConfiguration {
 
   @Bean
-  public ProjectFacadeService projectFacadeService(ProjectService projectService, ProjectUserService projectUserService, BoardService boardService,
-      AuthUserService authUserService, ProjectInformationResponseMapper projectInformationResponseMapper){
-    return new ProjectFacadeServiceImpl(projectService, projectUserService, boardService, authUserService, projectInformationResponseMapper);
+  public ProjectFacadeService projectFacadeService(ProjectService projectService,
+      ProjectUserService projectUserService, BoardService boardService,
+      AuthUserService authUserService,
+      ProjectInformationResponseMapper projectInformationResponseMapper) {
+    return new ProjectFacadeServiceImpl(projectService, projectUserService, boardService,
+        authUserService, projectInformationResponseMapper);
   }
 
   @Bean
-  public ProjectService projectService(ProjectRepository projectRepository,
-      ProjectUserService projectUserService, BoardService boardService,
-      AuthUserService authUserService, ProjectMapper projectMapper,
-      ProjectInformationResponseMapper projectInformationResponseMapper) {
-    return new ProjectServiceImpl(projectRepository, projectUserService,
-        boardService, authUserService, projectMapper, projectInformationResponseMapper);
+  public ProjectUserFacadeService projectUserFacadeService(ProjectUserService projectUserService, ProjectService projectService,
+      AuthUserService authUserService, RedisCacheService redisCacheService, EmailHelper emailHelper) {
+    return new ProjectUserFacadeServiceImpl(projectUserService, projectService, authUserService, redisCacheService, emailHelper);
+  }
+
+  @Bean
+  public ProjectService projectService(ProjectRepository projectRepository, ProjectMapper projectMapper) {
+    return new ProjectServiceImpl(projectRepository, projectMapper);
   }
 
   @Bean
