@@ -11,6 +11,7 @@ import org.ghtk.todo_list.entity.Sprint;
 import org.ghtk.todo_list.exception.ProjectIdMismatchException;
 import org.ghtk.todo_list.exception.ProjectNotFoundException;
 import org.ghtk.todo_list.exception.SprintNotFoundException;
+import org.ghtk.todo_list.exception.SprintStatusNotFoundException;
 import org.ghtk.todo_list.facade.SprintFacadeService;
 import org.ghtk.todo_list.mapper.SprintMapper;
 import org.ghtk.todo_list.model.response.CreateSprintResponse;
@@ -81,5 +82,23 @@ public class SprintFacadeServiceImpl implements SprintFacadeService {
     log.info("(getSprints)sprints: {}", sprints);
     return sprintMapper.toSprintResponses(sprints);
 
+  }
+
+  @Override
+  public List<SprintResponse> getSprintStatus(String projectId, String status) {
+    log.info("(getSprintStatus)");
+
+    String statusFormat = status.trim().toUpperCase();
+    if(!SprintStatus.isValid(statusFormat)) {
+      log.error("(getSprintStatus) status sprint not found: status {}", status);
+      throw new SprintStatusNotFoundException();
+    }
+    if(!projectService.existById(projectId)) {
+      log.error("(getSprintStatus) project not found: projectId {}", projectId);
+      throw new ProjectNotFoundException();
+    }
+    List<Sprint> sprints = sprintService.findSprintsByProjectIdAndStatus(projectId, statusFormat);
+    log.info("(getSprintStatus)sprints: {}", sprints);
+    return sprintMapper.toSprintResponses(sprints);
   }
 }

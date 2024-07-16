@@ -44,4 +44,10 @@ public class SprintServiceImpl implements SprintService {
     log.info("(findSprintsByProjectId)");
     return sprintRepository.findByProjectId(projectId);
   }
+
+  @Override
+  public List<Sprint> findSprintsByProjectIdAndStatus(String projectId, String status) {
+    log.info("(findSprintsByProjectIdAndStatus)");
+    return sprintRepository.findByProjectIdAndStatus(projectId, status);
+  }
 }

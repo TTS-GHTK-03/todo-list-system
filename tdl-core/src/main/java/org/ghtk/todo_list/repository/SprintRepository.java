@@ -14,4 +14,10 @@ public interface SprintRepository extends JpaRepository<Sprint, String> {
       WHERE sp.projectId = :projectId
       """)
   List<Sprint> findByProjectId(String projectId);
+
+  @Query("""
+      SELECT sp FROM Sprint sp
+      WHERE sp.projectId = :projectId AND sp.status = :status
+      """)
+  List<Sprint> findByProjectIdAndStatus(String projectId, String status);
 }
