@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.constant.SprintStatus;
 import org.ghtk.todo_list.entity.Project;
 import org.ghtk.todo_list.entity.Sprint;
+import org.ghtk.todo_list.exception.InvalidDateRangeException;
 import org.ghtk.todo_list.exception.ProjectIdMismatchException;
 import org.ghtk.todo_list.exception.ProjectNotFoundException;
 import org.ghtk.todo_list.exception.SprintNotFoundException;
@@ -54,6 +55,11 @@ public class SprintFacadeServiceImpl implements SprintFacadeService {
       String startDate, String endDate) {
     log.info("(startSprint)projectId: {}, sprintId {}", projectId, sprintId);
 
+    if(!isValidDateRange(LocalDate.parse(startDate), LocalDate.parse(endDate))) {
+      log.error("(startSprint)invalid date range: startDate {}, endDate: {}", startDate, endDate);
+      throw new InvalidDateRangeException();
+    }
+
     Sprint sprint = sprintService.findById(sprintId);
     if (!sprint.getProjectId().equals(projectId)) {
       log.error("(startSprint) projectId mismatch: sprintId {}, expected projectId {}, but found projectId {}",
@@ -68,6 +74,31 @@ public class SprintFacadeServiceImpl implements SprintFacadeService {
     sprintService.save(sprint);
 
     return sprintMapper.toStartSprintResponse(sprint);
+  }
+
+  @Override
+  public SprintResponse updateSprint(String projectId, String sprintId, String title,
+      String startDate, String endDate) {
+    log.info("(updateSprint)projectId: {}, sprintId {}", projectId, sprintId);
+
+    if(!isValidDateRange(LocalDate.parse(startDate), LocalDate.parse(endDate))) {
+      log.error("(updateSprint)invalid date range: startDate {}, endDate: {}", startDate, endDate);
+      throw new InvalidDateRangeException();
+    }
+
+    Sprint sprint = sprintService.findById(sprintId);
+    if (!sprint.getProjectId().equals(projectId)) {
+      log.error("(updateSprint) projectId mismatch: sprintId {}, expected projectId {}, but found projectId {}",
+          sprintId, projectId, sprint.getProjectId());
+      throw new ProjectIdMismatchException();
+    }
+
+    sprint.setTitle(title);
+    sprint.setStartDate(LocalDate.parse(startDate));
+    sprint.setEndDate(LocalDate.parse(endDate));
+    sprintService.save(sprint);
+
+    return sprintMapper.toSprintResponse(sprint);
   }
 
   @Override
@@ -113,5 +144,9 @@ public class SprintFacadeServiceImpl implements SprintFacadeService {
     }
     log.info("(getSprint)sprint: {}", sprint);
     return sprintMapper.toSprintResponse(sprint);
+  }
+
+  private boolean isValidDateRange(LocalDate startDate, LocalDate endDate) {
+    return startDate.isBefore(endDate);
   }
 }
