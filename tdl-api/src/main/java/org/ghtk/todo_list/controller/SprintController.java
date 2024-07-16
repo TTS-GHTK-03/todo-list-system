@@ -49,14 +49,14 @@ public class SprintController {
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         sprintFacadeService.getSprints(projectId));
   }
-  @GetMapping("/{status}")
+  @GetMapping("/status/{status}")
   public BaseResponse getSprintStatus(@PathVariable("project_id") String projectId, @PathVariable("status") String status) {
     log.info("(getSprintStatus) projectId: {}, status: {}", projectId, status);
     getUserId();
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         sprintFacadeService.getSprintStatus(projectId, status));
   }
-  @GetMapping("/board/{id}")
+  @GetMapping("/{id}")
   public BaseResponse getSprint(@PathVariable("project_id") String projectId, @PathVariable("id") String id) {
     log.info("(getSprint) projectId: {}, id: {}", projectId, id);
     getUserId();
