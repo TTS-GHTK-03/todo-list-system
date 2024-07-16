@@ -46,8 +46,7 @@ public class TdlCoreConfiguration {
   }
 
   @Bean
-  public ProjectService projectService(ProjectRepository projectRepository,
-      ProjectMapper projectMapper) {
+  public ProjectService projectService(ProjectRepository projectRepository, ProjectMapper projectMapper) {
     return new ProjectServiceImpl(projectRepository, projectMapper);
   }
   @Bean
