@@ -255,4 +255,24 @@
   <changeSet id="20240715-0856-delete-column-project" author="Phan Kieu">
     <dropColumn tableName="project" columnName="role"/>
   </changeSet>
+
+  <changeSet id="20240715-1145-add-column-project-id" author="Han Luan">
+    <addColumn tableName="sprint">
+      <column name="project_id" type="varchar(255)"/>
+    </addColumn>
+  </changeSet>
+  <changeSet id="20240715-1146-foreign-key-sprint" author="Han Luan">
+    <addForeignKeyConstraint baseTableName="sprint" baseColumnNames="project_id"
+      constraintName="FK_sprint_project"
+      referencedTableName="project" referencedColumnNames="id"/>
+  </changeSet>
+  <changeSet id="20240715-1438-foreign-key-sprint" author="Han Luan">
+    <modifyDataType tableName="sprint" columnName="status" newDataType="varchar(255)"/>
+  </changeSet>
+  <changeSet id="20240715-1835-add-column-count-sprint" author="Han Luan">
+    <addColumn tableName="project">
+      <column name="count_sprint" type="bigint"/>
+    </addColumn>
+  </changeSet>
+
 </databaseChangeLog>

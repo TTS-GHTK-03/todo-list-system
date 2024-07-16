@@ -20,4 +20,5 @@ public class Sprint extends BaseEntity {
   private String status;
   private LocalDate startDate;
   private LocalDate endDate;
+  private String projectId;
 }
