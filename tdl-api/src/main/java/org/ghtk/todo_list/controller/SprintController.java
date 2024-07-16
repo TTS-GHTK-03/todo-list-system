@@ -49,6 +49,7 @@ public class SprintController {
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         sprintFacadeService.getSprints(projectId));
   }
+
   @GetMapping("/status/{status}")
   public BaseResponse getSprintStatus(@PathVariable("project_id") String projectId, @PathVariable("status") String status) {
     log.info("(getSprintStatus) projectId: {}, status: {}", projectId, status);
