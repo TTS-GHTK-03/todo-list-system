@@ -20,13 +20,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/sprints")
+@RequestMapping("/api/v1/projects/{project_id}/sprints")
 @RequiredArgsConstructor
 public class SprintController {
 
   private final SprintFacadeService sprintFacadeService;
 
-  @PostMapping("/{project_id}")
+  @PostMapping()
   public BaseResponse createSprintByProject(@PathVariable("project_id") String projectId) {
     log.info("(createSprintByProject) project {}", projectId);
     getUserId();
@@ -34,7 +34,7 @@ public class SprintController {
         sprintFacadeService.createSprintByProject(projectId));
   }
 
-  @PutMapping("/{project_id}/start/{sprint_id}")
+  @PutMapping("/start/{sprint_id}")
   public BaseResponse startSprint(@RequestBody @Valid StartSprintRequest request,  @PathVariable("project_id") String projectId, @PathVariable("sprint_id") String sprintId) {
     log.info("(startSprint) projectId {}, sprintId {}", projectId, sprintId);
     getUserId();
@@ -42,14 +42,14 @@ public class SprintController {
         sprintFacadeService.startSprint(projectId, sprintId, request.getTitle(), request.getStartDate(), request.getEndDate()));
   }
 
-  @GetMapping("/{project_id}")
+  @GetMapping()
   public BaseResponse getSprints(@PathVariable("project_id") String projectId) {
     log.info("(getSprints) projectId: {}", projectId);
     getUserId();
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         sprintFacadeService.getSprints(projectId));
   }
-  @GetMapping("/{project_id}/{status}")
+  @GetMapping("/{status}")
   public BaseResponse getSprintStatus(@PathVariable("project_id") String projectId, @PathVariable("status") String status) {
     log.info("(getSprintStatus) projectId: {}, status: {}", projectId, status);
     getUserId();
