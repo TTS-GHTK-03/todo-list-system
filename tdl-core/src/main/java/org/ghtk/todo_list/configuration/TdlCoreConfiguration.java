@@ -43,12 +43,8 @@ public class TdlCoreConfiguration {
   }
 
   @Bean
-  public ProjectService projectService(ProjectRepository projectRepository,
-      ProjectUserService projectUserService, BoardService boardService,
-      AuthUserService authUserService, ProjectMapper projectMapper,
-      ProjectInformationResponseMapper projectInformationResponseMapper) {
-    return new ProjectServiceImpl(projectRepository, projectUserService,
-        boardService, authUserService, projectMapper, projectInformationResponseMapper);
+  public ProjectService projectService(ProjectRepository projectRepository, ProjectMapper projectMapper) {
+    return new ProjectServiceImpl(projectRepository, projectMapper);
   }
   @Bean
   public SprintFacadeService sprintFacadeService(
