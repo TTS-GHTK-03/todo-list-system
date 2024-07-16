@@ -5,6 +5,7 @@ import static org.ghtk.todo_list.util.SecurityUtil.getUserId;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.dto.response.BaseResponse;
+import org.ghtk.todo_list.facade.ProjectFacadeService;
 import org.ghtk.todo_list.model.request.CreateProjectRequest;
 import org.ghtk.todo_list.service.ProjectService;
 import org.springframework.http.HttpStatus;
@@ -18,7 +19,7 @@ import java.time.LocalDate;
 @RequiredArgsConstructor
 public class ProjectController {
 
-  private final ProjectService projectService;
+  private final ProjectFacadeService projectService;
 
   @GetMapping()
   public BaseResponse getAllProject() {

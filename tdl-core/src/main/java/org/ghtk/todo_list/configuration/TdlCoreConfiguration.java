@@ -1,5 +1,7 @@
 package org.ghtk.todo_list.configuration;
 
+import org.ghtk.todo_list.facade.ProjectFacadeService;
+import org.ghtk.todo_list.facade.imp.ProjectFacadeServiceImpl;
 import org.ghtk.todo_list.facade.SprintFacadeService;
 import org.ghtk.todo_list.facade.imp.SprintFacadeServiceImpl;
 import org.ghtk.todo_list.mapper.BoardMapper;
@@ -33,6 +35,12 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @EnableJpaAuditing
 @EntityScan(basePackages = "org.ghtk.todo_list.entity")
 public class TdlCoreConfiguration {
+
+  @Bean
+  public ProjectFacadeService projectFacadeService(ProjectService projectService, ProjectUserService projectUserService, BoardService boardService,
+      AuthUserService authUserService, ProjectInformationResponseMapper projectInformationResponseMapper){
+    return new ProjectFacadeServiceImpl(projectService, projectUserService, boardService, authUserService, projectInformationResponseMapper);
+  }
 
   @Bean
   public ProjectService projectService(ProjectRepository projectRepository,

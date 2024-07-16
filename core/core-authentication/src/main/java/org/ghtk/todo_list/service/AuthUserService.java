@@ -13,9 +13,10 @@ public interface AuthUserService {
   AuthUser findById(String id);
   AuthUser create(String email, String accountId);
   boolean existsByEmail(String email);
+  boolean existById(String id);
   Optional<AuthUser> findByAccountId(String accountId);
   AuthUserResponse updateUserDetail(String userId, UpdateInformationRequest request);
   AuthUserResponse getDetail(String userId);
-  List<UserNameResponse> getNameUser(String userId, String projectId);
   UserProjection getByUserId(String userId);
+  List<UserNameResponse> getNameUser(String projectId);
 }
