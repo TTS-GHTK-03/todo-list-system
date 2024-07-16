@@ -68,7 +68,7 @@ public class SprintFacadeServiceImpl implements SprintFacadeService {
     }
 
     sprint.setStatus(SprintStatus.START.toString());
-    if(title!= null) sprint.setTitle(title);
+    if(title!= null && !title.isEmpty()) sprint.setTitle(title);
     sprint.setStartDate(LocalDate.parse(startDate));
     sprint.setEndDate(LocalDate.parse(endDate));
     sprintService.save(sprint);
@@ -93,7 +93,7 @@ public class SprintFacadeServiceImpl implements SprintFacadeService {
       throw new ProjectIdMismatchException();
     }
 
-    sprint.setTitle(title);
+    if(title!= null && !title.isEmpty()) sprint.setTitle(title);
     sprint.setStartDate(LocalDate.parse(startDate));
     sprint.setEndDate(LocalDate.parse(endDate));
     sprintService.save(sprint);
