@@ -1,11 +1,14 @@
 package org.ghtk.todo_list.configuration;
 
 import org.ghtk.todo_list.facade.ActivityLogFacadeService;
+import org.ghtk.todo_list.core_email.helper.EmailHelper;
 import org.ghtk.todo_list.facade.ProjectFacadeService;
 import org.ghtk.todo_list.facade.imp.ActivityLogFacadeServiceImpl;
+import org.ghtk.todo_list.facade.ProjectUserFacadeService;
 import org.ghtk.todo_list.facade.imp.ProjectFacadeServiceImpl;
 import org.ghtk.todo_list.facade.SprintFacadeService;
 import org.ghtk.todo_list.facade.imp.SprintFacadeServiceImpl;
+import org.ghtk.todo_list.facade.imp.ProjectUserFacadeServiceImpl;
 import org.ghtk.todo_list.mapper.BoardMapper;
 import org.ghtk.todo_list.mapper.ProjectInformationResponseMapper;
 import org.ghtk.todo_list.mapper.ProjectMapper;
@@ -24,6 +27,7 @@ import org.ghtk.todo_list.service.ProjectService;
 import org.ghtk.todo_list.service.ProjectUserService;
 import org.ghtk.todo_list.service.SprintService;
 import org.ghtk.todo_list.service.TaskAssigneesService;
+import org.ghtk.todo_list.service.RedisCacheService;
 import org.ghtk.todo_list.service.impl.ActivityLogServiceImpl;
 import org.ghtk.todo_list.service.impl.BoardServiceImpl;
 import org.ghtk.todo_list.service.impl.ProjectServiceImpl;
@@ -48,6 +52,12 @@ public class TdlCoreConfiguration {
   public ProjectFacadeService projectFacadeService(ProjectService projectService, ProjectUserService projectUserService, BoardService boardService,
       AuthUserService authUserService, ProjectInformationResponseMapper projectInformationResponseMapper){
     return new ProjectFacadeServiceImpl(projectService, projectUserService, boardService, authUserService, projectInformationResponseMapper);
+  }
+
+  @Bean
+  public ProjectUserFacadeService projectUserFacadeService(ProjectUserService projectUserService, ProjectService projectService,
+      AuthUserService authUserService, RedisCacheService redisCacheService, EmailHelper emailHelper) {
+    return new ProjectUserFacadeServiceImpl(projectUserService, projectService, authUserService, redisCacheService, emailHelper);
   }
 
   @Bean

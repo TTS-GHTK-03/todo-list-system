@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
 public interface ProjectUserRepository extends JpaRepository<ProjectUser, String> {
 
   @Query("""
-      SELECT pu FROM ProjectUser pu WHERE pu.userId = :userId AND pu.projectId = :projectId
+      SELECT pu.role FROM ProjectUser pu WHERE pu.userId = :userId AND pu.projectId = :projectId
       """)
   String getRoleProjectUser(@Param("userId") String userId, @Param("projectId") String projectId);
 
