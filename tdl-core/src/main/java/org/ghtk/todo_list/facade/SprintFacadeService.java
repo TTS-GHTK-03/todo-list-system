@@ -10,6 +10,7 @@ public interface SprintFacadeService {
    CreateSprintResponse createSprintByProject(String projectId);
 
    StartSprintResponse startSprint(String projectId, String sprintId, String title, String startDate, String endDate);
+   SprintResponse updateSprint(String projectId, String sprintId, String title, String startDate, String endDate);
 
    List<SprintResponse> getSprints(String projectId);
    List<SprintResponse> getSprintStatus(String projectId, String status);
