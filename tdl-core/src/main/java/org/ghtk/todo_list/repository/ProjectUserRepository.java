@@ -22,8 +22,8 @@ public interface ProjectUserRepository extends JpaRepository<ProjectUser, String
 
   @Query("""
     select pu.projectId from ProjectUser pu
-    where pu.role = 'ADMIN' AND pu.userId IN 
+    where pu.role = :role AND pu.userId IN 
     (SELECT s.id FROM AuthUser s)
   """)
-  List<String> findProjectIdByUserId();
+  List<String> findProjectIdByUserId(String role);
 }

@@ -20,17 +20,21 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class TaskScheduler {
 
+  public static final String TASK_STATUS_DONE = "DONE";
+  public static final String SPRINT_STATUS_START = "START";
+  public static final String ROLE = "ROLE";
+
   private final EmailHelper emailHelper;
   private final TaskRepository taskRepository;
   private final ProjectUserRepository projectRepository;
   private final AuthUserService authUserService;
   private final TaskAssigneesService taskAssigneesService;
 
-  @Scheduled(fixedRate = 6000)
+  @Scheduled(cron = "0 0 6 * * *")
   private void checkTasks() {
     log.info("(checkTasks)Check for tasks that are about to expire");
     List<Task> allTasks = new ArrayList<>();
-    List<String> ids = projectRepository.findProjectIdByUserId();
+    List<String> ids = projectRepository.findProjectIdByUserId(ROLE);
 
     for (String id : ids) {
       List<Task> tasks = getTasksFromSprint(id);
@@ -58,6 +62,6 @@ public class TaskScheduler {
 
   private List<Task> getTasksFromSprint(String projectId) {
     log.info("(getTasksFromSprint)projectId: {}", projectId);
-    return taskRepository.findAllByProjectId(projectId);
+    return taskRepository.findAllByProjectId(projectId, TASK_STATUS_DONE, SPRINT_STATUS_START);
   }
 }
