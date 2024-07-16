@@ -21,5 +21,10 @@ public interface TaskRepository extends JpaRepository<Task, String> {
           """)
   String getUserIdById(String taskId);
 
-
+  @Query("""
+    SELECT t FROM Task t 
+    WHERE t.status != 'DONE' AND t.sprintId IN 
+    (SELECT s.id FROM Sprint s WHERE s.status = 'START' AND s.projectId = :projectId)
+  """)
+  List<Task> findAllByProjectId(String projectId);
 }

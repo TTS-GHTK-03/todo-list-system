@@ -12,16 +12,19 @@ import org.ghtk.todo_list.mapper.SprintMapper;
 import org.ghtk.todo_list.repository.BoardRepository;
 import org.ghtk.todo_list.repository.ProjectRepository;
 import org.ghtk.todo_list.repository.ProjectUserRepository;
+import org.ghtk.todo_list.repository.TaskAssigneesRepository;
 import org.ghtk.todo_list.service.AuthUserService;
 import org.ghtk.todo_list.repository.SprintRepository;
 import org.ghtk.todo_list.service.BoardService;
 import org.ghtk.todo_list.service.ProjectService;
 import org.ghtk.todo_list.service.ProjectUserService;
 import org.ghtk.todo_list.service.SprintService;
+import org.ghtk.todo_list.service.TaskAssigneesService;
 import org.ghtk.todo_list.service.impl.BoardServiceImpl;
 import org.ghtk.todo_list.service.impl.ProjectServiceImpl;
 import org.ghtk.todo_list.service.impl.ProjectUserServiceImpl;
 import org.ghtk.todo_list.service.impl.SprintServiceImpl;
+import org.ghtk.todo_list.service.impl.TaskAssigneesServiceImpl;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -44,11 +47,8 @@ public class TdlCoreConfiguration {
 
   @Bean
   public ProjectService projectService(ProjectRepository projectRepository,
-      ProjectUserService projectUserService, BoardService boardService,
-      AuthUserService authUserService, ProjectMapper projectMapper,
-      ProjectInformationResponseMapper projectInformationResponseMapper) {
-    return new ProjectServiceImpl(projectRepository, projectUserService,
-        boardService, authUserService, projectMapper, projectInformationResponseMapper);
+      ProjectMapper projectMapper) {
+    return new ProjectServiceImpl(projectRepository, projectMapper);
   }
   @Bean
   public SprintFacadeService sprintFacadeService(
@@ -71,5 +71,10 @@ public class TdlCoreConfiguration {
   @Bean
   public SprintService sprintService(SprintRepository sprintRepository) {
     return new SprintServiceImpl(sprintRepository);
+  }
+
+  @Bean
+  public TaskAssigneesService taskAssigneesService(TaskAssigneesRepository taskAssigneesRepository) {
+    return new TaskAssigneesServiceImpl(taskAssigneesRepository);
   }
 }
