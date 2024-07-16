@@ -1,6 +1,7 @@
 package org.ghtk.todo_list.service.impl;
 
 import java.time.LocalDate;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.constant.SprintStatus;
@@ -36,5 +37,11 @@ public class SprintServiceImpl implements SprintService {
       log.error("(findById)projectId: {} not found", id);
       throw new SprintNotFoundException();
     });
+  }
+
+  @Override
+  public List<Sprint> findSprintsByProjectId(String projectId) {
+    log.info("(findSprintsByProjectId)");
+    return sprintRepository.findByProjectId(projectId);
   }
 }

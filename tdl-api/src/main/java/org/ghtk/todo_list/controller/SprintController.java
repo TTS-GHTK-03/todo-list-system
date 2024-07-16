@@ -10,6 +10,7 @@ import org.ghtk.todo_list.dto.response.BaseResponse;
 import org.ghtk.todo_list.facade.SprintFacadeService;
 import org.ghtk.todo_list.model.request.StartSprintRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -39,5 +40,13 @@ public class SprintController {
     getUserId();
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         sprintFacadeService.startSprint(projectId, sprintId, request.getTitle(), request.getStartDate(), request.getEndDate()));
+  }
+
+  @GetMapping("/{project_id}")
+  public BaseResponse getSprints(@PathVariable("project_id") String projectId) {
+    log.info("(getSprints) projectId: {}", projectId);
+    getUserId();
+    return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
+        sprintFacadeService.getSprints(projectId));
   }
 }
