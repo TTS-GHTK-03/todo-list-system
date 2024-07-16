@@ -50,4 +50,10 @@ public class SprintServiceImpl implements SprintService {
     log.info("(findSprintsByProjectIdAndStatus)");
     return sprintRepository.findByProjectIdAndStatus(projectId, status);
   }
+
+  @Override
+  public boolean existById(String id) {
+    log.info("(existById)id: {}", id);
+    return sprintRepository.existsById(id);
+  }
 }

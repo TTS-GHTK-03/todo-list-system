@@ -8,4 +8,5 @@ public interface SprintService {
   Sprint findById(String id);
   List<Sprint> findSprintsByProjectId(String projectId);
   List<Sprint> findSprintsByProjectIdAndStatus(String projectId, String status);
+  boolean existById(String id);
 }

@@ -15,4 +15,6 @@ public interface TaskService {
   TaskResponse updateStatus(String taskId, String taskStatus, UserProjection userProjection);
 
   String getUserIdById(String taskId);
+
+  TaskResponse updateSprintId(String projectId, String taskId, String sprintId, UserProjection userProjection);
 }
