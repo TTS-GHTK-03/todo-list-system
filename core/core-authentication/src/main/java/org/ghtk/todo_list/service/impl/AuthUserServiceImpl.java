@@ -21,6 +21,7 @@ import org.ghtk.todo_list.service.AuthUserService;
 public class AuthUserServiceImpl implements AuthUserService {
 
   private final AuthUserRepository repository;
+  private static final String ADMIN_ROLE = "ADMIN";
 
   @Override
   public AuthUser findById(String id) {
@@ -111,7 +112,7 @@ public class AuthUserServiceImpl implements AuthUserService {
   @Override
   public List<UserNameResponse> getNameUser(String projectId) {
     log.info("(getNameUser)projectId: {}", projectId);
-    return repository.getNameUser(projectId);
+    return repository.getNameUser(ADMIN_ROLE, projectId);
   }
 
   @Override
