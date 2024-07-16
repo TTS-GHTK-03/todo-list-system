@@ -61,4 +61,22 @@ public class TaskServiceImp implements TaskService {
     return taskRepository.getUserIdById(taskId);
   }
 
+  @Override
+  public TaskResponse updateSprintId(String projectId, String taskId, String sprintId,
+      UserProjection userProjection) {
+    log.info("(updateSprintId)projectId: {}, taskId: {}, sprintId: {}, userProjection: {}",
+        projectId, taskId, sprintId, userProjection);
+    var task = taskRepository
+        .findByProjectIdAndId(projectId, taskId)
+        .orElseThrow(() -> {
+          log.error("(updateSprintId)projectId: {}, taskId: {}, sprintId: {}, userProjection: {}",
+              projectId, taskId, sprintId, userProjection);
+          throw new TaskNotFoundException();
+        });
+    task.setSprintId(sprintId);
+    task.setProjectId(null);
+    taskRepository.save(task);
+    return new TaskResponse(task.getId(), task.getTitle(), task.getPoint(), task.getStatus(), userProjection);
+  }
+
 }

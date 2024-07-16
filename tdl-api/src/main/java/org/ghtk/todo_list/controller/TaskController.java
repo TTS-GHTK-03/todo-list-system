@@ -7,7 +7,7 @@ import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.dto.response.BaseResponse;
-import org.ghtk.todo_list.facade.TDLFacadeService;
+import org.ghtk.todo_list.facade.TaskFacadeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,13 +24,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class TaskController {
 
   @Autowired
-  private TDLFacadeService tdlFacadeService;
+  private TaskFacadeService taskFacadeService;
 
   @GetMapping("/{project_id}/tasks")
   public BaseResponse getTasksByProjectId(@PathVariable("project_id") String projectId) {
     log.info("(getAllTasks)");
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
-        tdlFacadeService.getAllTaskByProjectId(getUserId(), projectId));
+        taskFacadeService.getAllTaskByProjectId(getUserId(), projectId));
   }
 
   @GetMapping("/{project_id}/tasks/{task_id}")
@@ -38,7 +38,7 @@ public class TaskController {
       @PathVariable("task_id") String taskId) {
     log.info("(getTask)");
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
-        tdlFacadeService.getTaskByTaskId(getUserId(), projectId, taskId));
+        taskFacadeService.getTaskByTaskId(getUserId(), projectId, taskId));
   }
 
   @PatchMapping("/{project_id}/tasks/{task_id}")
@@ -46,6 +46,14 @@ public class TaskController {
       @PathVariable("task_id") String taskId, @Valid @RequestParam(value = "statusTask") String status) {
     log.info("(updateStatusTask)");
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
-        tdlFacadeService.updateStatusTask(getUserId(), projectId, taskId, status));
+        taskFacadeService.updateStatusTask(getUserId(), projectId, taskId, status));
+  }
+
+  @PatchMapping("/{project_id}/sprints/{sprint_id}/tasks/{task_id}")
+  public BaseResponse updateSprintTask(@PathVariable("project_id") String projectId,
+      @PathVariable("task_id") String taskId, @PathVariable("sprint_id") String sprintId) {
+    log.info("(updateSprintTask)");
+    return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
+        taskFacadeService.updateSprintTask(getUserId(), projectId, sprintId, taskId));
   }
 }

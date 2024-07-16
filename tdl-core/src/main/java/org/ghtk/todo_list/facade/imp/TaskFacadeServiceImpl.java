@@ -5,11 +5,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.constant.TaskStatus;
 import org.ghtk.todo_list.exception.ProjectNotFoundException;
+import org.ghtk.todo_list.exception.SprintNotFoundException;
 import org.ghtk.todo_list.exception.StatusTaskInvalidException;
-import org.ghtk.todo_list.facade.TDLFacadeService;
+import org.ghtk.todo_list.facade.TaskFacadeService;
 import org.ghtk.todo_list.model.response.TaskResponse;
 import org.ghtk.todo_list.service.AuthUserService;
 import org.ghtk.todo_list.service.ProjectService;
+import org.ghtk.todo_list.service.SprintService;
 import org.ghtk.todo_list.service.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -17,7 +19,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @RequiredArgsConstructor
 @Component
-public class TDLFacadeServiceImpl implements TDLFacadeService {
+public class TaskFacadeServiceImpl implements TaskFacadeService {
 
   @Autowired
   private ProjectService projectService;
@@ -25,6 +27,7 @@ public class TDLFacadeServiceImpl implements TDLFacadeService {
   @Autowired
   private TaskService taskService;
   private final AuthUserService authUserService;
+  private final SprintService sprintService;
 
   @Override
   public List<TaskResponse> getAllTaskByProjectId(String userId, String projectId) {
@@ -54,11 +57,27 @@ public class TDLFacadeServiceImpl implements TDLFacadeService {
     return taskService.updateStatus(taskId, status.toUpperCase(), authUserService.getByUserId(id));
   }
 
+  @Override
+  public TaskResponse updateSprintTask(String userId, String projectId, String sprintId, String taskId) {
+    log.info("(updateSprintTask)sprintId: {}, taskId: {},projectId: {}", sprintId, taskId, projectId);
+    validateProjectId(projectId);
+    validateSprintId(sprintId);
+    return taskService.updateSprintId(projectId, taskId, sprintId, authUserService.getByUserId(userId));
+  }
+
   void validateProjectId(String projectId) {
     log.info("(validateProjectId)projectId: {}", projectId);
     if (!projectService.existById(projectId)) {
       log.error("(validateProjectId)projectId: {}", projectId);
       throw new ProjectNotFoundException();
+    }
+  }
+
+  void validateSprintId(String sprintId) {
+    log.info("(validateSprintId)sprintId: {}", sprintId);
+    if (!sprintService.existById(sprintId)) {
+      log.error("(validateSprintId)sprintId: {}", sprintId);
+      throw new SprintNotFoundException();
     }
   }
 }
