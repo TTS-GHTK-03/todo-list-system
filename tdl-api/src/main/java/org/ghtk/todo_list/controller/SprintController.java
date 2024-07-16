@@ -30,7 +30,7 @@ public class SprintController {
   public BaseResponse createSprintByProject(@PathVariable("project_id") String projectId) {
     log.info("(createSprintByProject) project {}", projectId);
     getUserId();
-    return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
+    return BaseResponse.of(HttpStatus.CREATED.value(), LocalDate.now().toString(),
         sprintFacadeService.createSprintByProject(projectId));
   }
 
@@ -49,11 +49,19 @@ public class SprintController {
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         sprintFacadeService.getSprints(projectId));
   }
-  @GetMapping("/{status}")
+
+  @GetMapping("/status/{status}")
   public BaseResponse getSprintStatus(@PathVariable("project_id") String projectId, @PathVariable("status") String status) {
     log.info("(getSprintStatus) projectId: {}, status: {}", projectId, status);
     getUserId();
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         sprintFacadeService.getSprintStatus(projectId, status));
+  }
+  @GetMapping("/{id}")
+  public BaseResponse getSprint(@PathVariable("project_id") String projectId, @PathVariable("id") String id) {
+    log.info("(getSprint) projectId: {}, id: {}", projectId, id);
+    getUserId();
+    return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
+        sprintFacadeService.getSprint(projectId, id));
   }
 }

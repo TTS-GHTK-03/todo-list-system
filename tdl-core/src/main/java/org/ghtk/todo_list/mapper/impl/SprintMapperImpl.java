@@ -50,4 +50,16 @@ public class SprintMapperImpl implements SprintMapper {
         .collect(Collectors.toList());
   }
 
+  @Override
+  public SprintResponse toSprintResponse(Sprint sprint) {
+    return SprintResponse.builder()
+        .id(sprint.getId())
+        .title(sprint.getTitle())
+        .status(sprint.getStatus())
+        .startDate(sprint.getStartDate())
+        .endDate(sprint.getEndDate())
+        .createdAt(sprint.getCreatedAt())
+        .lastUpdatedAt(sprint.getLastUpdatedAt())
+        .build();
+  }
 }

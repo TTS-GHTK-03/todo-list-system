@@ -11,4 +11,5 @@ public interface SprintMapper {
   CreateSprintResponse toCreateSprintResponse(Sprint sprint);
   StartSprintResponse toStartSprintResponse(Sprint sprint);
   List<SprintResponse> toSprintResponses(List<Sprint> sprints);
+  SprintResponse toSprintResponse(Sprint sprint);
 }

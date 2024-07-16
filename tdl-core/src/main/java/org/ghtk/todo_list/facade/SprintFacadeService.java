@@ -13,4 +13,5 @@ public interface SprintFacadeService {
 
    List<SprintResponse> getSprints(String projectId);
    List<SprintResponse> getSprintStatus(String projectId, String status);
+   SprintResponse getSprint(String projectId, String id);
 }

@@ -101,4 +101,17 @@ public class SprintFacadeServiceImpl implements SprintFacadeService {
     log.info("(getSprintStatus)sprints: {}", sprints);
     return sprintMapper.toSprintResponses(sprints);
   }
+
+  @Override
+  public SprintResponse getSprint(String projectId, String id) {
+    log.info("(getSprint)");
+    Sprint sprint = sprintService.findById(id);
+    if (!sprint.getProjectId().equals(projectId)) {
+      log.error("(getSprint) projectId mismatch: sprintId {}, expected projectId {}, but found projectId {}",
+          id, projectId, sprint.getProjectId());
+      throw new ProjectIdMismatchException();
+    }
+    log.info("(getSprint)sprint: {}", sprint);
+    return sprintMapper.toSprintResponse(sprint);
+  }
 }
