@@ -275,4 +275,10 @@
     </addColumn>
   </changeSet>
 
+  <changeSet id="20240716-1431-add-is-send-mail" author="Gia Linh">
+    <addColumn tableName="task">
+      <column name="is_send_mail" type="boolean"/>
+    </addColumn>
+  </changeSet>
+
 </databaseChangeLog>

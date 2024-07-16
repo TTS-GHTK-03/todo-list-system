@@ -1,7 +1,9 @@
 package org.ghtk.todo_list.repository;
 
+import java.util.Optional;
 import org.ghtk.todo_list.entity.Task;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -21,5 +23,12 @@ public interface TaskRepository extends JpaRepository<Task, String> {
           """)
   String getUserIdById(String taskId);
 
+  @Query("""
+    SELECT t FROM Task t 
+    WHERE t.status != :taskStatusDone AND t.sprintId IN 
+    (SELECT s.id FROM Sprint s WHERE s.status = :sprintStatusStart AND s.projectId = :projectId)
+  """)
+  List<Task> findAllByProjectId(String projectId, String taskStatusDone, String sprintStatusStart);
 
+  Optional<Task> findByProjectIdAndId(String projectId, String id);
 }
