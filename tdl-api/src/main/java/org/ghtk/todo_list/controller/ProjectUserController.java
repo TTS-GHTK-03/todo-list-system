@@ -6,15 +6,16 @@ import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.dto.response.BaseResponse;
-import org.ghtk.todo_list.facade.ProjectFacadeService;
 import org.ghtk.todo_list.facade.ProjectUserFacadeService;
 import org.ghtk.todo_list.model.request.AcceptUserRequest;
 import org.ghtk.todo_list.model.request.InviteUserRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
@@ -33,10 +34,10 @@ public class ProjectUserController {
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(), "Đã gửi lời mời thành công!");
   }
 
-  @PostMapping("/accept")
-  public BaseResponse accept(@RequestBody AcceptUserRequest acceptUserRequest){
+  @GetMapping("/accept")
+  public BaseResponse accept(@RequestParam(value = "emailEncode") String emailEncode){
     log.info("(accept)");
-    projectUserFacadeService.accept(acceptUserRequest.getEmail());
+    projectUserFacadeService.accept(emailEncode);
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(), "Đã chấp nhận lời mời!");
   }
 }

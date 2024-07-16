@@ -66,6 +66,12 @@ public class AuthUserServiceImpl implements AuthUserService {
   }
 
   @Override
+  public String getUserId(String email) {
+    log.info("(getUserId)email: {}", email);
+    return repository.getUserId(email);
+  }
+
+  @Override
   public AuthUserResponse updateUserDetail(String userId, UpdateInformationRequest request) {
     log.info("(updateUserDetail)userId: {}, request: {}", userId, request);
     var user = repository

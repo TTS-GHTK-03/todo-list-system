@@ -17,6 +17,7 @@ import org.ghtk.todo_list.service.ProjectService;
 
 import java.util.List;
 import org.ghtk.todo_list.service.ProjectUserService;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -93,5 +94,20 @@ public class ProjectServiceImpl implements ProjectService {
   public boolean existById(String id) {
     log.info("(existById)id: {}", id);
     return projectRepository.existsById(id);
+  }
+
+  @Override
+  public Project getProjectById(String projectId) {
+    log.info("(getProjectById)projectId: {}", projectId);
+    return projectRepository.findById(projectId).orElseThrow(() -> {
+      log.error("(getProjectById)projectId: {} not found", projectId);
+      throw new ProjectNotFoundException();
+    });
+  }
+
+  @Override
+  public void updateCountSprint(String projectId, Long countSprint) {
+    log.info("(updateCountSprint)projectId: {}, countSprint: {}", projectId, countSprint);
+    projectRepository.updateCountSprint(projectId, countSprint);
   }
 }

@@ -2,14 +2,18 @@ package org.ghtk.todo_list.facade.imp;
 
 import static org.ghtk.todo_list.constant.CacheConstant.INVITE_KEY;
 
+import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.HashMap;
-import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.ghtk.todo_list.constant.RoleProjectUser;
+import org.ghtk.todo_list.constant.URL;
 import org.ghtk.todo_list.core_email.helper.EmailHelper;
-import org.ghtk.todo_list.exception.EmailNotInviteExcpetion;
+import org.ghtk.todo_list.entity.ProjectUser;
+import org.ghtk.todo_list.exception.EmailNotInviteException;
 import org.ghtk.todo_list.exception.ProjectNotFoundException;
+import org.ghtk.todo_list.exception.RoleProjectUserNotFound;
 import org.ghtk.todo_list.exception.UserNotFoundException;
 import org.ghtk.todo_list.facade.ProjectUserFacadeService;
 import org.ghtk.todo_list.model.request.RedisInviteUserRequest;
@@ -42,9 +46,18 @@ public class ProjectUserFacadeServiceImpl implements ProjectUserFacadeService {
       throw new ProjectNotFoundException();
     }
 
+    if(!RoleProjectUser.isValid(role)){
+      log.error("(inviteUser)role: {} not found", role);
+      throw new RoleProjectUserNotFound();
+    }
+
     var subject = "Admin invited you to join them in Todo List";
     var param = new HashMap<String, Object>();
+    String emailEncode = encodeEmail(email);
+
     param.put("email", email);
+    param.put("domain", URL.DOMAIN);
+    param.put("emailEncode", emailEncode);
     emailHelper.send(subject, email, "email-invite-to-project-template", param);
 
     RedisInviteUserRequest redisInviteUserRequest = new RedisInviteUserRequest();
@@ -55,23 +68,55 @@ public class ProjectUserFacadeServiceImpl implements ProjectUserFacadeService {
   }
 
   @Override
-  public String accept(String email) {
-    log.info("(accept)email: {}", email);
+  public String accept(String emailEncode) {
+    log.info("(accept)email: {}", emailEncode);
 
+    String email = decryptionEmailEncode(emailEncode);
     var redisRequest = redisCacheService.get(INVITE_KEY, email);
 
     if(redisRequest.isEmpty()){
-      log.error("(accept)redis invite user request: {} isn't invited", email);
-      throw new EmailNotInviteExcpetion();
+      log.error("(accept)email: {} isn't invited", email);
+      throw new EmailNotInviteException();
     }
 
     RedisInviteUserRequest redisInviteUserRequest = (RedisInviteUserRequest) redisRequest.get();
-    String acceptEmailKey = generateAcceptEmailKey(email, redisInviteUserRequest.getProjectId(), redisInviteUserRequest.getRole());
-    System.out.println(acceptEmailKey);
+    String projectId = redisInviteUserRequest.getProjectId();
+    String role = redisInviteUserRequest.getRole();
+
+    if(!projectService.existById(projectId)){
+      log.error("(accept)project: {} not found", projectId);
+      throw new ProjectNotFoundException();
+    }
+
+    if(!RoleProjectUser.isValid(role)){
+      log.error("(accept)role: {} not found", role);
+      throw new RoleProjectUserNotFound();
+    }
+
+    if(!authUserService.existsByEmail(email)){
+      log.info("(accept)email: {} not found", email);
+      //call login page
+    } else {
+      log.info("(accept)email: {} is existed", email);
+      String userId = authUserService.getUserId(email);
+      ProjectUser projectUser = projectUserService.createProjectUser(userId, projectId, role, LocalDateTime.now(), LocalDateTime.now());
+      //call project page
+      String acceptEmailKey = generateAcceptEmailKey(email, projectId, role);
+    }
+
     return null;
   }
 
   private String generateAcceptEmailKey(String email, String projectId, String role){
     return Base64.getEncoder().encodeToString((email + projectId + role + System.currentTimeMillis()).getBytes());
+  }
+
+  private String encodeEmail(String email){
+    return Base64.getEncoder().encodeToString((email).getBytes());
+  }
+
+  private String decryptionEmailEncode(String emailEncode){
+    byte[] email = Base64.getDecoder().decode(emailEncode);
+    return new String(email);
   }
 }

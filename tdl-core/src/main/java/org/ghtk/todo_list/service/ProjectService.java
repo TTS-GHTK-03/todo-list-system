@@ -3,7 +3,6 @@ package org.ghtk.todo_list.service;
 import org.ghtk.todo_list.entity.Project;
 
 import java.util.List;
-import org.ghtk.todo_list.model.response.ProjectInformationResponse;
 
 public interface ProjectService {
 
@@ -16,4 +15,6 @@ public interface ProjectService {
   boolean existById(String id);
 
   Project createProject(String userId, String title);
+  Project getProjectById(String projectId);
+  void updateCountSprint(String projectId, Long countSprint);
 }

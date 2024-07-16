@@ -36,6 +36,7 @@ public class WebSecurityConfiguration {
         .authorizeHttpRequests(authorize -> authorize
             .requestMatchers("/api/v1/projects/**").permitAll()
             .requestMatchers("/api/v1/users/**").permitAll()
+            .requestMatchers("/api/v1/sprints/**").permitAll()
             .requestMatchers("/api/v1/auth/**").permitAll()
             .anyRequest().authenticated()
         )

@@ -20,6 +20,11 @@ public interface AuthUserRepository extends JpaRepository<AuthUser, String> {
   Optional<AuthUser> findByAccountId(String accountId);
 
   @Query("""
+      SELECT u.userId FROM AuthUser u WHERE u.email = :email
+      """)
+  String getUserId(String email);
+
+  @Query("""
       SELECT new org.ghtk.todo_list.dto.response.UserNameResponse(u.firstName, u.middleName, u.lastName)
       FROM AuthUser u JOIN ProjectUser pu ON u.id = pu.userId
       WHERE pu.role = 'ADMIN' AND pu.projectId = :projectId
