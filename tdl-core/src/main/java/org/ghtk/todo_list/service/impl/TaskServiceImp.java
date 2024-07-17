@@ -79,4 +79,9 @@ public class TaskServiceImp implements TaskService {
     return new TaskResponse(task.getId(), task.getTitle(), task.getPoint(), task.getStatus(), userProjection);
   }
 
+  @Override
+  public boolean existsByUserIdAndTaskId(String userId, String taskId) {
+    log.info("(existsByUserIdAndTaskId)");
+    return taskRepository.existsByUserIdAndTaskId(userId, taskId);
+  }
 }

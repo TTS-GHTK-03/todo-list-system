@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.dto.response.BaseResponse;
 import org.ghtk.todo_list.facade.TaskFacadeService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -20,8 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class TaskAssigneesController {
 
-  @Autowired
-  private TaskFacadeService taskFacadeService;
+  private final TaskFacadeService taskFacadeService;
 
   @PostMapping("/users/{user_id}/tasks/{task_id}")
   public BaseResponse agileTaskByUser(@PathVariable("user_id") String userId, @PathVariable("task_id") String taskId) {

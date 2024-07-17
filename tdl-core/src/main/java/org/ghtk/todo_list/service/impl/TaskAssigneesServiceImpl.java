@@ -39,7 +39,6 @@ public class TaskAssigneesServiceImpl implements TaskAssigneesService {
 
   @Override
   public boolean existsByUserIdAndTaskId(String userId, String taskId) {
-    log.info("(existsByUserIdAndTaskId)");
     return taskAssigneesRepository.existsByUserIdAndTaskId(userId, taskId);
   }
 }

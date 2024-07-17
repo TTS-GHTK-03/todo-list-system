@@ -9,6 +9,8 @@ import org.ghtk.todo_list.entity.TaskAssignees;
 import org.ghtk.todo_list.exception.ProjectNotFoundException;
 import org.ghtk.todo_list.exception.SprintNotFoundException;
 import org.ghtk.todo_list.exception.StatusTaskInvalidException;
+import org.ghtk.todo_list.exception.TaskAssignmentExistsException;
+import org.ghtk.todo_list.exception.TaskNotFoundException;
 import org.ghtk.todo_list.facade.TaskFacadeService;
 import org.ghtk.todo_list.model.response.TaskResponse;
 import org.ghtk.todo_list.service.AuthUserService;
@@ -31,7 +33,8 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
   private TaskService taskService;
   private final AuthUserService authUserService;
   private final SprintService sprintService;
-  private final TaskAssigneesService taskAssigneesService;
+  @Autowired
+  private TaskAssigneesService taskAssigneesService;
 
   @Override
   public List<TaskResponse> getAllTaskByProjectId(String userId, String projectId) {
@@ -88,8 +91,13 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
   @Override
   public TaskAssignees agileTaskByUser(String userId, String taskId) {
     log.info("(agileTaskByUser) userId: {}, taskId: {}", userId, taskId);
-    if(!taskAssigneesService.existsByUserIdAndTaskId(userId, taskId)){
-      log.error("(agileTaskByUser)");
+    if(taskAssigneesService.existsByUserIdAndTaskId(userId, taskId)) {
+      log.error("(agileTaskByUser)Task with Id {} is already assigned to user with Id {}", taskId, userId);
+      throw new TaskAssignmentExistsException();
+    }
+    if(!taskService.existsByUserIdAndTaskId(userId, taskId)){
+      log.error("(agileTaskByUser)Task with Id {} does not exist for user with Id {}", taskId, userId);
+      throw new TaskNotFoundException();
     }
     TaskAssignees taskAssignees = new TaskAssignees();
     taskAssignees.setUserId(userId);
