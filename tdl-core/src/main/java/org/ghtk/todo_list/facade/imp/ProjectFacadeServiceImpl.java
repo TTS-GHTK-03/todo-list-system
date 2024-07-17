@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.ghtk.todo_list.constant.RoleProjectUser;
 import org.ghtk.todo_list.dto.response.UserNameResponse;
 import org.ghtk.todo_list.entity.Project;
 import org.ghtk.todo_list.entity.ProjectUser;
@@ -28,7 +29,6 @@ public class ProjectFacadeServiceImpl implements ProjectFacadeService {
   private final BoardService boardService;
   private final AuthUserService authUserService;
   private final ProjectInformationResponseMapper projectInformationResponseMapper;
-  private static final String ADMIN_ROLE = "ADMIN";
 
   @Override
   public List<Project> getAllProject(String userId) {
@@ -81,7 +81,8 @@ public class ProjectFacadeServiceImpl implements ProjectFacadeService {
 
     Project projectSaved = projectService.createProject(userId, title);
 
-    ProjectUser projectUser = projectUserService.createProjectUser(userId, projectSaved.getId(), ADMIN_ROLE);
+    ProjectUser projectUser = projectUserService.createProjectUser(userId, projectSaved.getId(),
+        RoleProjectUser.ADMIN.toString());
 
     return projectSaved;
   }
