@@ -6,7 +6,7 @@ import org.ghtk.todo_list.entity.Comment;
 import org.ghtk.todo_list.exception.SprintNotFoundException;
 import org.ghtk.todo_list.exception.TaskNotFoundException;
 import org.ghtk.todo_list.facade.CommentFacadeService;
-import org.ghtk.todo_list.model.response.CreateCommentResponse;
+import org.ghtk.todo_list.model.response.CommentResponse;
 import org.ghtk.todo_list.service.CommentService;
 import org.ghtk.todo_list.service.TaskService;
 import org.springframework.stereotype.Component;
@@ -21,10 +21,18 @@ public class CommentFacadeServiceImp implements CommentFacadeService {
   private final CommentService commentService;
 
   @Override
-  public CreateCommentResponse createComment(String userId, String taskid, String text) {
+  public CommentResponse createComment(String userId, String taskid, String text) {
     log.info("(createComment)userId: {},taskId: {}", userId, taskid);
     validateTaskId(taskid);
     return commentService.createComment(userId, taskid, text);
+  }
+
+  @Override
+  public CommentResponse updateComment(String userId, String taskId, String commentId,
+      String text) {
+    log.info("(updateComment)userId: {},taskId: {}", userId, taskId);
+    validateTaskId(taskId);
+    return commentService.updateComment(userId, taskId, commentId, text);
   }
 
   void validateTaskId(String taskId) {
