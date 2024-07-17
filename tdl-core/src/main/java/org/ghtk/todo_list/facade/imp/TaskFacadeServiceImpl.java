@@ -44,8 +44,7 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
   public TaskResponse getTaskByTaskId(String userId, String projectId, String taskId) {
     log.info("(getTaskByTaskId)taskId: {},projectId: {}", taskId, projectId);
     validateProjectId(projectId);
-    String id = taskService.getUserIdById(taskId);
-    return taskService.findById(taskId, authUserService.getByUserId(id));
+    return taskService.findById(taskId, taskAssigneesService.findUserIdByTaskId(taskId));
   }
 
   @Override
@@ -58,7 +57,7 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
       throw new StatusTaskInvalidException();
     }
     String id = taskService.getUserIdById(taskId);
-    return taskService.updateStatus(taskId, status.toUpperCase(), authUserService.getByUserId(id));
+    return taskService.updateStatus(taskId, status.toUpperCase(), taskAssigneesService.findUserIdByTaskId(taskId));
   }
 
   @Override
@@ -66,7 +65,7 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
     log.info("(updateSprintTask)sprintId: {}, taskId: {},projectId: {}", sprintId, taskId, projectId);
     validateProjectId(projectId);
     validateSprintId(sprintId);
-    return taskService.updateSprintId(projectId, taskId, sprintId, authUserService.getByUserId(userId));
+    return taskService.updateSprintId(projectId, taskId, sprintId, taskAssigneesService.findUserIdByTaskId(taskId));
   }
 
   void validateProjectId(String projectId) {
@@ -102,5 +101,30 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
 
     return taskAssigneesService.save(taskAssignees);
 
+  }
+
+  @Override
+  public TaskResponse cloneTask(String userId, String projectId, String taskId) {
+    log.info("(cloneTask)taskId: {},projectId: {}", taskId, projectId);
+    validateProjectId(projectId);
+    var user = authUserService.findByUnassigned();
+    var task = taskService.findById(taskId);
+
+    var clonedTask = new Task();
+    clonedTask.setTitle(task.getTitle());
+    clonedTask.setStatus(TaskStatus.TODO.toString());
+    clonedTask.setUserId(userId);
+    clonedTask.setChecklist(task.getChecklist());
+    clonedTask.setDescription(task.getDescription());
+    clonedTask.setLabel(task.getLabel());
+    clonedTask.setProjectId(task.getProjectId());
+    var taskClone = taskService.save(clonedTask);
+    agileTaskByUser(user.getId(), taskClone.getId());
+    return TaskResponse.of(
+        taskClone.getId(),
+        taskClone.getTitle(),
+        0,
+        taskClone.getStatus(),
+        user.getId());
   }
 }

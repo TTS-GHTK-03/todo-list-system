@@ -10,13 +10,17 @@ public interface TaskService {
 
   List<TaskResponse> getAllTasksByProjectId(String projectId);
 
-  TaskResponse findById(String taskId, UserProjection userProjection);
+  TaskResponse findById(String taskId, String userId);
 
-  TaskResponse updateStatus(String taskId, String taskStatus, UserProjection userProjection);
+  TaskResponse updateStatus(String taskId, String taskStatus, String userId);
 
   String getUserIdById(String taskId);
 
-  TaskResponse updateSprintId(String projectId, String taskId, String sprintId, UserProjection userProjection);
+  TaskResponse updateSprintId(String projectId, String taskId, String sprintId, String userId);
 
   boolean existsByUserIdAndTaskId(String userId, String taskId);
+
+  Task findById(String taskId);
+
+  Task save(Task task);
 }
