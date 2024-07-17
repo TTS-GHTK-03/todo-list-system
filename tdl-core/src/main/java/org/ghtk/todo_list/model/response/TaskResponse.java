@@ -5,14 +5,14 @@ import lombok.Data;
 import org.ghtk.todo_list.repository.UserProjection;
 
 @Data
-@AllArgsConstructor
+@AllArgsConstructor(staticName = "of")
 public class TaskResponse {
 
   private String id;
   private String title;
   private Integer point;
   private String status;
-  private UserProjection userProjection;
+  private String userId;
 
   public TaskResponse(String id, String title, Integer point, String status) {
     this.id = id;

@@ -33,19 +33,17 @@ public class TaskServiceImp implements TaskService {
   }
 
   @Override
-  public TaskResponse findById(String taskId, UserProjection userProjection) {
+  public TaskResponse findById(String taskId, String userId) {
     log.info("(getTaskByTaskId)projectId: {}", taskId);
     var task = taskRepository.findById(taskId).orElseThrow(() -> {
       throw new TaskNotFoundException();
     });
 
-    return new TaskResponse(task.getId(), task.getTitle(), task.getPoint(), task.getStatus(),
-        userProjection);
+    return TaskResponse.of(task.getId(), task.getTitle(), task.getPoint(), task.getStatus(), userId);
   }
 
   @Override
-  public TaskResponse updateStatus(String taskId, String taskStatus,
-      UserProjection userProjection) {
+  public TaskResponse updateStatus(String taskId, String taskStatus, String userId) {
     log.info("(updateStatus)taskId: {}, status: {}", taskId, taskStatus);
     var task = taskRepository
         .findById(taskId)
@@ -55,8 +53,7 @@ public class TaskServiceImp implements TaskService {
         });
     task.setStatus(taskStatus);
     taskRepository.save(task);
-    return new TaskResponse(task.getId(), task.getTitle(), task.getPoint(), task.getStatus(),
-        userProjection);
+    return TaskResponse.of(task.getId(), task.getTitle(), task.getPoint(), task.getStatus(), userId);
   }
 
   @Override
@@ -66,22 +63,19 @@ public class TaskServiceImp implements TaskService {
   }
 
   @Override
-  public TaskResponse updateSprintId(String projectId, String taskId, String sprintId,
-      UserProjection userProjection) {
-    log.info("(updateSprintId)projectId: {}, taskId: {}, sprintId: {}, userProjection: {}",
-        projectId, taskId, sprintId, userProjection);
+  public TaskResponse updateSprintId(String projectId, String taskId, String sprintId, String userId) {
+    log.info("(updateSprintId)projectId: {}, taskId: {}, sprintId: {}, userId: {}",
+        projectId, taskId, sprintId, userId);
     var task = taskRepository
         .findByProjectIdAndId(projectId, taskId)
         .orElseThrow(() -> {
-          log.error("(updateSprintId)projectId: {}, taskId: {}, sprintId: {}, userProjection: {}",
-              projectId, taskId, sprintId, userProjection);
+          log.error("(updateSprintId)projectId: {}, taskId: {}, sprintId: {}, userId: {}",
+              projectId, taskId, sprintId, userId);
           throw new TaskNotFoundException();
         });
     task.setSprintId(sprintId);
-    task.setProjectId(null);
     taskRepository.save(task);
-    return new TaskResponse(task.getId(), task.getTitle(), task.getPoint(), task.getStatus(),
-        userProjection);
+    return TaskResponse.of(task.getId(), task.getTitle(), task.getPoint(), task.getStatus(), userId);
   }
 
   @Override
@@ -93,5 +87,21 @@ public class TaskServiceImp implements TaskService {
   public boolean existById(String id) {
     log.info("(existById)id: {}", id);
     return taskRepository.existsById(id);
+  }
+
+  @Override
+  public Task findById(String taskId) {
+    log.info("(findById)taskId: {}", taskId);
+    return taskRepository.findById(taskId)
+        .orElseThrow(() -> {
+          log.error("(findById)taskId: {}", taskId);
+          throw new TaskNotFoundException();
+        });
+  }
+
+  @Override
+  public Task save(Task task) {
+    log.info("(save)task: {}", task);
+    return taskRepository.save(task);
   }
 }

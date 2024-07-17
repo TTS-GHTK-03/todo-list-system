@@ -14,4 +14,5 @@ public interface TaskFacadeService {
   TaskResponse updateSprintTask(String userId, String projectId, String sprintId, String taskId);
 
   TaskAssignees agileTaskByUser(String email, String id);
+  TaskResponse cloneTask(String userId, String projectId, String taskId);
 }
