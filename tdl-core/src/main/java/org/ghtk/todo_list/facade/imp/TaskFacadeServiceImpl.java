@@ -151,7 +151,6 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
     log.info("(updateStartDateDueDateTask)projectId: {}, sprintId: {}, taskId: {}", projectId,
         sprintId, taskId);
 
-    redisCacheService.save(CacheConstant.UPDATE_STATUS_TASK, taskId, statusTaskKey);
     var redisStatusTaskKey = redisCacheService.get(CacheConstant.UPDATE_STATUS_TASK, taskId);
     if (redisStatusTaskKey.isEmpty()) {
       log.error("(updateStartDateDueDateTask)statusTaskKey: {} not found", statusTaskKey);

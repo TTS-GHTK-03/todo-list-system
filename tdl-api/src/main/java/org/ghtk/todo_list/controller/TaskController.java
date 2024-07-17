@@ -69,7 +69,7 @@ public class TaskController {
         taskFacadeService.cloneTask(getUserId(), projectId, taskId));
   }
 
-  @PutMapping("/{project_id}/sprints/{sprint_id}/tasks/{task_id}/update_date")
+  @PutMapping("/{project_id}/sprints/{sprint_id}/tasks/{task_id}/update-date")
   public BaseResponse updateStartDateDueDateTask(@PathVariable("project_id") String projectId,
       @PathVariable("sprint_id") String sprintId, @PathVariable("task_id") String taskId,
       @RequestBody @Valid UpdateDueDateTaskRequest updateDueDateTaskRequest) {
