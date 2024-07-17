@@ -1,18 +1,25 @@
 package org.ghtk.todo_list.configuration;
 
+import org.ghtk.todo_list.facade.ActivityLogFacadeService;
+import org.ghtk.todo_list.core_email.helper.EmailHelper;
 import org.ghtk.todo_list.facade.ProjectFacadeService;
+import org.ghtk.todo_list.facade.imp.ActivityLogFacadeServiceImpl;
+import org.ghtk.todo_list.facade.ProjectUserFacadeService;
 import org.ghtk.todo_list.facade.imp.ProjectFacadeServiceImpl;
 import org.ghtk.todo_list.facade.SprintFacadeService;
 import org.ghtk.todo_list.facade.imp.SprintFacadeServiceImpl;
+import org.ghtk.todo_list.facade.imp.ProjectUserFacadeServiceImpl;
 import org.ghtk.todo_list.mapper.BoardMapper;
 import org.ghtk.todo_list.mapper.ProjectInformationResponseMapper;
 import org.ghtk.todo_list.mapper.ProjectMapper;
 import org.ghtk.todo_list.mapper.ProjectUserMapper;
 import org.ghtk.todo_list.mapper.SprintMapper;
+import org.ghtk.todo_list.repository.ActivityLogRepository;
 import org.ghtk.todo_list.repository.BoardRepository;
 import org.ghtk.todo_list.repository.ProjectRepository;
 import org.ghtk.todo_list.repository.ProjectUserRepository;
 import org.ghtk.todo_list.repository.TaskAssigneesRepository;
+import org.ghtk.todo_list.service.ActivityLogService;
 import org.ghtk.todo_list.service.AuthUserService;
 import org.ghtk.todo_list.repository.SprintRepository;
 import org.ghtk.todo_list.service.BoardService;
@@ -20,6 +27,8 @@ import org.ghtk.todo_list.service.ProjectService;
 import org.ghtk.todo_list.service.ProjectUserService;
 import org.ghtk.todo_list.service.SprintService;
 import org.ghtk.todo_list.service.TaskAssigneesService;
+import org.ghtk.todo_list.service.RedisCacheService;
+import org.ghtk.todo_list.service.impl.ActivityLogServiceImpl;
 import org.ghtk.todo_list.service.impl.BoardServiceImpl;
 import org.ghtk.todo_list.service.impl.ProjectServiceImpl;
 import org.ghtk.todo_list.service.impl.ProjectUserServiceImpl;
@@ -43,6 +52,12 @@ public class TdlCoreConfiguration {
   public ProjectFacadeService projectFacadeService(ProjectService projectService, ProjectUserService projectUserService, BoardService boardService,
       AuthUserService authUserService, ProjectInformationResponseMapper projectInformationResponseMapper){
     return new ProjectFacadeServiceImpl(projectService, projectUserService, boardService, authUserService, projectInformationResponseMapper);
+  }
+
+  @Bean
+  public ProjectUserFacadeService projectUserFacadeService(ProjectUserService projectUserService, ProjectService projectService,
+      AuthUserService authUserService, RedisCacheService redisCacheService, EmailHelper emailHelper) {
+    return new ProjectUserFacadeServiceImpl(projectUserService, projectService, authUserService, redisCacheService, emailHelper);
   }
 
   @Bean
@@ -75,5 +90,16 @@ public class TdlCoreConfiguration {
   @Bean
   public TaskAssigneesService taskAssigneesService(TaskAssigneesRepository taskAssigneesRepository) {
     return new TaskAssigneesServiceImpl(taskAssigneesRepository);
+  }
+
+  @Bean
+  public ActivityLogService activityLogService(ActivityLogRepository activityLogRepository) {
+    return new ActivityLogServiceImpl(activityLogRepository);
+  }
+
+  @Bean
+  public ActivityLogFacadeService activityLogFacadeService(ActivityLogService activityLogService,
+      ProjectService projectService) {
+    return new ActivityLogFacadeServiceImpl(activityLogService, projectService);
   }
 }
