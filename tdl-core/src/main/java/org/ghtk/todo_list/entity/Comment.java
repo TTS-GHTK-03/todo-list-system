@@ -18,5 +18,5 @@ public class Comment extends BaseEntity {
   private String text;
   private String taskId;
   private String userId;
-  private String parent_id;
+  private String parentId;
 }
