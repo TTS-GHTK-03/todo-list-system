@@ -4,14 +4,20 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.constant.TaskStatus;
+import org.ghtk.todo_list.entity.Task;
+import org.ghtk.todo_list.entity.TaskAssignees;
 import org.ghtk.todo_list.exception.ProjectNotFoundException;
 import org.ghtk.todo_list.exception.SprintNotFoundException;
 import org.ghtk.todo_list.exception.StatusTaskInvalidException;
+import org.ghtk.todo_list.exception.TaskAssignmentExistsException;
+import org.ghtk.todo_list.exception.TaskNotExistUserException;
+import org.ghtk.todo_list.exception.TaskNotFoundException;
 import org.ghtk.todo_list.facade.TaskFacadeService;
 import org.ghtk.todo_list.model.response.TaskResponse;
 import org.ghtk.todo_list.service.AuthUserService;
 import org.ghtk.todo_list.service.ProjectService;
 import org.ghtk.todo_list.service.SprintService;
+import org.ghtk.todo_list.service.TaskAssigneesService;
 import org.ghtk.todo_list.service.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -21,13 +27,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class TaskFacadeServiceImpl implements TaskFacadeService {
 
-  @Autowired
-  private ProjectService projectService;
-
-  @Autowired
-  private TaskService taskService;
+  private final ProjectService projectService;
+  private final TaskService taskService;
   private final AuthUserService authUserService;
   private final SprintService sprintService;
+  private final TaskAssigneesService taskAssigneesService;
 
   @Override
   public List<TaskResponse> getAllTaskByProjectId(String userId, String projectId) {
@@ -79,5 +83,24 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
       log.error("(validateSprintId)sprintId: {}", sprintId);
       throw new SprintNotFoundException();
     }
+  }
+
+  @Override
+  public TaskAssignees agileTaskByUser(String userId, String taskId) {
+    log.info("(agileTaskByUser) userId: {}, taskId: {}", userId, taskId);
+    if(taskAssigneesService.existsByUserIdAndTaskId(userId, taskId)) {
+      log.error("(agileTaskByUser)Task with Id {} is already assigned to user with Id {}", taskId, userId);
+      throw new TaskAssignmentExistsException();
+    }
+    if(!taskService.existsByUserIdAndTaskId(userId, taskId)){
+      log.error("(agileTaskByUser)Task with Id {} does not exist for user with Id {}", taskId, userId);
+      throw new TaskNotExistUserException();
+    }
+    TaskAssignees taskAssignees = new TaskAssignees();
+    taskAssignees.setUserId(userId);
+    taskAssignees.setTaskId(taskId);
+
+    return taskAssigneesService.save(taskAssignees);
+
   }
 }
