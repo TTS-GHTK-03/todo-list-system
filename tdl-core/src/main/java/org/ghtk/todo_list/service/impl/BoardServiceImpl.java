@@ -18,8 +18,8 @@ public class BoardServiceImpl implements BoardService {
   private final BoardMapper boardMapper;
 
   @Override
-  public Board createBoard(String projectId, LocalDateTime createdAt, LocalDateTime lastUpdatedAt) {
-    Board board = boardMapper.toBoard(projectId, createdAt, lastUpdatedAt);
+  public Board createBoard(String projectId) {
+    Board board = boardMapper.toBoard(projectId);
     return boardRepository.save(board);
   }
 }

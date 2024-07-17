@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.ghtk.todo_list.constant.RoleProjectUser;
 import org.ghtk.todo_list.dto.response.UserNameResponse;
 import org.ghtk.todo_list.entity.Project;
 import org.ghtk.todo_list.entity.ProjectUser;
@@ -38,8 +39,7 @@ public class ProjectFacadeServiceImpl implements ProjectFacadeService {
       throw new UserNotFoundException();
     }
 
-    List<Project> projectList = projectService.getAllProject(userId);
-    return projectList;
+    return projectService.getAllProject(userId);
   }
 
   @Override
@@ -47,13 +47,11 @@ public class ProjectFacadeServiceImpl implements ProjectFacadeService {
     log.info("(getProject)user: {}, project: {}", userId, projectId);
 
     if(!authUserService.existById(userId)){
-      log.error("(getAllProject)userId: {} not found", userId);
+      log.error("(getProject)userId: {} not found", userId);
       throw new UserNotFoundException();
     }
 
-    Project project = projectService.getProject(userId, projectId);
-
-    return project;
+    return projectService.getProject(userId, projectId);
   }
 
   @Override
@@ -61,7 +59,7 @@ public class ProjectFacadeServiceImpl implements ProjectFacadeService {
     log.info("(getProjectInformation)user: {}, project: {}", userId, projectId);
 
     if(!authUserService.existById(userId)){
-      log.error("(getAllProject)userId: {} not found", userId);
+      log.error("(getProjectInformation)userId: {} not found", userId);
       throw new UserNotFoundException();
     }
 
@@ -77,16 +75,15 @@ public class ProjectFacadeServiceImpl implements ProjectFacadeService {
     log.info("(createProject)user: {}", userId);
 
     if(!authUserService.existById(userId)){
-      log.error("(getAllProject)userId: {} not found", userId);
+      log.error("(createProject)userId: {} not found", userId);
       throw new UserNotFoundException();
     }
 
     Project projectSaved = projectService.createProject(userId, title);
 
-    ProjectUser projectUser = projectUserService.createProjectUser(userId, projectSaved.getId(), "ADMIN", LocalDateTime.now(), LocalDateTime.now());
+    ProjectUser projectUser = projectUserService.createProjectUser(userId, projectSaved.getId(),
+        RoleProjectUser.ADMIN.toString());
 
     return projectSaved;
   }
-
-
 }

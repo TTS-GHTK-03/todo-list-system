@@ -86,7 +86,7 @@ public class ProjectServiceImpl implements ProjectService {
       keyProjectCheck = stringBuilder.toString() + count;
     }
 
-    Project project = projectMapper.toProject(title, stringBuilder.append(count).toString(), LocalDateTime.now(), LocalDateTime.now());
+    Project project = projectMapper.toProject(title, stringBuilder.append(count).toString());
     return projectRepository.save(project);
   }
 
