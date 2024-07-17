@@ -20,7 +20,7 @@ public interface AuthUserRepository extends JpaRepository<AuthUser, String> {
   Optional<AuthUser> findByAccountId(String accountId);
 
   @Query("""
-      SELECT u.userId FROM AuthUser u WHERE u.email = :email
+      SELECT u.id FROM AuthUser u WHERE u.email = :email
       """)
   String getUserId(String email);
 
