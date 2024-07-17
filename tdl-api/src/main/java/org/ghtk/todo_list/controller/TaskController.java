@@ -8,11 +8,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.dto.response.BaseResponse;
 import org.ghtk.todo_list.facade.TaskFacadeService;
+import org.ghtk.todo_list.model.request.UpdateDueDateTaskRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -43,7 +46,8 @@ public class TaskController {
 
   @PatchMapping("/{project_id}/tasks/{task_id}")
   public BaseResponse updateStatusTask(@PathVariable("project_id") String projectId,
-      @PathVariable("task_id") String taskId, @Valid @RequestParam(value = "statusTask") String status) {
+      @PathVariable("task_id") String taskId,
+      @Valid @RequestParam(value = "statusTask") String status) {
     log.info("(updateStatusTask)");
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         taskFacadeService.updateStatusTask(getUserId(), projectId, taskId, status));
@@ -55,5 +59,17 @@ public class TaskController {
     log.info("(updateSprintTask)");
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         taskFacadeService.updateSprintTask(getUserId(), projectId, sprintId, taskId));
+  }
+
+  @PutMapping("/{project_id}/sprints/{sprint_id}/tasks/{task_id}/update_date")
+  public BaseResponse updateStartDateDueDateTask(@PathVariable("project_id") String projectId,
+      @PathVariable("sprint_id") String sprintId, @PathVariable("task_id") String taskId,
+      @RequestBody @Valid UpdateDueDateTaskRequest updateDueDateTaskRequest) {
+    log.info("(updateStartDateDueDateTask)project: {}, sprint: {}, task: {}", projectId, sprintId,
+        taskId);
+    return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
+        taskFacadeService.updateStartDateDueDateTask(getUserId(), projectId, sprintId, taskId,
+            updateDueDateTaskRequest.getStatusTaskKey(),
+            updateDueDateTaskRequest.getDueDate()));
   }
 }
