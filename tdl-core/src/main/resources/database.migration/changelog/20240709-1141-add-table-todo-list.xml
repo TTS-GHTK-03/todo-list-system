@@ -281,4 +281,10 @@
     </addColumn>
   </changeSet>
 
+  <changeSet id="20240717-1425-add-column-parent-id" author="Gia Linh">
+    <addColumn tableName="comment">
+      <column name="parent_id" type="varchar(255)"/>
+    </addColumn>
+  </changeSet>
+
 </databaseChangeLog>

@@ -26,7 +26,8 @@ public class TaskServiceImp implements TaskService {
     log.info("(getAllTasksByProjectId)projectId: {}", projectId);
     List<Task> tasks = taskRepository.getAllTasksByProjectId(projectId);
     return tasks.stream()
-        .map(task -> new TaskResponse(task.getId(), task.getTitle(), task.getPoint(), task.getStatus()))
+        .map(task -> new TaskResponse(task.getId(), task.getTitle(), task.getPoint(),
+            task.getStatus()))
         .collect(Collectors.toList());
 
   }
@@ -81,6 +82,11 @@ public class TaskServiceImp implements TaskService {
   public boolean existsByUserIdAndTaskId(String userId, String taskId) {
     log.info("(existsByUserIdAndTaskId)");
     return taskRepository.existsByUserIdAndTaskId(userId, taskId);
+  }
+  @Override
+  public boolean existById(String id) {
+    log.info("(existById)id: {}", id);
+    return taskRepository.existsById(id);
   }
 
   @Override
