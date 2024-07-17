@@ -4,6 +4,7 @@ import java.util.List;
 import org.ghtk.todo_list.constant.TaskStatus;
 import org.ghtk.todo_list.entity.Task;
 import org.ghtk.todo_list.model.response.TaskResponse;
+import org.ghtk.todo_list.model.response.UpdateDueDateTaskResponse;
 import org.ghtk.todo_list.repository.UserProjection;
 
 public interface TaskService {
@@ -24,4 +25,6 @@ public interface TaskService {
   Task findById(String taskId);
 
   Task save(Task task);
+
+  UpdateDueDateTaskResponse updateDueDate(String projectId, String sprintId, String taskId, String dueDate);
 }

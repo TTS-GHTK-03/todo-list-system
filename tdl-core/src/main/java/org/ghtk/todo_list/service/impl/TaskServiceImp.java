@@ -1,10 +1,12 @@
 package org.ghtk.todo_list.service.impl;
 
+import java.time.LocalDate;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.entity.Task;
 import org.ghtk.todo_list.exception.TaskNotFoundException;
 import org.ghtk.todo_list.model.response.TaskResponse;
+import org.ghtk.todo_list.model.response.UpdateDueDateTaskResponse;
 import org.ghtk.todo_list.repository.TaskRepository;
 import org.ghtk.todo_list.repository.UserProjection;
 import org.ghtk.todo_list.service.TaskService;
@@ -103,5 +105,20 @@ public class TaskServiceImp implements TaskService {
   public Task save(Task task) {
     log.info("(save)task: {}", task);
     return taskRepository.save(task);
+  }
+  public UpdateDueDateTaskResponse updateDueDate(String projectId, String sprintId, String taskId, String dueDate){
+    log.info("(updateDueDate)projectId: {}, sprintId: {}, taskId: {}",
+        projectId, sprintId, taskId);
+    var task = taskRepository
+        .findByProjectIdAndId(projectId, taskId)
+        .orElseThrow(() -> {
+          log.error("(updateDueDate)projectId: {}, sprintId: {}, taskId: {}",
+              projectId, sprintId, taskId);
+          throw new TaskNotFoundException();
+        });
+    task.setStartDate(LocalDate.now());
+    task.setDueDate(LocalDate.parse(dueDate));
+    taskRepository.save(task);
+    return new UpdateDueDateTaskResponse(task.getId(), task.getStatus(), task.getDueDate());
   }
 }

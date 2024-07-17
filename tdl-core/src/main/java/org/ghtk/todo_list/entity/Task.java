@@ -23,6 +23,7 @@ public class Task extends BaseEntity {
   private Integer point;
   private String checklist;
   private String status;
+  private LocalDate startDate;
   private LocalDate dueDate;
   private String sprintId;
   private String userId;

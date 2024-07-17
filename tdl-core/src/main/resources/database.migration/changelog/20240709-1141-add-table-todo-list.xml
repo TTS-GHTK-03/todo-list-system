@@ -287,4 +287,10 @@
     </addColumn>
   </changeSet>
 
+  <changeSet id="20240717-1151-add-start-date" author="Phan Kieu">
+    <addColumn tableName="task">
+      <column name="start_date" type="date"/>
+    </addColumn>
+  </changeSet>
+
 </databaseChangeLog>
