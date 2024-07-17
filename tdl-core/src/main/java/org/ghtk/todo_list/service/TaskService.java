@@ -17,5 +17,7 @@ public interface TaskService {
   String getUserIdById(String taskId);
 
   TaskResponse updateSprintId(String projectId, String taskId, String sprintId, UserProjection userProjection);
+
+  boolean existsByUserIdAndTaskId(String userId, String taskId);
   boolean existById(String id);
 }

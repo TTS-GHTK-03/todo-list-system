@@ -4,5 +4,5 @@ import java.time.LocalDateTime;
 import org.ghtk.todo_list.entity.Board;
 
 public interface BoardMapper {
-  Board toBoard(String projectId, LocalDateTime createdAt, LocalDateTime lastUpdatedAt);
+  Board toBoard(String projectId);
 }

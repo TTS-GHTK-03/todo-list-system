@@ -9,14 +9,11 @@ import org.springframework.stereotype.Component;
 public class ProjectUserMapperImpl implements ProjectUserMapper {
 
   @Override
-  public ProjectUser toProjectUser(String userId, String projectId, String role,
-      LocalDateTime createdAt, LocalDateTime lastUpdatedAt) {
+  public ProjectUser toProjectUser(String userId, String projectId, String role) {
     ProjectUser projectUser = new ProjectUser();
     projectUser.setUserId(userId);
     projectUser.setProjectId(projectId);
     projectUser.setRole(role);
-    projectUser.setCreatedAt(createdAt);
-    projectUser.setLastUpdatedAt(lastUpdatedAt);
     return projectUser;
   }
 }

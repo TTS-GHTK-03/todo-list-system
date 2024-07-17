@@ -27,11 +27,13 @@ public class CommentServiceImp implements CommentService {
     comment.setTaskId(taskId);
     comment.setUserId(userId);
     comment.setText(text);
+    comment.setParent_id("null");
 
     Comment savedComment = commentRepository.save(comment);
     return CreateCommentResponse.builder()
         .id(savedComment.getId())
         .text(savedComment.getText())
+        .parent_id(savedComment.getParent_id())
         .taskId(savedComment.getTaskId())
         .userId(savedComment.getUserId())
         .createdAt(savedComment.getCreatedAt())
