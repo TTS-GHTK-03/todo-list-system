@@ -1,5 +1,8 @@
 package org.ghtk.todo_list.facade.imp;
 
+import static org.ghtk.todo_list.constant.CacheConstant.UPDATE_STATUS_TASK;
+import static org.ghtk.todo_list.constant.CacheConstant.UPDATE_STATUS_TASK_KEY;
+
 import java.time.LocalDate;
 import java.time.LocalDate;
 import java.util.List;
@@ -73,7 +76,8 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
       log.error("(updateStatusTask)taskId: {},projectId: {}", taskId, projectId);
       throw new StatusTaskInvalidException();
     }
-    String id = taskService.getUserIdById(taskId);
+    String statusTaskKey = taskId + UPDATE_STATUS_TASK_KEY;
+    redisCacheService.save(UPDATE_STATUS_TASK, taskId, statusTaskKey);
     return taskService.updateStatus(taskId, status.toUpperCase(), taskAssigneesService.findUserIdByTaskId(taskId));
   }
 
@@ -151,7 +155,7 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
     log.info("(updateStartDateDueDateTask)projectId: {}, sprintId: {}, taskId: {}", projectId,
         sprintId, taskId);
 
-    var redisStatusTaskKey = redisCacheService.get(CacheConstant.UPDATE_STATUS_TASK, taskId);
+    var redisStatusTaskKey = redisCacheService.get(UPDATE_STATUS_TASK, taskId);
     if (redisStatusTaskKey.isEmpty()) {
       log.error("(updateStartDateDueDateTask)statusTaskKey: {} not found", statusTaskKey);
       throw new StatusTaskKeyNotFoundException();
