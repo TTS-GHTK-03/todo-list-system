@@ -19,5 +19,7 @@ public class CacheConstant {
     public static final String RESET_PASSWORD_KEY = "RESET_PASSWORD_KEY";
     public static final long OTP_TTL_MINUTES = 3L;
 
-    public static final String INVITE_KEY = "INViTE_KEY";
+    public static final String INVITE_KEY = "INVITE_KEY";
+    public static final String UPDATE_STATUS_TASK = "UPDATE_STATUS_TASK";
+    public static final String UPDATE_STATUS_TASK_KEY = "_UPDATE_STATUS_TASK_KEY";
 }
