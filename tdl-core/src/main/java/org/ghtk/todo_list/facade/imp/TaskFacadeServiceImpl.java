@@ -33,8 +33,7 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
   private TaskService taskService;
   private final AuthUserService authUserService;
   private final SprintService sprintService;
-  @Autowired
-  private TaskAssigneesService taskAssigneesService;
+  private final TaskAssigneesService taskAssigneesService;
 
   @Override
   public List<TaskResponse> getAllTaskByProjectId(String userId, String projectId) {
