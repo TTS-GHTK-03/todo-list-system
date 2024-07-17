@@ -26,7 +26,8 @@ public class TaskServiceImp implements TaskService {
     log.info("(getAllTasksByProjectId)projectId: {}", projectId);
     List<Task> tasks = taskRepository.getAllTasksByProjectId(projectId);
     return tasks.stream()
-        .map(task -> new TaskResponse(task.getId(), task.getTitle(), task.getPoint(), task.getStatus()))
+        .map(task -> new TaskResponse(task.getId(), task.getTitle(), task.getPoint(),
+            task.getStatus()))
         .collect(Collectors.toList());
 
   }
@@ -44,11 +45,13 @@ public class TaskServiceImp implements TaskService {
       throw new TaskNotFoundException();
     });
 
-    return new TaskResponse(task.getId(), task.getTitle(), task.getPoint(), task.getStatus(), userProjection);
+    return new TaskResponse(task.getId(), task.getTitle(), task.getPoint(), task.getStatus(),
+        userProjection);
   }
 
   @Override
-  public TaskResponse updateStatus(String taskId, String taskStatus, UserProjection userProjection) {
+  public TaskResponse updateStatus(String taskId, String taskStatus,
+      UserProjection userProjection) {
     log.info("(updateStatus)taskId: {}, status: {}", taskId, taskStatus);
     var task = taskRepository
         .findById(taskId)
@@ -58,7 +61,8 @@ public class TaskServiceImp implements TaskService {
         });
     task.setStatus(taskStatus);
     taskRepository.save(task);
-    return new TaskResponse(task.getId(), task.getTitle(), task.getPoint(), task.getStatus(), userProjection);
+    return new TaskResponse(task.getId(), task.getTitle(), task.getPoint(), task.getStatus(),
+        userProjection);
   }
 
   @Override
@@ -82,7 +86,8 @@ public class TaskServiceImp implements TaskService {
     task.setSprintId(sprintId);
     task.setProjectId(null);
     taskRepository.save(task);
-    return new TaskResponse(task.getId(), task.getTitle(), task.getPoint(), task.getStatus(), userProjection);
+    return new TaskResponse(task.getId(), task.getTitle(), task.getPoint(), task.getStatus(),
+        userProjection);
   }
 
   @Override
@@ -91,4 +96,9 @@ public class TaskServiceImp implements TaskService {
     return taskRepository.existsByUserIdAndTaskId(userId, taskId);
   }
 
+  @Override
+  public boolean existById(String id) {
+    log.info("(existById)id: {}", id);
+    return taskRepository.existsById(id);
+  }
 }
