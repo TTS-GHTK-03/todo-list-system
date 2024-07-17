@@ -10,6 +10,7 @@ import org.ghtk.todo_list.exception.ProjectNotFoundException;
 import org.ghtk.todo_list.exception.SprintNotFoundException;
 import org.ghtk.todo_list.exception.StatusTaskInvalidException;
 import org.ghtk.todo_list.exception.TaskAssignmentExistsException;
+import org.ghtk.todo_list.exception.TaskNotExistUserException;
 import org.ghtk.todo_list.exception.TaskNotFoundException;
 import org.ghtk.todo_list.facade.TaskFacadeService;
 import org.ghtk.todo_list.model.response.TaskResponse;
@@ -93,7 +94,7 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
     }
     if(!taskService.existsByUserIdAndTaskId(userId, taskId)){
       log.error("(agileTaskByUser)Task with Id {} does not exist for user with Id {}", taskId, userId);
-      throw new TaskNotFoundException();
+      throw new TaskNotExistUserException();
     }
     TaskAssignees taskAssignees = new TaskAssignees();
     taskAssignees.setUserId(userId);
