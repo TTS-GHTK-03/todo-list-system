@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -46,8 +47,7 @@ public class TaskController {
 
   @PatchMapping("/{project_id}/tasks/{task_id}")
   public BaseResponse updateStatusTask(@PathVariable("project_id") String projectId,
-      @PathVariable("task_id") String taskId,
-      @Valid @RequestParam(value = "statusTask") String status) {
+      @PathVariable("task_id") String taskId, @Valid @RequestParam(value = "statusTask") String status) {
     log.info("(updateStatusTask)");
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         taskFacadeService.updateStatusTask(getUserId(), projectId, taskId, status));
@@ -59,6 +59,14 @@ public class TaskController {
     log.info("(updateSprintTask)");
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         taskFacadeService.updateSprintTask(getUserId(), projectId, sprintId, taskId));
+  }
+
+  @PostMapping("/{project_id}/tasks/{task_id}/clone")
+  public BaseResponse cloneTask(@PathVariable("project_id") String projectId,
+      @PathVariable("task_id") String taskId) {
+    log.info("(cloneTask)");
+    return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
+        taskFacadeService.cloneTask(getUserId(), projectId, taskId));
   }
 
   @PutMapping("/{project_id}/sprints/{sprint_id}/tasks/{task_id}/update_date")

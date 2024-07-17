@@ -11,6 +11,7 @@ import org.ghtk.todo_list.dto.response.UserNameResponse;
 import org.ghtk.todo_list.entity.AuthUser;
 import org.ghtk.todo_list.exception.AccountAlreadyHasUserException;
 import org.ghtk.todo_list.exception.EmailAlreadyExistedException;
+import org.ghtk.todo_list.exception.EmailNotFoundException;
 import org.ghtk.todo_list.exception.UserNotFoundException;
 import org.ghtk.todo_list.repository.AuthUserRepository;
 import org.ghtk.todo_list.repository.UserProjection;
@@ -22,6 +23,7 @@ public class AuthUserServiceImpl implements AuthUserService {
 
   private final AuthUserRepository repository;
   private static final String ADMIN_ROLE = "ADMIN";
+  private static final String UNASSIGNED = "Unassigned";
 
   @Override
   public AuthUser findById(String id) {
@@ -116,6 +118,20 @@ public class AuthUserServiceImpl implements AuthUserService {
   }
 
   @Override
+  public AuthUser create(String lastName) {
+    log.info("(create)lastName: {}", lastName);
+    AuthUser authUser = new AuthUser();
+    authUser.setLastName(lastName);
+    return repository.save(authUser);
+  }
+
+  @Override
+  public AuthUser findByUnassigned() {
+    log.info("(findByUnassigned)");
+    return repository.findByLastName(UNASSIGNED);
+  }
+
+  @Override
   public UserProjection getByUserId(String userId) {
     log.info("(getByUserId)userId: {}", userId);
     return repository.findByUserId(userId)
@@ -124,4 +140,5 @@ public class AuthUserServiceImpl implements AuthUserService {
           throw new UserNotFoundException();
         });
   }
+
 }

@@ -35,5 +35,6 @@ public interface AuthUserRepository extends JpaRepository<AuthUser, String> {
     where a.id = :userId
   """)
   Optional<UserProjection> findByUserId(String userId);
+  AuthUser findByLastName(String lastName);
 
 }

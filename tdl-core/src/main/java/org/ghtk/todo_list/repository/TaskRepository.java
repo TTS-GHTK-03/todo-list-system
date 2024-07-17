@@ -19,18 +19,31 @@ public interface TaskRepository extends JpaRepository<Task, String> {
   boolean existsById(String id);
 
   @Query("""
-        select ta.userId from TaskAssignees ta
-        join Task t on t.id = ta.taskId
-        WHERE t.id = :taskId
-          """)
+      select ta.userId from TaskAssignees ta
+      join Task t on t.id = ta.taskId
+      WHERE t.id = :taskId
+        """)
   String getUserIdById(String taskId);
 
   @Query("""
-    SELECT t FROM Task t 
-    WHERE t.status != :taskStatusDone AND t.sprintId IN 
-    (SELECT s.id FROM Sprint s WHERE s.status = :sprintStatusStart AND s.projectId = :projectId)
-  """)
+        SELECT t FROM Task t 
+        WHERE t.status != :taskStatusDone AND t.sprintId IN 
+        (SELECT s.id FROM Sprint s WHERE s.status = :sprintStatusStart AND s.projectId = :projectId)
+      """)
   List<Task> findAllByProjectId(String projectId, String taskStatusDone, String sprintStatusStart);
 
   Optional<Task> findByProjectIdAndId(String projectId, String id);
+
+  @Query("""
+      SELECT CASE WHEN EXISTS (
+          SELECT 1
+          FROM ProjectUser pu
+          JOIN Project p ON pu.projectId = p.id
+          JOIN Task t ON pu.projectId = t.projectId
+          WHERE pu.userId = :userId
+          AND t.id = :taskId
+      ) THEN TRUE ELSE FALSE END
+      """)
+  boolean existsByUserIdAndTaskId(@Param("userId") String userId, @Param("taskId") String taskId);
+
 }
