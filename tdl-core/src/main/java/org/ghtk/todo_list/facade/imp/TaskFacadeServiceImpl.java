@@ -3,18 +3,13 @@ package org.ghtk.todo_list.facade.imp;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.ghtk.todo_list.constant.SprintStatus;
 import org.ghtk.todo_list.constant.TaskStatus;
-import org.ghtk.todo_list.entity.Task;
 import org.ghtk.todo_list.entity.TaskAssignees;
 import org.ghtk.todo_list.exception.ProjectNotFoundException;
 import org.ghtk.todo_list.exception.SprintNotFoundException;
-import org.ghtk.todo_list.exception.SprintStatusNotFoundException;
 import org.ghtk.todo_list.exception.StatusTaskInvalidException;
 import org.ghtk.todo_list.exception.TaskAssignmentExistsException;
 import org.ghtk.todo_list.exception.TaskNotExistUserException;
-import org.ghtk.todo_list.exception.TaskNotFoundException;
-import org.ghtk.todo_list.exception.TaskStatusNotFoundException;
 import org.ghtk.todo_list.facade.TaskFacadeService;
 import org.ghtk.todo_list.mapper.TaskMapper;
 import org.ghtk.todo_list.model.response.TaskResponse;
@@ -23,7 +18,6 @@ import org.ghtk.todo_list.service.ProjectService;
 import org.ghtk.todo_list.service.SprintService;
 import org.ghtk.todo_list.service.TaskAssigneesService;
 import org.ghtk.todo_list.service.TaskService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -120,7 +114,7 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
     String statusFormat = status.trim().toUpperCase();
     if (!TaskStatus.isValid(statusFormat)) {
       log.error("(getAllTaskByProjectIdAndStatus) status task not found: status {}", status);
-      throw new TaskStatusNotFoundException();
+      throw new StatusTaskInvalidException();
     }
     validateProjectId(projectId);
 
