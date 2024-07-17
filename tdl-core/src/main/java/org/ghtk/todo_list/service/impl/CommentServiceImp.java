@@ -36,6 +36,7 @@ public class CommentServiceImp implements CommentService {
         .id(savedComment.getId())
         .text(savedComment.getText())
         .parentId(savedComment.getParentId())
+        .parentId(savedComment.getParentId())
         .taskId(savedComment.getTaskId())
         .userId(savedComment.getUserId())
         .createdAt(savedComment.getCreatedAt())
