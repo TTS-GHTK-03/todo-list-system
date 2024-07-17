@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 public class CreateCommentResponse {
   private String id;
   private String text;
-  private String parent_id;
+  private String parentId;
   private String taskId;
   private String userId;
   private LocalDateTime createdAt;
