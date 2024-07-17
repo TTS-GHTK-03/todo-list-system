@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 @Slf4j
 @RequiredArgsConstructor
-@Service
 public class TaskAssigneesServiceImpl implements TaskAssigneesService {
 
   private final TaskAssigneesRepository taskAssigneesRepository;
