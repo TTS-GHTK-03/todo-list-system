@@ -42,8 +42,7 @@ public interface TaskRepository extends JpaRepository<Task, String> {
           SELECT 1
           FROM ProjectUser pu
           JOIN Project p ON pu.projectId = p.id
-          JOIN Sprint sp ON sp.projectId = p.id
-          JOIN Task t ON t.sprintId = sp.id
+          JOIN Task t ON pu.projectId = t.projectId
           WHERE pu.userId = :userId
           AND t.id = :taskId
       ) THEN TRUE ELSE FALSE END

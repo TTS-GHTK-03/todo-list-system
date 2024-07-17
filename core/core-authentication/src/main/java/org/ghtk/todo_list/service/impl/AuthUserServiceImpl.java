@@ -23,6 +23,7 @@ public class AuthUserServiceImpl implements AuthUserService {
 
   private final AuthUserRepository repository;
   private static final String ADMIN_ROLE = "ADMIN";
+  private static final String UNASSIGNED = "Unassigned";
 
   @Override
   public AuthUser findById(String id) {
@@ -114,6 +115,20 @@ public class AuthUserServiceImpl implements AuthUserService {
   public List<UserNameResponse> getNameUser(String projectId) {
     log.info("(getNameUser)projectId: {}", projectId);
     return repository.getNameUser(ADMIN_ROLE, projectId);
+  }
+
+  @Override
+  public AuthUser create(String lastName) {
+    log.info("(create)lastName: {}", lastName);
+    AuthUser authUser = new AuthUser();
+    authUser.setLastName(lastName);
+    return repository.save(authUser);
+  }
+
+  @Override
+  public AuthUser findByUnassigned() {
+    log.info("(findByUnassigned)");
+    return repository.findByLastName(UNASSIGNED);
   }
 
   @Override

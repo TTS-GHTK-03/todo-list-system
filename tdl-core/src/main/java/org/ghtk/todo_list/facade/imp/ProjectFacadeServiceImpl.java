@@ -80,10 +80,10 @@ public class ProjectFacadeServiceImpl implements ProjectFacadeService {
     }
 
     Project projectSaved = projectService.createProject(userId, title);
-
+    var user = authUserService.create("Unassigned");
     ProjectUser projectUser = projectUserService.createProjectUser(userId, projectSaved.getId(),
         RoleProjectUser.ADMIN.toString());
-
+    projectUserService.createProjectUser(user.getId(), projectSaved.getId(), RoleProjectUser.VIEWER.toString());
     return projectSaved;
   }
 }
