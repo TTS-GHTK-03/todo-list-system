@@ -26,11 +26,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class TaskFacadeServiceImpl implements TaskFacadeService {
 
-  @Autowired
-  private ProjectService projectService;
-
-  @Autowired
-  private TaskService taskService;
+  private final ProjectService projectService;
+  private final TaskService taskService;
   private final AuthUserService authUserService;
   private final SprintService sprintService;
   private final TaskAssigneesService taskAssigneesService;
