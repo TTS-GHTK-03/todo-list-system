@@ -23,8 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class TaskController {
 
-  @Autowired
-  private TaskFacadeService taskFacadeService;
+  private final TaskFacadeService taskFacadeService;
 
   @GetMapping("/{project_id}/tasks")
   public BaseResponse getTasksByProjectId(@PathVariable("project_id") String projectId) {
@@ -32,6 +31,15 @@ public class TaskController {
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         taskFacadeService.getAllTaskByProjectId(getUserId(), projectId));
   }
+
+  @GetMapping("/{project_id}/tasks/status/{status}")
+  public BaseResponse getTasksByProjectIdAndStatus(@PathVariable("project_id") String projectId, @PathVariable("status") String status) {
+    log.info("(getTasksByProjectIdAndStatus)");
+    getUserId();
+    return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
+        taskFacadeService.getAllTaskByProjectIdAndStatus(projectId, status));
+  }
+
 
   @GetMapping("/{project_id}/tasks/{task_id}")
   public BaseResponse getTaskByTaskId(@PathVariable("project_id") String projectId,

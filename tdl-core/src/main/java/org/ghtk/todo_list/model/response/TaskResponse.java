@@ -1,10 +1,12 @@
 package org.ghtk.todo_list.model.response;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import org.ghtk.todo_list.repository.UserProjection;
 
 @Data
+@Builder
 @AllArgsConstructor
 public class TaskResponse {
 

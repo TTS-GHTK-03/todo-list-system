@@ -14,4 +14,5 @@ public interface TaskFacadeService {
   TaskResponse updateSprintTask(String userId, String projectId, String sprintId, String taskId);
 
   TaskAssignees agileTaskByUser(String email, String id);
+  List<TaskResponse> getAllTaskByProjectIdAndStatus(String projectId, String status);
 }

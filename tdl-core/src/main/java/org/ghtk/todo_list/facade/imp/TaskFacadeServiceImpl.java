@@ -3,16 +3,20 @@ package org.ghtk.todo_list.facade.imp;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.ghtk.todo_list.constant.SprintStatus;
 import org.ghtk.todo_list.constant.TaskStatus;
 import org.ghtk.todo_list.entity.Task;
 import org.ghtk.todo_list.entity.TaskAssignees;
 import org.ghtk.todo_list.exception.ProjectNotFoundException;
 import org.ghtk.todo_list.exception.SprintNotFoundException;
+import org.ghtk.todo_list.exception.SprintStatusNotFoundException;
 import org.ghtk.todo_list.exception.StatusTaskInvalidException;
 import org.ghtk.todo_list.exception.TaskAssignmentExistsException;
 import org.ghtk.todo_list.exception.TaskNotExistUserException;
 import org.ghtk.todo_list.exception.TaskNotFoundException;
+import org.ghtk.todo_list.exception.TaskStatusNotFoundException;
 import org.ghtk.todo_list.facade.TaskFacadeService;
+import org.ghtk.todo_list.mapper.TaskMapper;
 import org.ghtk.todo_list.model.response.TaskResponse;
 import org.ghtk.todo_list.service.AuthUserService;
 import org.ghtk.todo_list.service.ProjectService;
@@ -32,6 +36,7 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
   private final AuthUserService authUserService;
   private final SprintService sprintService;
   private final TaskAssigneesService taskAssigneesService;
+  private final TaskMapper taskMapper;
 
   @Override
   public List<TaskResponse> getAllTaskByProjectId(String userId, String projectId) {
@@ -53,7 +58,7 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
       String status) {
     log.info("(updateStatusTask)taskId: {},projectId: {}", taskId, projectId);
     validateProjectId(projectId);
-    if(!TaskStatus.isValid(status)) {
+    if (!TaskStatus.isValid(status)) {
       log.error("(updateStatusTask)taskId: {},projectId: {}", taskId, projectId);
       throw new StatusTaskInvalidException();
     }
@@ -62,11 +67,14 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
   }
 
   @Override
-  public TaskResponse updateSprintTask(String userId, String projectId, String sprintId, String taskId) {
-    log.info("(updateSprintTask)sprintId: {}, taskId: {},projectId: {}", sprintId, taskId, projectId);
+  public TaskResponse updateSprintTask(String userId, String projectId, String sprintId,
+      String taskId) {
+    log.info("(updateSprintTask)sprintId: {}, taskId: {},projectId: {}", sprintId, taskId,
+        projectId);
     validateProjectId(projectId);
     validateSprintId(sprintId);
-    return taskService.updateSprintId(projectId, taskId, sprintId, authUserService.getByUserId(userId));
+    return taskService.updateSprintId(projectId, taskId, sprintId,
+        authUserService.getByUserId(userId));
   }
 
   void validateProjectId(String projectId) {
@@ -88,12 +96,14 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
   @Override
   public TaskAssignees agileTaskByUser(String userId, String taskId) {
     log.info("(agileTaskByUser) userId: {}, taskId: {}", userId, taskId);
-    if(taskAssigneesService.existsByUserIdAndTaskId(userId, taskId)) {
-      log.error("(agileTaskByUser)Task with Id {} is already assigned to user with Id {}", taskId, userId);
+    if (taskAssigneesService.existsByUserIdAndTaskId(userId, taskId)) {
+      log.error("(agileTaskByUser)Task with Id {} is already assigned to user with Id {}", taskId,
+          userId);
       throw new TaskAssignmentExistsException();
     }
-    if(!taskService.existsByUserIdAndTaskId(userId, taskId)){
-      log.error("(agileTaskByUser)Task with Id {} does not exist for user with Id {}", taskId, userId);
+    if (!taskService.existsByUserIdAndTaskId(userId, taskId)) {
+      log.error("(agileTaskByUser)Task with Id {} does not exist for user with Id {}", taskId,
+          userId);
       throw new TaskNotExistUserException();
     }
     TaskAssignees taskAssignees = new TaskAssignees();
@@ -102,5 +112,19 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
 
     return taskAssigneesService.save(taskAssignees);
 
+  }
+
+  @Override
+  public List<TaskResponse> getAllTaskByProjectIdAndStatus(String projectId, String status) {
+    log.info("(getAllTaskByProjectIdAndStatus)projectId: {}, status: {}", projectId, status);
+    String statusFormat = status.trim().toUpperCase();
+    if (!TaskStatus.isValid(statusFormat)) {
+      log.error("(getAllTaskByProjectIdAndStatus) status task not found: status {}", status);
+      throw new TaskStatusNotFoundException();
+    }
+    validateProjectId(projectId);
+
+    return taskMapper.toTaskResponses(
+        taskService.getAllTasksByProjectIdAndStatus(projectId, statusFormat));
   }
 }
