@@ -7,4 +7,5 @@ public interface CommentService {
   CommentResponse createComment(String userId, String taskId, String text);
 
   CommentResponse updateComment(String userId, String taskId, String commentId, String text);
+  Comment findById(String commentId);
 }

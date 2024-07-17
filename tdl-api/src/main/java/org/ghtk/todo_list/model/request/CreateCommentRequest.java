@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 
 @Getter
-public class CommentRequest {
+public class CreateCommentRequest {
 
   @NotBlank(message = "Text is required")
   private String text;

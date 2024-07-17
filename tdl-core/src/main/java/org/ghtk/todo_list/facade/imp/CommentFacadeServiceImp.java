@@ -3,14 +3,13 @@ package org.ghtk.todo_list.facade.imp;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.entity.Comment;
-import org.ghtk.todo_list.exception.SprintNotFoundException;
 import org.ghtk.todo_list.exception.TaskNotFoundException;
+import org.ghtk.todo_list.exception.UserNotFoundException;
 import org.ghtk.todo_list.facade.CommentFacadeService;
 import org.ghtk.todo_list.model.response.CommentResponse;
 import org.ghtk.todo_list.service.CommentService;
 import org.ghtk.todo_list.service.TaskService;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Repository;
 
 @Slf4j
 @Component
@@ -32,6 +31,7 @@ public class CommentFacadeServiceImp implements CommentFacadeService {
       String text) {
     log.info("(updateComment)userId: {},taskId: {}", userId, taskId);
     validateTaskId(taskId);
+    validateUserId(userId,commentId);
     return commentService.updateComment(userId, taskId, commentId, text);
   }
 
@@ -40,6 +40,15 @@ public class CommentFacadeServiceImp implements CommentFacadeService {
     if (!taskService.existById(taskId)) {
       log.error("(validateTaskId)taskId: {}", taskId);
       throw new TaskNotFoundException();
+    }
+  }
+
+  void validateUserId(String userId, String commentId) {
+    log.info("(validateUserId)userId: {}, commentId: {}", userId, commentId);
+    Comment comment = commentService.findById(commentId);
+    if (!userId.equals(comment.getUserId())) {
+      log.error("(validateUserId)userId: {}, commentId: {}", userId, commentId);
+      throw new UserNotFoundException();
     }
   }
 }

@@ -66,4 +66,14 @@ public class CommentServiceImp implements CommentService {
         .lastUpdatedAt(savedComment.getLastUpdatedAt())
         .build();
   }
+
+  @Override
+  public Comment findById(String commentId) {
+  log.info("(findById)commentId: {}", commentId);
+    return commentRepository.findById(commentId)
+        .orElseThrow(() -> {
+          log.error("(findById)commentId: {}", commentId);
+          throw new CommentNotFoundException();
+        });
+  }
 }
