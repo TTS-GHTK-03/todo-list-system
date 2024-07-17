@@ -1,6 +1,7 @@
 package org.ghtk.todo_list.service.impl;
 
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.entity.Comment;
 import org.ghtk.todo_list.entity.Task;
@@ -16,10 +17,10 @@ import java.util.List;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class TaskServiceImp implements TaskService {
 
-  @Autowired
-  private TaskRepository taskRepository;
+  private final TaskRepository taskRepository;
 
   @Override
   public List<TaskResponse> getAllTasksByProjectId(String projectId) {

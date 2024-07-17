@@ -39,7 +39,7 @@ public class CommentController {
   }
 
   @PostMapping("/tasks/{task_id}/comments/{comment_id}")
-  public BaseResponse createComment(
+  public BaseResponse updateComment(
       @Valid @RequestBody CommentRequest commentRequest,
       @PathVariable("task_id") String taskId, @PathVariable("comment_id") String commentId) {
     log.info("(UpdateComment)taskId: {}, commentId: {}", taskId, commentId);
