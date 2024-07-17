@@ -99,7 +99,7 @@ public class ProjectUserFacadeServiceImpl implements ProjectUserFacadeService {
     } else {
       log.info("(accept)email: {} is existed", email);
       String userId = authUserService.getUserId(email);
-      ProjectUser projectUser = projectUserService.createProjectUser(userId, projectId, role, LocalDateTime.now(), LocalDateTime.now());
+      ProjectUser projectUser = projectUserService.createProjectUser(userId, projectId, role);
       //call project page
       String acceptEmailKey = generateAcceptEmailKey(email, projectId, role);
     }

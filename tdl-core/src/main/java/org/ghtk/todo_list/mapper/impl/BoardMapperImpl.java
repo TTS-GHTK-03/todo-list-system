@@ -9,11 +9,9 @@ import org.springframework.stereotype.Component;
 public class BoardMapperImpl implements BoardMapper {
 
   @Override
-  public Board toBoard(String projectId, LocalDateTime createdAt, LocalDateTime lastUpdatedAt) {
+  public Board toBoard(String projectId) {
     Board board = new Board();
     board.setProjectId(projectId);
-    board.setCreatedAt(createdAt);
-    board.setLastUpdatedAt(lastUpdatedAt);
     return board;
   }
 }
