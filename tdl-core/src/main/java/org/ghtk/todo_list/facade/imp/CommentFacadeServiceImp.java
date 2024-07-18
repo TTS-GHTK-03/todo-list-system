@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.entity.Comment;
 import org.ghtk.todo_list.exception.TaskNotFoundException;
+import org.ghtk.todo_list.exception.UserInvalidException;
 import org.ghtk.todo_list.exception.UserNotFoundException;
 import org.ghtk.todo_list.facade.CommentFacadeService;
 import org.ghtk.todo_list.model.response.CommentResponse;
@@ -34,7 +35,7 @@ public class CommentFacadeServiceImp implements CommentFacadeService {
     Comment comment = commentService.findById(commentId);
     if (!userId.equals(comment.getUserId())) {
       log.error("(updateComment)userId: {}, commentId: {}", userId, commentId);
-      throw new UserNotFoundException();
+      throw new UserInvalidException();
     }
     comment.setText(text);
     Comment savedComment = commentService.save(comment);
