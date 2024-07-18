@@ -96,8 +96,10 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
   }
 
   @Override
-  public TaskResponse updateSprintTask(String userId, String projectId, String sprintId, String taskId) {
-    log.info("(updateSprintTask)sprintId: {}, taskId: {},projectId: {}", sprintId, taskId, projectId);
+  public TaskResponse updateSprintTask(String userId, String projectId, String sprintId,
+      String taskId) {
+    log.info("(updateSprintTask)sprintId: {}, taskId: {},projectId: {}", sprintId, taskId,
+        projectId);
     validateProjectId(projectId);
     validateSprintId(sprintId);
     if (taskService.existsBySprintId(sprintId)) {
@@ -226,6 +228,29 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
     }
   }
 
+  @Override
+  public TaskResponse createTask(String userId, String projectId, String title) {
+    log.info("(createTask)userId: {},projectId: {}", userId, projectId);
+    validateProjectId(projectId);
+
+    Task task = new Task();
+    task.setTitle(title);
+    task.setUserId(userId);
+    task.setProjectId(projectId);
+    Task savedTask = taskService.save(task);
+
+    var user = authUserService.findByUnassigned();
+    agileTaskByUser(user.getId(), savedTask.getId());
+
+    return TaskResponse.builder()
+        .id(savedTask.getId())
+        .title(savedTask.getTitle())
+        .point(savedTask.getPoint())
+        .status(savedTask.getStatus())
+        .userId(savedTask.getUserId())
+        .build();
+  }
+
   void validateUserId(String userId) {
     log.info("(validateUserId)userId: {}", userId);
     if (!authUserService.existById(userId)) {
@@ -246,7 +271,7 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
     log.info("(validateDueDateTask)projectId: {}, sprintId: {}", projectId, sprintId);
     Sprint sprint = sprintService.findSprintByProjectIdAndSprintId(projectId, sprintId);
 
-    if(!LocalDate.now().isBefore(LocalDate.parse(dueDate))) {
+    if (!LocalDate.now().isBefore(LocalDate.parse(dueDate))) {
       log.error("(validateDueDateTask)dueDate: {} invalid", dueDate);
       throw new DueDateTaskInvalidStartDateException();
     }
@@ -257,7 +282,8 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
   }
 
   @Override
-  public List<TaskResponse> getAllTaskByProjectIdAndStatus(String userId, String projectId, String status) {
+  public List<TaskResponse> getAllTaskByProjectIdAndStatus(String userId, String projectId,
+      String status) {
     log.info("(getAllTaskByProjectIdAndStatus)projectId: {}, status: {}", projectId, status);
     String statusFormat = status.trim().toUpperCase();
     if (!TaskStatus.isValid(statusFormat)) {

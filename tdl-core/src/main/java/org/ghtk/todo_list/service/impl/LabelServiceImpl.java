@@ -1,5 +1,6 @@
 package org.ghtk.todo_list.service.impl;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.entity.Label;
@@ -33,6 +34,13 @@ public class LabelServiceImpl implements LabelService {
 
   @Override
   public boolean existByTypeIdAndTitle(String typeId, String title) {
+    log.info("(existByTypeIdAndTitle)typeId: {}, title: {}", typeId, title);
     return labelRepository.existsByTypeIdAndTitle(typeId, title);
+  }
+
+  @Override
+  public List<Label> getLabelsByType(String typeId) {
+    log.info("(getLabelsByType)typeId: {}", typeId);
+    return labelRepository.findByTypeId(typeId);
   }
 }

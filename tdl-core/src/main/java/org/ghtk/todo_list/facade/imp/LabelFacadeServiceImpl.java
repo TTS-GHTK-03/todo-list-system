@@ -1,5 +1,6 @@
 package org.ghtk.todo_list.facade.imp;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.entity.Label;
@@ -69,6 +70,17 @@ public class LabelFacadeServiceImpl implements LabelFacadeService {
 
     log.info("(updateLabel) label: {}", label);
     return labelMapper.toLabelResponse(label);
+  }
+
+  @Override
+  public List<LabelResponse> getLabelsByTypeId(String projectId, String typeId) {
+
+    log.info("(getLabelsByTypeId)");
+    validProjectInType(projectId, typeId);
+    List<Label> labels = labelService.getLabelsByType(typeId);
+
+    log.info("(getLabelsByTypeId)labels: {}", labels);
+    return labelMapper.toLabelResponses(labels);
   }
 
   private void validProjectInType(String projectId, String typeId) {
