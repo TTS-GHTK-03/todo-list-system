@@ -11,10 +11,12 @@ import org.ghtk.todo_list.facade.CommentFacadeService;
 import org.ghtk.todo_list.model.request.CreateCommentRequest;
 import org.ghtk.todo_list.model.request.UpdateCommentRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RequestMapping("/api/v1/projects")
@@ -44,5 +46,19 @@ public class CommentController {
             updateCommentRequest.getText()));
   }
 
+  @GetMapping("/{task_id}/comments")
+  public BaseResponse getAllCommentsByTaskId(@PathVariable("task_id") String taskId) {
+    log.info("(getAllCommentsByTaskId)taskId: {}", taskId);
+    return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
+        commentFacadeService.getAllCommentsByTaskId(taskId));
+  }
+
+  @GetMapping("/{task_id}/comments/{comment_id}")
+  public BaseResponse getCommentByCommentId(@PathVariable("task_id") String taskId, @PathVariable("comment_id") String commentId) {
+    log.info("(getCommentByCommentId)taskId: {}, commentId: {}", taskId, commentId);
+    return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
+        commentFacadeService.getCommentByCommentId(taskId, commentId));
+  }
 }
+
 

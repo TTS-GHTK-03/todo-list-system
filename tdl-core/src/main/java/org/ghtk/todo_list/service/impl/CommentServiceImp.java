@@ -1,6 +1,8 @@
 package org.ghtk.todo_list.service.impl;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.entity.Comment;
@@ -69,12 +71,22 @@ public class CommentServiceImp implements CommentService {
 
   @Override
   public Comment findById(String commentId) {
-  log.info("(findById)commentId: {}", commentId);
+    log.info("(findById)commentId: {}", commentId);
     return commentRepository.findById(commentId)
         .orElseThrow(() -> {
           log.error("(findById)commentId: {}", commentId);
           throw new CommentNotFoundException();
         });
+  }
+
+  @Override
+  public List<CommentResponse> getAllCommentsByTaskId(String taskId) {
+    log.info("(findAllByTaskId)taskId: {}", taskId);
+    List<Comment> comments = commentRepository.findAllByTaskId(taskId);
+    return comments.stream()
+        .map(comment -> new CommentResponse(comment.getId(), comment.getText(),
+            comment.getParentId(), comment.getTaskId(), comment.getUserId(), comment.getCreatedAt(),
+            comment.getLastUpdatedAt())).collect(Collectors.toList());
   }
 
   @Override

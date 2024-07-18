@@ -1,5 +1,6 @@
 package org.ghtk.todo_list.facade.imp;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.entity.Comment;
@@ -39,6 +40,29 @@ public class CommentFacadeServiceImp implements CommentFacadeService {
     }
     comment.setText(text);
     Comment savedComment = commentService.save(comment);
+    return CommentResponse.builder()
+        .id(savedComment.getId())
+        .text(savedComment.getText())
+        .parentId(savedComment.getParentId())
+        .taskId(savedComment.getTaskId())
+        .userId(savedComment.getUserId())
+        .createdAt(savedComment.getCreatedAt())
+        .lastUpdatedAt(savedComment.getLastUpdatedAt())
+        .build();
+  }
+
+  @Override
+  public List<CommentResponse> getAllCommentsByTaskId(String taskId) {
+    log.info("(findAllByTaskId)taskId: {}", taskId);
+    validateTaskId(taskId);
+    return commentService.getAllCommentsByTaskId(taskId);
+  }
+
+  @Override
+  public CommentResponse getCommentByCommentId(String taskId, String commentId) {
+    log.info("(getCommentByCommentId)taskId: {}, commentId: {}", taskId, commentId);
+    validateTaskId(taskId);
+    Comment savedComment = commentService.findById(commentId);
     return CommentResponse.builder()
         .id(savedComment.getId())
         .text(savedComment.getText())
