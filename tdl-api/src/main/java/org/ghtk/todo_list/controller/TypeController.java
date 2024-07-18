@@ -1,5 +1,7 @@
 package org.ghtk.todo_list.controller;
 
+import static org.ghtk.todo_list.util.SecurityUtil.getUserId;
+
 import jakarta.validation.Valid;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
@@ -24,10 +26,20 @@ public class TypeController {
   private final TypeFacadeService typeFacadeService;
 
   @PostMapping()
-  public BaseResponse createType(@PathVariable("project_id") String projectId, @RequestBody @Valid TypeRequest typeRequest) {
-    log.info("(createType)createTypeRequest: {}", typeRequest);
+  public BaseResponse createType(@PathVariable("project_id") String projectId,
+      @RequestBody @Valid TypeRequest typeRequest) {
+    log.info("(createType)projectId: {}, typeRequest: {}", projectId, typeRequest);
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
-        typeFacadeService.createType(projectId, typeRequest.getTitle(), typeRequest.getImage(),
+        typeFacadeService.createType(getUserId(), projectId, typeRequest.getTitle(), typeRequest.getImage(),
+            typeRequest.getDescription()));
+  }
+
+  @PutMapping("/{type_id}")
+  public BaseResponse updateType(@PathVariable("project_id") String projectId,
+      @PathVariable("type_id") String typeId, @RequestBody @Valid TypeRequest typeRequest) {
+    log.info("(updateType)projectId: {}, typeId: {}, typeRequest: {}", projectId, typeId, typeRequest);
+    return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
+        typeFacadeService.updateType(getUserId(), projectId, typeId, typeRequest.getTitle(), typeRequest.getImage(),
             typeRequest.getDescription()));
   }
 }

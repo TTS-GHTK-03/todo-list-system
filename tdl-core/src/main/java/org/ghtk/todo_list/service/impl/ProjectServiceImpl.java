@@ -121,7 +121,7 @@ public class ProjectServiceImpl implements ProjectService {
     projectRepository.updateCountSprint(projectId, countSprint);
   }
 
-  void validateProjectId(String projectId){
+  private void validateProjectId(String projectId){
     log.info("(validateProjectId)projectId: {}", projectId);
     if(!projectRepository.existsById(projectId)){
       log.error("(validateProjectId)project: {} not found", projectId);
@@ -129,7 +129,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
   }
 
-   void validateTitle(String title){
+   private void validateTitle(String title){
     log.info("(validateTitle)title: {}", title);
      if (projectRepository.existsByTitle(title)) {
        log.error("(validateTitle)project: {} already existed ", title);

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.entity.Type;
 import org.ghtk.todo_list.exception.ProjectNotFoundException;
+import org.ghtk.todo_list.exception.TypeNotFoundException;
 import org.ghtk.todo_list.exception.TypeTitleAlreadyExistedException;
 import org.ghtk.todo_list.facade.TypeFacadeService;
 import org.ghtk.todo_list.mapper.TypeMapper;
@@ -19,7 +20,8 @@ public class TypeFacadeServiceImpl implements TypeFacadeService {
   private final TypeMapper typeMapper;
 
   @Override
-  public Type createType(String projectId, String title, String image, String description) {
+  public Type createType(String userId, String projectId, String title, String image,
+      String description) {
     log.info("(createType)projectId: {}, title: {}, image: {}, description: {}", projectId, title,
         image, description);
 
@@ -32,17 +34,41 @@ public class TypeFacadeServiceImpl implements TypeFacadeService {
     return typeService.createType(type);
   }
 
-  void validateProjectId(String projectId){
+  @Override
+  public Type updateType(String userId, String projectId, String typeId, String title, String image,
+      String description) {
+    log.info("(updateType)userId: {}, projectId: {}, typeId: {}, title: {}, image: {}, description: {}",
+        userId, projectId, typeId, title, image, description);
+
+    validateProjectId(projectId);
+    validateTypeId(typeId);
+    validateTypeTitle(projectId, title);
+
+    Type type = typeMapper.toType(title, image, description);
+    type.setId(typeId);
+
+    return typeService.updateType(type);
+  }
+
+  private void validateProjectId(String projectId) {
     log.info("(validateProjectId)projectId: {}", projectId);
-    if(!projectService.existById(projectId)){
+    if (!projectService.existById(projectId)) {
       log.error("(validateProjectId)projectId: {} not found", projectId);
       throw new ProjectNotFoundException();
     }
   }
 
-  void validateTypeTitle(String projectId, String title){
+  private void validateTypeId(String typeId) {
+    log.info("(validateTypeId)typeId: {}", typeId);
+    if (!typeService.existById(typeId)) {
+      log.error("(validateTypeId)typeId: {} not found", typeId);
+      throw new TypeNotFoundException();
+    }
+  }
+
+  private void validateTypeTitle(String projectId, String title) {
     log.info("(validateTypeTitle)projectId: {}, title: {}", projectId, title);
-    if(typeService.existByProjectIdAndTitle(projectId, title)){
+    if (typeService.existByProjectIdAndTitle(projectId, title)) {
       log.error("(validateTypeTitle)title: {} already existed in projectId: {}", title, projectId);
       throw new TypeTitleAlreadyExistedException();
     }

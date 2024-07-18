@@ -23,13 +23,19 @@ public class TypeServiceImpl implements TypeService {
   }
 
   @Override
+  public Type updateType(Type type) {
+    log.info("(updateType)type: {}", type);
+    return typeRepository.save(type);
+  }
+
+  @Override
   public boolean existById(String id) {
     return typeRepository.existsById(id);
   }
 
   @Override
   public boolean existByProjectIdAndTitle(String projectId, String title) {
-    log.info("(existByTitle)title: {}", title);
+    log.info("(existByProjectIdAndTitle)title: {}", title);
     return typeRepository.existsByProjectIdAndTitle(projectId, title);
   }
 
