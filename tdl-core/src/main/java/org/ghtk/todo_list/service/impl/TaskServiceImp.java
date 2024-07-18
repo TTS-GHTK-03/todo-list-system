@@ -36,6 +36,12 @@ public class TaskServiceImp implements TaskService {
   }
 
   @Override
+  public List<Task> getAllTasksByProjectIdAndStatus(String projectId, String status) {
+    log.info("(getAllTasksByProjectIdAndStatus)");
+    return taskRepository.getAllTasksByProjectIdAndStatus(projectId, status);
+  }
+
+  @Override
   public TaskResponse findById(String taskId, String userId) {
     log.info("(getTaskByTaskId)projectId: {}", taskId);
     var task = taskRepository.findById(taskId).orElseThrow(() -> {
@@ -86,6 +92,7 @@ public class TaskServiceImp implements TaskService {
     log.info("(existsByUserIdAndTaskId)");
     return taskRepository.existsByUserIdAndTaskId(userId, taskId);
   }
+
   @Override
   public boolean existById(String id) {
     log.info("(existById)id: {}", id);
