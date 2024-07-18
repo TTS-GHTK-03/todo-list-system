@@ -2,6 +2,7 @@ package org.ghtk.todo_list.controller;
 
 import static org.ghtk.todo_list.util.SecurityUtil.getUserId;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.dto.response.BaseResponse;
@@ -44,7 +45,7 @@ public class ProjectController {
   }
 
   @PostMapping()
-  public BaseResponse createProject(@RequestBody CreateProjectRequest createProjectRequest) {
+  public BaseResponse createProject(@RequestBody @Valid CreateProjectRequest createProjectRequest) {
     log.info("(createProject)project: {}", createProjectRequest);
     return BaseResponse.of(HttpStatus.CREATED.value(), LocalDate.now().toString(),
         projectService.createProject(getUserId(), createProjectRequest.getTitle()));
@@ -52,7 +53,7 @@ public class ProjectController {
 
   @PutMapping("/{project_id}")
   public BaseResponse updateProject(@PathVariable("project_id") String projectId,
-      @RequestBody UpdateProjectRequest updateProjectRequest) {
+      @RequestBody @Valid UpdateProjectRequest updateProjectRequest) {
     log.info("(updateProject)project: {}", updateProjectRequest);
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         projectService.updateProject(getUserId(), projectId, updateProjectRequest.getTitle(),
