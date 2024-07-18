@@ -67,12 +67,6 @@ public class SprintController {
     }
   }
 
-//  @GetMapping("/status/{status}")
-//  public BaseResponse getSprintStatus(@PathVariable("project_id") String projectId, @PathVariable("status") String status) {
-//    log.info("(getSprintStatus) projectId: {}, status: {}", projectId, status);
-//    getUserId();
-//
-//  }
   @GetMapping("/{id}")
   public BaseResponse getSprint(@PathVariable("project_id") String projectId, @PathVariable("id") String id) {
     log.info("(getSprint) projectId: {}, id: {}", projectId, id);
