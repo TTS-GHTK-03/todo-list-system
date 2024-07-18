@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/types/{type_id}/labels")
+@RequestMapping("/api/v1/projects/{project_id}/types/{type_id}/labels")
 @RequiredArgsConstructor
 public class LabelController {
 
@@ -26,11 +26,11 @@ public class LabelController {
 
   @PostMapping()
   public BaseResponse createLabel(@RequestBody @Valid CreateLabelRequest request,
-      @PathVariable("type_id") String typeId) {
+      @PathVariable("project_id") String projectId, @PathVariable("type_id") String typeId) {
     log.info("(createLabel)");
 
     getUserId();
     return BaseResponse.of(HttpStatus.CREATED.value(), LocalDate.now().toString(),
-        labelFacadeService.createLabel(typeId, request.getTitle(), request.getDescription()));
+        labelFacadeService.createLabel(projectId, typeId, request.getTitle(), request.getDescription()));
   }
 }

@@ -3,7 +3,9 @@ package org.ghtk.todo_list.facade.imp;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.entity.Label;
+import org.ghtk.todo_list.entity.Type;
 import org.ghtk.todo_list.exception.LabelAlreadyExistsException;
+import org.ghtk.todo_list.exception.ProjectIdMismatchException;
 import org.ghtk.todo_list.exception.SprintStatusNotFoundException;
 import org.ghtk.todo_list.exception.TypeNotFoundException;
 import org.ghtk.todo_list.facade.LabelFacadeService;
@@ -23,13 +25,16 @@ public class LabelFacadeServiceImpl implements LabelFacadeService {
   private final TypeService typeService;
 
   @Override
-  public LabelResponse createLabel(String typeId, String title, String description) {
+  public LabelResponse createLabel(String projectId, String typeId, String title, String description) {
     log.info("(createLabel)");
 
-    if(!typeService.existById(typeId)) {
-      log.error("(createLabel) typeId not found: {}", typeId);
-      throw new TypeNotFoundException();
+    Type type = typeService.findById(typeId);
+
+    if(!type.getProjectId().equals(projectId)) {
+      log.error("(createLabel) ProjectId: {} Mismatch", typeId);
+      throw new ProjectIdMismatchException();
     }
+
     if(labelService.existByTypeIdAndTitle(typeId, title)) {
       log.error("(createLabel)Invalid typeId: {}, title: {}", typeId, title);
       throw new LabelAlreadyExistsException();
