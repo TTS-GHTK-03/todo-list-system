@@ -13,4 +13,6 @@ public interface ProjectFacadeService {
   ProjectInformationResponse getProjectInformation(String userId, String projectId);
 
   Project createProject(String userId, String title);
+
+  Project updateProject(String userId, String projectId, String title, String keyProject);
 }

@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.dto.response.BaseResponse;
 import org.ghtk.todo_list.facade.ProjectFacadeService;
 import org.ghtk.todo_list.model.request.CreateProjectRequest;
+import org.ghtk.todo_list.model.request.UpdateProjectRequest;
 import org.ghtk.todo_list.service.ProjectService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -49,5 +50,12 @@ public class ProjectController {
         projectService.createProject(getUserId(), createProjectRequest.getTitle()));
   }
 
-
+  @PutMapping("/{project_id}")
+  public BaseResponse updateProject(@PathVariable("project_id") String projectId,
+      @RequestBody UpdateProjectRequest updateProjectRequest) {
+    log.info("(updateProject)project: {}", updateProjectRequest);
+    return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
+        projectService.updateProject(getUserId(), projectId, updateProjectRequest.getTitle(),
+            updateProjectRequest.getKeyProject()));
+  }
 }

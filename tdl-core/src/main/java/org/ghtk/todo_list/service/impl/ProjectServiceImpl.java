@@ -37,10 +37,7 @@ public class ProjectServiceImpl implements ProjectService {
   public Project getProject(String userId, String projectId) {
     log.info("(getProject)user: {}, project: {}", userId, projectId);
 
-    if (!projectRepository.existsById(projectId) ) {
-      log.error("(getProject)user: {} not found ", projectId);
-      throw new ProjectNotFoundException();
-    }
+    validateProjectId(projectId);
 
     Project project = projectRepository.getProject(userId, projectId);
 
@@ -56,10 +53,7 @@ public class ProjectServiceImpl implements ProjectService {
   public Project getProjectInformation(String projectId) {
     log.info("(getProjectInformation)project: {}", projectId);
 
-    if(!projectRepository.existsById(projectId)){
-      log.error("(getProjectInformation)project: {}", projectId);
-      throw new ProjectNotFoundException();
-    }
+    validateProjectId(projectId);
     return projectRepository.findById(projectId).get();
   }
 
@@ -67,10 +61,7 @@ public class ProjectServiceImpl implements ProjectService {
   public Project createProject(String userId, String title) {
     log.info("(createProject)user: {}", userId);
 
-    if (projectRepository.findByTitle(title) != null) {
-      log.error("(createProject)project: {} already has title ", title);
-      throw new ProjectTitleAlreadyExistedException();
-    }
+    validateTitle(title);
 
     String regex = "[\\s,;:.!?-]+";
     String[] titleList = title.split(regex);
@@ -80,10 +71,10 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     int count = 1;
-    String keyProjectCheck = stringBuilder.toString() + count;
-    while (projectRepository.findByKeyProject(keyProjectCheck) != null){
-      count++;
+    String keyProjectCheck = stringBuilder.toString();
+    while (!projectRepository.existsByKeyProject(keyProjectCheck)){
       keyProjectCheck = stringBuilder.toString() + count;
+      count++;
     }
 
     Project project = projectMapper.toProject(title, stringBuilder.append(count).toString());
@@ -91,9 +82,28 @@ public class ProjectServiceImpl implements ProjectService {
   }
 
   @Override
+  public Project updateProject(Project project) {
+    log.info("(updateProject)project: {}", project);
+    return projectRepository.save(project);
+  }
+
+
+  @Override
   public boolean existById(String id) {
     log.info("(existById)id: {}", id);
     return projectRepository.existsById(id);
+  }
+
+  @Override
+  public boolean existByTitle(String title) {
+    log.info("(existByTitle)title: {}", title);
+    return projectRepository.existsByTitle(title);
+  }
+
+  @Override
+  public boolean existByKeyProject(String keyProject) {
+    log.info("(existByKeyProject)keyProject: {}", keyProject);
+    return projectRepository.existsByKeyProject(keyProject);
   }
 
   @Override
@@ -110,4 +120,20 @@ public class ProjectServiceImpl implements ProjectService {
     log.info("(updateCountSprint)projectId: {}, countSprint: {}", projectId, countSprint);
     projectRepository.updateCountSprint(projectId, countSprint);
   }
+
+  void validateProjectId(String projectId){
+    log.info("(validateProjectId)projectId: {}", projectId);
+    if(!projectRepository.existsById(projectId)){
+      log.error("(validateProjectId)project: {} not found", projectId);
+      throw new ProjectNotFoundException();
+    }
+  }
+
+   void validateTitle(String title){
+    log.info("(validateTitle)title: {}", title);
+     if (projectRepository.existsByTitle(title)) {
+       log.error("(validateTitle)project: {} already existed ", title);
+       throw new ProjectTitleAlreadyExistedException();
+     }
+   }
 }

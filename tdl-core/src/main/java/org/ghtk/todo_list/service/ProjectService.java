@@ -13,8 +13,11 @@ public interface ProjectService {
   Project getProjectInformation(String projectId);
 
   boolean existById(String id);
+  boolean existByTitle(String title);
+  boolean existByKeyProject(String keyProject);
 
   Project createProject(String userId, String title);
+  Project updateProject(Project project);
   Project getProjectById(String projectId);
   void updateCountSprint(String projectId, Long countSprint);
 }
