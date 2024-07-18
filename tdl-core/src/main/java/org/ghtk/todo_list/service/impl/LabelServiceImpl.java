@@ -3,6 +3,8 @@ package org.ghtk.todo_list.service.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.entity.Label;
+import org.ghtk.todo_list.exception.LabelNotFoundException;
+import org.ghtk.todo_list.exception.TypeNotFoundException;
 import org.ghtk.todo_list.repository.LabelRepository;
 import org.ghtk.todo_list.service.LabelService;
 import org.springframework.stereotype.Service;
@@ -18,6 +20,15 @@ public class LabelServiceImpl implements LabelService {
   public Label save(Label label) {
     log.info("(save)label: {}", label);
     return labelRepository.save(label);
+  }
+
+  @Override
+  public Label findById(String id) {
+    log.info("(findById)labelId: {}", id);
+    return labelRepository.findById(id).orElseThrow(() -> {
+      log.error("(findById)labelId: {} not found", id);
+      throw new LabelNotFoundException();
+    });
   }
 
   @Override
