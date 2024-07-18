@@ -1,5 +1,6 @@
 package org.ghtk.todo_list.facade.imp;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.entity.Type;
@@ -8,6 +9,7 @@ import org.ghtk.todo_list.exception.TypeNotFoundException;
 import org.ghtk.todo_list.exception.TypeTitleAlreadyExistedException;
 import org.ghtk.todo_list.facade.TypeFacadeService;
 import org.ghtk.todo_list.mapper.TypeMapper;
+import org.ghtk.todo_list.model.response.TypeResponse;
 import org.ghtk.todo_list.service.ProjectService;
 import org.ghtk.todo_list.service.TypeService;
 
@@ -48,6 +50,18 @@ public class TypeFacadeServiceImpl implements TypeFacadeService {
     type.setId(typeId);
 
     return typeService.updateType(type);
+  }
+
+  @Override
+  public List<TypeResponse> getAllTypes(String projectId) {
+    log.info("(getAllTypes)projectId: {}", projectId);
+
+    validateProjectId(projectId);
+
+    List<Type> typeList = typeService.findAllByProjectId(projectId);
+    List<TypeResponse> typeResponseList = typeMapper.toTypeResponses(typeList);
+
+    return typeMapper.toTypeResponses(typeList);
   }
 
   private void validateProjectId(String projectId) {
