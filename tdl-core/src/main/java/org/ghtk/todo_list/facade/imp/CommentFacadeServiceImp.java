@@ -1,8 +1,10 @@
 package org.ghtk.todo_list.facade.imp;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.entity.Comment;
+import org.ghtk.todo_list.exception.CommentNotFoundException;
 import org.ghtk.todo_list.exception.ProjectNotFoundException;
 import org.ghtk.todo_list.exception.TaskNotFoundException;
 import org.ghtk.todo_list.exception.UserInvalidException;
@@ -56,6 +58,37 @@ public class CommentFacadeServiceImp implements CommentFacadeService {
   }
 
   @Override
+  public List<CommentResponse> getAllCommentsByTaskId(String taskId) {
+    log.info("(findAllByTaskId)taskId: {}", taskId);
+    validateTaskId(taskId);
+    return commentService.getAllCommentsByTaskId(taskId);
+  }
+
+  @Override
+  public List<CommentResponse> getAllCommentsByParentId(String taskId, String parentId) {
+    log.info("(getAllCommentsByParentId)taskId: {},parentId: {}",taskId, parentId);
+    validateTaskId(taskId);
+    validateParentId(parentId);
+    return commentService.getAllCommentsByParentId(taskId, parentId);
+  }
+
+  @Override
+  public CommentResponse findById(String taskId, String commentId) {
+    log.info("(getCommentByCommentId)taskId: {}, commentId: {}", taskId, commentId);
+    validateTaskId(taskId);
+    Comment comment = commentService.findById(commentId);
+    return CommentResponse.builder()
+        .id(comment.getId())
+        .text(comment.getText())
+        .parentId(comment.getParentId())
+        .taskId(comment.getTaskId())
+        .userId(comment.getUserId())
+        .createdAt(comment.getCreatedAt())
+        .lastUpdatedAt(comment.getLastUpdatedAt())
+        .build();
+  }
+
+  @Override
   public CommentResponse replyComment(String userId, String projectId, String taskId, String commentId, String text) {
     log.info("(replyComment)userId: {},taskId: {}, commentId: {}, text: {}", userId, taskId, commentId, text);
     validateProjectId(projectId);
@@ -68,6 +101,14 @@ public class CommentFacadeServiceImp implements CommentFacadeService {
     if (!taskService.existById(taskId)) {
       log.error("(validateTaskId)taskId: {}", taskId);
       throw new TaskNotFoundException();
+    }
+  }
+
+  void validateParentId(String parentId) {
+    log.info("(validateParentId)parentId: {}",parentId);
+    if (!commentService.existById(parentId)) {
+      log.error("(validateParentId)parentId: {}", parentId);
+      throw new CommentNotFoundException();
     }
   }
 
