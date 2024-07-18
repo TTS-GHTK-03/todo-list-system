@@ -16,9 +16,11 @@ import org.ghtk.todo_list.exception.SprintStatusNotFoundException;
 import org.ghtk.todo_list.facade.SprintFacadeService;
 import org.ghtk.todo_list.mapper.SprintMapper;
 import org.ghtk.todo_list.model.response.CreateSprintResponse;
+import org.ghtk.todo_list.model.response.ProgressStatisticsResponse;
 import org.ghtk.todo_list.model.response.SprintResponse;
 import org.ghtk.todo_list.model.response.StartSprintResponse;
 import org.ghtk.todo_list.service.ProjectService;
+import org.ghtk.todo_list.service.SprintProgressService;
 import org.ghtk.todo_list.service.SprintService;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +32,7 @@ public class SprintFacadeServiceImpl implements SprintFacadeService {
   private final SprintService sprintService;
   private final SprintMapper sprintMapper;
   private final ProjectService projectService;
+  private final SprintProgressService sprintProgressService;
 
   @Transactional
   @Override
@@ -144,6 +147,24 @@ public class SprintFacadeServiceImpl implements SprintFacadeService {
     }
     log.info("(getSprint)sprint: {}", sprint);
     return sprintMapper.toSprintResponse(sprint);
+  }
+
+  @Override
+  public ProgressStatisticsResponse getProgressStatistics(String projectId, String sprintId) {
+    log.info("(getProgressStatistics) projectId: {}, sprintId {}", projectId, sprintId);
+    var sprintProgress = sprintProgressService.findBySprintId(sprintId);
+    int totalTask = sprintProgress.getTotalTask();
+    double completionRate;
+    if (totalTask == 0) {
+      completionRate = 0.0;
+    }
+
+    completionRate = ((double) sprintProgress.getCompleteTask() / totalTask) * 100;
+    return ProgressStatisticsResponse
+        .from(sprintProgress.getSprintId(),
+            sprintProgress.getTotalTask(),
+            sprintProgress.getCompleteTask(),
+            (completionRate + "%"));
   }
 
   private boolean isValidDateRange(LocalDate startDate, LocalDate endDate) {
