@@ -30,19 +30,19 @@ public class TaskController {
   private final TaskFacadeService taskFacadeService;
 
   @GetMapping("/{project_id}/tasks")
-  public BaseResponse getTasksByProjectId(@PathVariable("project_id") String projectId) {
-    log.info("(getAllTasks)");
-    return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
-        taskFacadeService.getAllTaskByProjectId(getUserId(), projectId));
+  public BaseResponse getTasksByProjectId(@PathVariable("project_id") String projectId, @RequestParam(value = "status", required = false) String status) {
+    log.info("(getTasksByProjectId)");
+    if (status == null) {
+      log.info("(getTasksByProjectId)getAllTasks");
+      return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
+          taskFacadeService.getAllTaskByProjectId(getUserId(), projectId));
+    } else {
+      log.info("(getTasksByProjectId)getTasksByProjectIdAndStatus");
+      return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
+          taskFacadeService.getAllTaskByProjectIdAndStatus(getUserId(), projectId, status));
+    }
   }
 
-  @GetMapping("/{project_id}/tasks/status/{status}")
-  public BaseResponse getTasksByProjectIdAndStatus(@PathVariable("project_id") String projectId, @PathVariable("status") String status) {
-    log.info("(getTasksByProjectIdAndStatus)");
-    getUserId();
-    return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
-        taskFacadeService.getAllTaskByProjectIdAndStatus(projectId, status));
-  }
 
 
   @GetMapping("/{project_id}/tasks/{task_id}")

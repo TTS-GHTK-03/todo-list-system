@@ -210,7 +210,7 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
   }
 
   @Override
-  public List<TaskResponse> getAllTaskByProjectIdAndStatus(String projectId, String status) {
+  public List<TaskResponse> getAllTaskByProjectIdAndStatus(String userId, String projectId, String status) {
     log.info("(getAllTaskByProjectIdAndStatus)projectId: {}, status: {}", projectId, status);
     String statusFormat = status.trim().toUpperCase();
     if (!TaskStatus.isValid(statusFormat)) {
