@@ -13,6 +13,7 @@ import org.ghtk.todo_list.model.request.UpdateCommentRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -25,23 +26,33 @@ public class CommentController {
 
   private final CommentFacadeService commentFacadeService;
 
-  @PostMapping("/tasks/{task_id}/comments")
+  @PostMapping("/{project_id}/tasks/{task_id}/comments")
   public BaseResponse createComment(
       @Valid @RequestBody CreateCommentRequest commentRequest,
-      @PathVariable("task_id") String taskId) {
+      @PathVariable("task_id") String taskId, @PathVariable("project_id") String projectId) {
     log.info("(CreateComment)taskId: {}", taskId);
     return BaseResponse.of(HttpStatus.CREATED.value(), LocalDate.now().toString(),
-        commentFacadeService.createComment(getUserId(), taskId, commentRequest.getText()));
+        commentFacadeService.createComment(getUserId(), projectId, taskId, commentRequest.getText()));
   }
 
-  @PostMapping("/tasks/{task_id}/comments/{comment_id}")
+  @PutMapping("/{project_id}/tasks/{task_id}/comments/{comment_id}")
   public BaseResponse updateComment(
-      @Valid @RequestBody UpdateCommentRequest updateCommentRequest,
-      @PathVariable("task_id") String taskId, @PathVariable("comment_id") String commentId) {
+      @Valid @RequestBody UpdateCommentRequest updateCommentRequest, @PathVariable("task_id") String taskId,
+      @PathVariable("comment_id") String commentId, @PathVariable("project_id") String projectId) {
     log.info("(UpdateComment)taskId: {}, commentId: {}", taskId, commentId);
     return BaseResponse.of(HttpStatus.CREATED.value(), LocalDate.now().toString(),
-        commentFacadeService.updateComment(getUserId(), taskId, commentId,
+        commentFacadeService.updateComment(getUserId(), projectId, taskId, commentId,
             updateCommentRequest.getText()));
+  }
+
+  @PostMapping("/{project_id}/tasks/{task_id}/comments/{comment_id}/reply")
+  public BaseResponse replyComment(
+      @Valid @RequestBody CreateCommentRequest request, @PathVariable("task_id") String taskId,
+      @PathVariable("comment_id") String commentId, @PathVariable("project_id") String projectId) {
+    log.info("(replyComment)taskId: {}, commentId: {}", taskId, commentId);
+    return BaseResponse.of(HttpStatus.CREATED.value(), LocalDate.now().toString(),
+        commentFacadeService.replyComment(getUserId(), projectId, taskId, commentId,
+            request.getText()));
   }
 
 }
