@@ -8,4 +8,6 @@ public interface TypeMapper {
   Type toType(String title, String image, String description);
 
   List<TypeResponse> toTypeResponses(List<Type> typeList);
+
+  TypeResponse toTypeResponse(Type type);
 }

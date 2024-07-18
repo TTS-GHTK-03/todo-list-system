@@ -32,4 +32,14 @@ public class TypeMapperImpl implements TypeMapper {
     }
     return typeResponseList;
   }
+
+  @Override
+  public TypeResponse toTypeResponse(Type type) {
+    TypeResponse typeResponse = new TypeResponse();
+    typeResponse.setId(type.getId());
+    typeResponse.setTitle(type.getTitle());
+    typeResponse.setImage(type.getImage());
+    typeResponse.setDescription(type.getDescription());
+    return typeResponse;
+  }
 }

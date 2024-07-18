@@ -58,10 +58,17 @@ public class TypeFacadeServiceImpl implements TypeFacadeService {
 
     validateProjectId(projectId);
 
-    List<Type> typeList = typeService.findAllByProjectId(projectId);
-    List<TypeResponse> typeResponseList = typeMapper.toTypeResponses(typeList);
+    return typeMapper.toTypeResponses(typeService.findAllByProjectId(projectId));
+  }
 
-    return typeMapper.toTypeResponses(typeList);
+  @Override
+  public TypeResponse getType(String projectId, String typeId) {
+    log.info("(getType)projectId: {}, typeId: {}", projectId, typeId);
+
+    validateProjectId(projectId);
+    validateTypeId(typeId);
+
+    return typeMapper.toTypeResponse(typeService.findById(typeId));
   }
 
   private void validateProjectId(String projectId) {
