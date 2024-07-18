@@ -9,6 +9,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface TaskAssigneesRepository extends JpaRepository<TaskAssignees, String> {
 
+  @Query("SELECT t.userId FROM TaskAssignees t WHERE t.taskId = :taskId")
   String findUserIdByTaskId(String taskId);
 
   boolean existsByUserIdAndTaskId(String userId, String taskId);

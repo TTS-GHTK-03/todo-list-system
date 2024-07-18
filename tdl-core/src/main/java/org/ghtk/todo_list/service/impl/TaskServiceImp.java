@@ -129,4 +129,10 @@ public class TaskServiceImp implements TaskService {
     taskRepository.save(task);
     return new UpdateDueDateTaskResponse(task.getId(), task.getStatus(), task.getDueDate());
   }
+
+  @Override
+  public List<Task> getAllBySprintId(String sprintId) {
+    log.info("(getAllBySprintId)sprintId: {}", sprintId);
+    return taskRepository.findAllBySprintId(sprintId);
+  }
 }
