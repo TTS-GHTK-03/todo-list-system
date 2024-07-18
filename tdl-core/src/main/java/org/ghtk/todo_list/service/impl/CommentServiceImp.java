@@ -94,4 +94,24 @@ public class CommentServiceImp implements CommentService {
     log.info("(save)comment: {}", comment);
     return commentRepository.save(comment);
   }
+
+  @Override
+  public CommentResponse replyComment(String userId, String taskId, String commentId, String text) {
+    log.info("(replyComment)userId: {}, taskId: {}, commentId: {}", userId, taskId, commentId);
+    Comment comment = new Comment();
+    comment.setTaskId(taskId);
+    comment.setUserId(userId);
+    comment.setText(text);
+    comment.setParentId(commentId);
+    comment = commentRepository.save(comment);
+    return CommentResponse.builder()
+        .id(comment.getId())
+        .text(comment.getText())
+        .parentId(comment.getParentId())
+        .taskId(comment.getTaskId())
+        .userId(comment.getUserId())
+        .createdAt(comment.getCreatedAt())
+        .lastUpdatedAt(comment.getLastUpdatedAt())
+        .build();
+  }
 }

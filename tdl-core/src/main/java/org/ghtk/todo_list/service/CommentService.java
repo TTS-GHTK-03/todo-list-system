@@ -11,4 +11,7 @@ public interface CommentService {
   Comment findById(String commentId);
   List<CommentResponse> getAllCommentsByTaskId(String taskId);
   Comment save(Comment comment);
+
+  CommentResponse replyComment(String userId, String taskId, String commentId, String text);
+
 }
