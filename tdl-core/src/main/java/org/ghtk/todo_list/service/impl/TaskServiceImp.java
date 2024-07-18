@@ -135,4 +135,10 @@ public class TaskServiceImp implements TaskService {
     log.info("(getAllBySprintId)sprintId: {}", sprintId);
     return taskRepository.findAllBySprintId(sprintId);
   }
+
+  @Override
+  public boolean existsBySprintId(String sprintId) {
+    log.info("(existsBySprintId)sprintId: {}", sprintId);
+    return taskRepository.existsBySprintId(sprintId);
+  }
 }

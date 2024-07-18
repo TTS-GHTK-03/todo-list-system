@@ -67,17 +67,19 @@ public class SprintController {
     }
   }
 
-//  @GetMapping("/status/{status}")
-//  public BaseResponse getSprintStatus(@PathVariable("project_id") String projectId, @PathVariable("status") String status) {
-//    log.info("(getSprintStatus) projectId: {}, status: {}", projectId, status);
-//    getUserId();
-//
-//  }
   @GetMapping("/{id}")
   public BaseResponse getSprint(@PathVariable("project_id") String projectId, @PathVariable("id") String id) {
     log.info("(getSprint) projectId: {}, id: {}", projectId, id);
     getUserId();
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         sprintFacadeService.getSprint(projectId, id));
+  }
+
+  @GetMapping("/{id}/progress")
+  public BaseResponse getProgressStatistics(@PathVariable("project_id") String projectId, @PathVariable("id") String id) {
+    log.info("(getProgressStatistics) projectId: {}, id: {}", projectId, id);
+    getUserId();
+    return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
+        sprintFacadeService.getProgressStatistics(projectId, id));
   }
 }
