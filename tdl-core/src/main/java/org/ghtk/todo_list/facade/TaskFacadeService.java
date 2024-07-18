@@ -20,5 +20,6 @@ public interface TaskFacadeService {
   TaskResponse cloneTask(String userId, String projectId, String taskId);
   UpdateDueDateTaskResponse updateStartDateDueDateTask(String userId, String projectId,
       String sprintId, String taskId, String statusTaskKey, String dueDate);
+  List<TaskResponse> getAllTaskByProjectIdAndStatus(String userId,String projectId, String status);
   List<TaskResponse> getAllBySprintId(String projectId, String sprintId);
 }

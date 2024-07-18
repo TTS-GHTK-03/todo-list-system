@@ -1,11 +1,13 @@
 package org.ghtk.todo_list.model.response;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import org.ghtk.todo_list.repository.UserProjection;
 
 @Data
 @AllArgsConstructor(staticName = "of")
+@Builder
 public class TaskResponse {
 
   private String id;

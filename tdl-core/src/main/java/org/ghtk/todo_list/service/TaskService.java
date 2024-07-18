@@ -28,5 +28,7 @@ public interface TaskService {
 
   UpdateDueDateTaskResponse updateDueDate(String projectId, String sprintId, String taskId, String dueDate);
 
+  List<Task> getAllTasksByProjectIdAndStatus(String projectId, String status);
+
   List<Task> getAllBySprintId(String sprintId);
 }
