@@ -6,6 +6,7 @@ public interface TypeService {
 
   Type createType(Type type);
 
+  Type updateType(Type type);
   boolean existById(String id);
 
   boolean existByProjectIdAndTitle(String projectId, String title);

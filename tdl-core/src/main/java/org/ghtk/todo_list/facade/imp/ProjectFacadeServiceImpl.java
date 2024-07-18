@@ -90,7 +90,7 @@ public class ProjectFacadeServiceImpl implements ProjectFacadeService {
     return projectService.updateProject(project);
   }
 
-  void validateUserId(String userId){
+  private void validateUserId(String userId){
     log.info("(validateUserId)userId: {}", userId);
     if(!authUserService.existById(userId)){
       log.error("(validateUserId)userId: {} not found", userId);
@@ -98,7 +98,7 @@ public class ProjectFacadeServiceImpl implements ProjectFacadeService {
     }
   }
 
-  void validateProjectId(String projectId){
+  private void validateProjectId(String projectId){
     log.info("(validateProjectId)projectId: {}", projectId);
     if(!projectService.existById(projectId)){
       log.error("(validateProjectId)projectId: {} not found", projectId);
@@ -106,7 +106,7 @@ public class ProjectFacadeServiceImpl implements ProjectFacadeService {
     }
   }
 
-  void validateTitle(String title){
+  private void validateTitle(String title){
     log.info("(validateTitle)title: {}", title);
     if(projectService.existByTitle(title)){
       log.error("(validateTitle)title: {} already existed", title);
@@ -114,7 +114,7 @@ public class ProjectFacadeServiceImpl implements ProjectFacadeService {
     }
   }
 
-  void validateKeyProject(String keyProject){
+  private void validateKeyProject(String keyProject){
     log.info("(validateKeyProject)keyProject: {}", keyProject);
     if(projectService.existByKeyProject(keyProject)){
       log.error("(validateKeyProject)keyProject: {} already existed", keyProject);
