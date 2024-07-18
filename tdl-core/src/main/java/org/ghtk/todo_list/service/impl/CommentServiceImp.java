@@ -76,4 +76,10 @@ public class CommentServiceImp implements CommentService {
           throw new CommentNotFoundException();
         });
   }
+
+  @Override
+  public Comment save(Comment comment) {
+    log.info("(save)comment: {}", comment);
+    return commentRepository.save(comment);
+  }
 }

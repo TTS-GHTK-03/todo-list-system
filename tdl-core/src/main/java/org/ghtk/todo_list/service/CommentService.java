@@ -8,4 +8,5 @@ public interface CommentService {
 
   CommentResponse updateComment(String userId, String taskId, String commentId, String text);
   Comment findById(String commentId);
+  Comment save(Comment comment);
 }

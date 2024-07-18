@@ -31,8 +31,22 @@ public class CommentFacadeServiceImp implements CommentFacadeService {
       String text) {
     log.info("(updateComment)userId: {},taskId: {}", userId, taskId);
     validateTaskId(taskId);
-    validateUserId(userId,commentId);
-    return commentService.updateComment(userId, taskId, commentId, text);
+    Comment comment = commentService.findById(commentId);
+    if (!userId.equals(comment.getUserId())) {
+      log.error("(updateComment)userId: {}, commentId: {}", userId, commentId);
+      throw new UserNotFoundException();
+    }
+    comment.setText(text);
+    Comment savedComment = commentService.save(comment);
+    return CommentResponse.builder()
+        .id(savedComment.getId())
+        .text(savedComment.getText())
+        .parentId(savedComment.getParentId())
+        .taskId(savedComment.getTaskId())
+        .userId(savedComment.getUserId())
+        .createdAt(savedComment.getCreatedAt())
+        .lastUpdatedAt(savedComment.getLastUpdatedAt())
+        .build();
   }
 
   void validateTaskId(String taskId) {
@@ -40,15 +54,6 @@ public class CommentFacadeServiceImp implements CommentFacadeService {
     if (!taskService.existById(taskId)) {
       log.error("(validateTaskId)taskId: {}", taskId);
       throw new TaskNotFoundException();
-    }
-  }
-
-  void validateUserId(String userId, String commentId) {
-    log.info("(validateUserId)userId: {}, commentId: {}", userId, commentId);
-    Comment comment = commentService.findById(commentId);
-    if (!userId.equals(comment.getUserId())) {
-      log.error("(validateUserId)userId: {}, commentId: {}", userId, commentId);
-      throw new UserNotFoundException();
     }
   }
 }
