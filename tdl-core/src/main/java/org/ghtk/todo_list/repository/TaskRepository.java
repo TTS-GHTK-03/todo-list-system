@@ -46,4 +46,6 @@ public interface TaskRepository extends JpaRepository<Task, String> {
       """)
   boolean existsByUserIdAndTaskId(@Param("userId") String userId, @Param("taskId") String taskId);
 
+  List<Task> findAllBySprintId(String sprintId);
+
 }

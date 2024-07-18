@@ -5,6 +5,7 @@ import static org.ghtk.todo_list.constant.CacheConstant.UPDATE_STATUS_TASK_KEY;
 
 import java.time.LocalDate;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -174,6 +175,26 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
     validateTaskId(taskId);
 
     return taskService.updateDueDate(projectId, sprintId, taskId, dueDate);
+  }
+
+  @Override
+  public List<TaskResponse> getAllBySprintId(String projectId, String sprintId) {
+    log.info("(getAllBySprintId)sprintId: {}", sprintId);
+    validateProjectId(projectId);
+    List<TaskResponse> responses = new ArrayList<>();
+    if (sprintService.existById(sprintId)) {
+      log.info("(allBySprintId)sprintId: {}", sprintId);
+      var tasks = taskService.getAllBySprintId(sprintId);
+      for (Task task : tasks) {
+        TaskResponse taskResponse = TaskResponse.of(task.getId(), task.getTitle(), task.getPoint(),
+            task.getStatus(), taskAssigneesService.findUserIdByTaskId(task.getId()));
+        responses.add(taskResponse);
+      }
+      return responses;
+    } else {
+      log.info("(allBySprintId)sprintId: {} don't exist", sprintId);
+      return responses;
+    }
   }
 
   void validateUserId(String userId) {

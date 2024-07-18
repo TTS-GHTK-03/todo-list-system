@@ -80,4 +80,13 @@ public class TaskController {
             updateDueDateTaskRequest.getStatusTaskKey(),
             updateDueDateTaskRequest.getDueDate()));
   }
+
+  @GetMapping("/{project_id}/sprints/{sprint_id}/tasks")
+  public BaseResponse getAllBySprintId(@PathVariable("project_id") String projectId,
+      @PathVariable("sprint_id") String sprintId) {
+    log.info("(getAllTaskBySprintId)");
+    getUserId();
+    return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
+        taskFacadeService.getAllBySprintId(projectId, sprintId));
+  }
 }
