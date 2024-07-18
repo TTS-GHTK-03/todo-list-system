@@ -11,6 +11,7 @@ import org.ghtk.todo_list.facade.LabelFacadeService;
 import org.ghtk.todo_list.model.request.CreateLabelRequest;
 import org.ghtk.todo_list.model.request.UpdateLabelRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -44,5 +45,13 @@ public class LabelController {
     getUserId();
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         labelFacadeService.updateLabel(projectId, typeId, labelId, request.getTitle(), request.getDescription()));
+  }
+
+  @GetMapping()
+  public BaseResponse getLabels(@PathVariable("project_id") String projectId, @PathVariable("type_id") String typeId) {
+    log.info("(getLabels)");
+    getUserId();
+    return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
+        labelFacadeService.getLabels(projectId, typeId));
   }
 }
