@@ -57,7 +57,7 @@ public class CommentController {
   public BaseResponse getCommentByCommentId(@PathVariable("task_id") String taskId, @PathVariable("comment_id") String commentId) {
     log.info("(getCommentByCommentId)taskId: {}, commentId: {}", taskId, commentId);
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
-        commentFacadeService.getCommentByCommentId(taskId, commentId));
+        commentFacadeService.findById(taskId, commentId));
   }
 }
 

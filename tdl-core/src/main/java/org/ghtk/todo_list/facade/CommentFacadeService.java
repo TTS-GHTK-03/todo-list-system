@@ -11,5 +11,5 @@ public interface CommentFacadeService {
   CommentResponse updateComment(String userId, String taskId, String commentId, String text);
 
   List<CommentResponse> getAllCommentsByTaskId(String taskId);
-  CommentResponse getCommentByCommentId(String taskId, String commentId);
+  CommentResponse findById(String taskId, String commentId);
 }

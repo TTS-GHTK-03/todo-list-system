@@ -59,18 +59,18 @@ public class CommentFacadeServiceImp implements CommentFacadeService {
   }
 
   @Override
-  public CommentResponse getCommentByCommentId(String taskId, String commentId) {
+  public CommentResponse findById(String taskId, String commentId) {
     log.info("(getCommentByCommentId)taskId: {}, commentId: {}", taskId, commentId);
     validateTaskId(taskId);
-    Comment savedComment = commentService.findById(commentId);
+    Comment comment = commentService.findById(commentId);
     return CommentResponse.builder()
-        .id(savedComment.getId())
-        .text(savedComment.getText())
-        .parentId(savedComment.getParentId())
-        .taskId(savedComment.getTaskId())
-        .userId(savedComment.getUserId())
-        .createdAt(savedComment.getCreatedAt())
-        .lastUpdatedAt(savedComment.getLastUpdatedAt())
+        .id(comment.getId())
+        .text(comment.getText())
+        .parentId(comment.getParentId())
+        .taskId(comment.getTaskId())
+        .userId(comment.getUserId())
+        .createdAt(comment.getCreatedAt())
+        .lastUpdatedAt(comment.getLastUpdatedAt())
         .build();
   }
 
