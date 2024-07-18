@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.dto.response.BaseResponse;
 import org.ghtk.todo_list.facade.TaskFacadeService;
+import org.ghtk.todo_list.model.request.CreateTaskRequest;
 import org.ghtk.todo_list.model.request.UpdateDueDateTaskRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -43,7 +44,13 @@ public class TaskController {
     }
   }
 
-
+  @PostMapping ("/{project_id}/tasks")
+  public BaseResponse createTask(@PathVariable("project_id") String projectId, @Valid @RequestBody
+      CreateTaskRequest createTaskRequest) {
+    log.info("(createTask)projectId: {}", projectId);
+    return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
+          taskFacadeService.createTask(getUserId(),projectId,createTaskRequest.getTitle()));
+    }
 
   @GetMapping("/{project_id}/tasks/{task_id}")
   public BaseResponse getTaskByTaskId(@PathVariable("project_id") String projectId,
