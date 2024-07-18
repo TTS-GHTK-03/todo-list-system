@@ -5,6 +5,7 @@ import lombok.Getter;
 
 @Getter
 public class CreateCommentRequest {
+
   @NotBlank(message = "Text is required")
   private String text;
 }

@@ -28,6 +28,7 @@ import org.ghtk.todo_list.exception.TaskNotFoundException;
 import org.ghtk.todo_list.exception.UserNotFoundException;
 import org.ghtk.todo_list.facade.TaskFacadeService;
 import org.ghtk.todo_list.model.response.StartSprintResponse;
+import org.ghtk.todo_list.mapper.TaskMapper;
 import org.ghtk.todo_list.model.response.TaskResponse;
 import org.ghtk.todo_list.model.response.UpdateDueDateTaskResponse;
 import org.ghtk.todo_list.service.AuthUserService;
@@ -37,7 +38,6 @@ import org.ghtk.todo_list.service.RedisCacheService;
 import org.ghtk.todo_list.service.SprintService;
 import org.ghtk.todo_list.service.TaskAssigneesService;
 import org.ghtk.todo_list.service.TaskService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Slf4j
@@ -52,6 +52,7 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
   private final TaskAssigneesService taskAssigneesService;
   private final ProjectUserService projectUserService;
   private final RedisCacheService redisCacheService;
+  private final TaskMapper taskMapper;
 
   @Override
   public List<TaskResponse> getAllTaskByProjectId(String userId, String projectId) {
@@ -108,12 +109,14 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
   @Override
   public TaskAssignees agileTaskByUser(String userId, String taskId) {
     log.info("(agileTaskByUser) userId: {}, taskId: {}", userId, taskId);
-    if(taskAssigneesService.existsByUserIdAndTaskId(userId, taskId)) {
-      log.error("(agileTaskByUser)Task with Id {} is already assigned to user with Id {}", taskId, userId);
+    if (taskAssigneesService.existsByUserIdAndTaskId(userId, taskId)) {
+      log.error("(agileTaskByUser)Task with Id {} is already assigned to user with Id {}", taskId,
+          userId);
       throw new TaskAssignmentExistsException();
     }
-    if(!taskService.existsByUserIdAndTaskId(userId, taskId)){
-      log.error("(agileTaskByUser)Task with Id {} does not exist for user with Id {}", taskId, userId);
+    if (!taskService.existsByUserIdAndTaskId(userId, taskId)) {
+      log.error("(agileTaskByUser)Task with Id {} does not exist for user with Id {}", taskId,
+          userId);
       throw new TaskNotExistUserException();
     }
     TaskAssignees taskAssignees = new TaskAssignees();
@@ -204,5 +207,19 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
       log.error("(validateDueDateTask)dueDate: {} invalid", dueDate);
       throw new DueDateTaskInvalidSprintEndDateException();
     }
+  }
+
+  @Override
+  public List<TaskResponse> getAllTaskByProjectIdAndStatus(String userId, String projectId, String status) {
+    log.info("(getAllTaskByProjectIdAndStatus)projectId: {}, status: {}", projectId, status);
+    String statusFormat = status.trim().toUpperCase();
+    if (!TaskStatus.isValid(statusFormat)) {
+      log.error("(getAllTaskByProjectIdAndStatus) status task not found: status {}", status);
+      throw new StatusTaskInvalidException();
+    }
+    validateProjectId(projectId);
+
+    return taskMapper.toTaskResponses(
+        taskService.getAllTasksByProjectIdAndStatus(projectId, statusFormat));
   }
 }

@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
@@ -52,20 +53,26 @@ public class SprintController {
   }
 
   @GetMapping()
-  public BaseResponse getSprints(@PathVariable("project_id") String projectId) {
+  public BaseResponse getSprints(@PathVariable("project_id") String projectId, @RequestParam(value = "status", required = false) String status) {
     log.info("(getSprints) projectId: {}", projectId);
     getUserId();
-    return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
-        sprintFacadeService.getSprints(projectId));
+    if(status == null) {
+      log.info("(getSprints) sprints");
+      return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
+          sprintFacadeService.getSprints(projectId));
+    }else {
+      log.info("(getSprints) sprints status");
+      return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
+          sprintFacadeService.getSprintStatus(projectId, status));
+    }
   }
 
-  @GetMapping("/status/{status}")
-  public BaseResponse getSprintStatus(@PathVariable("project_id") String projectId, @PathVariable("status") String status) {
-    log.info("(getSprintStatus) projectId: {}, status: {}", projectId, status);
-    getUserId();
-    return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
-        sprintFacadeService.getSprintStatus(projectId, status));
-  }
+//  @GetMapping("/status/{status}")
+//  public BaseResponse getSprintStatus(@PathVariable("project_id") String projectId, @PathVariable("status") String status) {
+//    log.info("(getSprintStatus) projectId: {}, status: {}", projectId, status);
+//    getUserId();
+//
+//  }
   @GetMapping("/{id}")
   public BaseResponse getSprint(@PathVariable("project_id") String projectId, @PathVariable("id") String id) {
     log.info("(getSprint) projectId: {}, id: {}", projectId, id);

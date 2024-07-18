@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class CreateCommentResponse {
+public class CommentResponse {
   private String id;
   private String text;
   private String parentId;
