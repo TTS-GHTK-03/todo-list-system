@@ -38,6 +38,7 @@ public class WebSecurityConfiguration {
             .requestMatchers("/api/v1/users/**").permitAll()
             .requestMatchers("/api/v1/sprints/**").permitAll()
             .requestMatchers("/api/v1/auth/**").permitAll()
+            .requestMatchers("/swagger**", "/swagger-ui**", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
             .anyRequest().authenticated()
         )
         .addFilterBefore(tokenAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
