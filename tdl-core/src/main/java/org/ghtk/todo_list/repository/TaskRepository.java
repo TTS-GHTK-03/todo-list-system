@@ -51,4 +51,6 @@ public interface TaskRepository extends JpaRepository<Task, String> {
 
   List<Task> findAllBySprintId(String sprintId);
 
+  boolean existsBySprintId(String sprintId);
+
 }

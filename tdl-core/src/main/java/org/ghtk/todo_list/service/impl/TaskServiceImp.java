@@ -4,13 +4,16 @@ import java.time.LocalDate;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.ghtk.todo_list.constant.TaskStatus;
 import org.ghtk.todo_list.entity.Comment;
 import org.ghtk.todo_list.entity.Task;
 import org.ghtk.todo_list.exception.TaskNotFoundException;
+import org.ghtk.todo_list.model.response.CommentResponse;
 import org.ghtk.todo_list.model.response.TaskResponse;
 import org.ghtk.todo_list.model.response.UpdateDueDateTaskResponse;
 import org.ghtk.todo_list.repository.TaskRepository;
 import org.ghtk.todo_list.repository.UserProjection;
+import org.ghtk.todo_list.service.AuthUserService;
 import org.ghtk.todo_list.service.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,6 +26,7 @@ import java.util.List;
 public class TaskServiceImp implements TaskService {
 
   private final TaskRepository taskRepository;
+  private final AuthUserService authUserService;
 
   @Override
   public List<TaskResponse> getAllTasksByProjectId(String projectId) {
@@ -134,5 +138,11 @@ public class TaskServiceImp implements TaskService {
   public List<Task> getAllBySprintId(String sprintId) {
     log.info("(getAllBySprintId)sprintId: {}", sprintId);
     return taskRepository.findAllBySprintId(sprintId);
+  }
+
+  @Override
+  public boolean existsBySprintId(String sprintId) {
+    log.info("(existsBySprintId)sprintId: {}", sprintId);
+    return taskRepository.existsBySprintId(sprintId);
   }
 }

@@ -31,4 +31,6 @@ public interface TaskService {
   List<Task> getAllTasksByProjectIdAndStatus(String projectId, String status);
 
   List<Task> getAllBySprintId(String sprintId);
+
+  boolean existsBySprintId(String sprintId);
 }

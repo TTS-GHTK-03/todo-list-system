@@ -21,6 +21,7 @@ import org.ghtk.todo_list.repository.ActivityLogRepository;
 import org.ghtk.todo_list.repository.BoardRepository;
 import org.ghtk.todo_list.repository.ProjectRepository;
 import org.ghtk.todo_list.repository.ProjectUserRepository;
+import org.ghtk.todo_list.repository.SprintProgressRepository;
 import org.ghtk.todo_list.repository.TaskAssigneesRepository;
 import org.ghtk.todo_list.service.ActivityLogService;
 import org.ghtk.todo_list.service.AuthUserService;
@@ -28,6 +29,7 @@ import org.ghtk.todo_list.repository.SprintRepository;
 import org.ghtk.todo_list.service.BoardService;
 import org.ghtk.todo_list.service.ProjectService;
 import org.ghtk.todo_list.service.ProjectUserService;
+import org.ghtk.todo_list.service.SprintProgressService;
 import org.ghtk.todo_list.service.SprintService;
 import org.ghtk.todo_list.service.TaskAssigneesService;
 import org.ghtk.todo_list.service.RedisCacheService;
@@ -36,6 +38,7 @@ import org.ghtk.todo_list.service.impl.ActivityLogServiceImpl;
 import org.ghtk.todo_list.service.impl.BoardServiceImpl;
 import org.ghtk.todo_list.service.impl.ProjectServiceImpl;
 import org.ghtk.todo_list.service.impl.ProjectUserServiceImpl;
+import org.ghtk.todo_list.service.impl.SprintProgressServiceImpl;
 import org.ghtk.todo_list.service.impl.SprintServiceImpl;
 import org.ghtk.todo_list.service.impl.TaskAssigneesServiceImpl;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -75,9 +78,9 @@ public class TdlCoreConfiguration {
   }
   @Bean
   public SprintFacadeService sprintFacadeService(
-      SprintService sprintService, ProjectService projectService, SprintMapper sprintMapper
+      SprintService sprintService, ProjectService projectService, SprintMapper sprintMapper, SprintProgressService sprintProgressService
   ) {
-    return new SprintFacadeServiceImpl(sprintService, sprintMapper, projectService);
+    return new SprintFacadeServiceImpl(sprintService, sprintMapper, projectService, sprintProgressService);
   }
 
   @Bean
@@ -110,5 +113,11 @@ public class TdlCoreConfiguration {
   public ActivityLogFacadeService activityLogFacadeService(ActivityLogService activityLogService,
       ProjectService projectService) {
     return new ActivityLogFacadeServiceImpl(activityLogService, projectService);
+  }
+
+  @Bean
+  public SprintProgressService sprintProgressService(
+      SprintProgressRepository sprintProgressRepository) {
+    return new SprintProgressServiceImpl(sprintProgressRepository);
   }
 }

@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.constant.CacheConstant;
 import org.ghtk.todo_list.constant.RoleProjectUser;
 import org.ghtk.todo_list.constant.TaskStatus;
+import org.ghtk.todo_list.entity.SprintProgress;
 import org.ghtk.todo_list.entity.Task;
 import org.ghtk.todo_list.entity.TaskAssignees;
 import org.ghtk.todo_list.entity.Sprint;
@@ -36,6 +37,7 @@ import org.ghtk.todo_list.service.AuthUserService;
 import org.ghtk.todo_list.service.ProjectService;
 import org.ghtk.todo_list.service.ProjectUserService;
 import org.ghtk.todo_list.service.RedisCacheService;
+import org.ghtk.todo_list.service.SprintProgressService;
 import org.ghtk.todo_list.service.SprintService;
 import org.ghtk.todo_list.service.TaskAssigneesService;
 import org.ghtk.todo_list.service.TaskService;
@@ -54,6 +56,7 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
   private final ProjectUserService projectUserService;
   private final RedisCacheService redisCacheService;
   private final TaskMapper taskMapper;
+  private final SprintProgressService sprintProgressService;
 
   @Override
   public List<TaskResponse> getAllTaskByProjectId(String userId, String projectId) {
@@ -78,17 +81,42 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
       log.error("(updateStatusTask)taskId: {},projectId: {}", taskId, projectId);
       throw new StatusTaskInvalidException();
     }
-    String statusTaskKey = taskId + UPDATE_STATUS_TASK_KEY;
-    redisCacheService.save(UPDATE_STATUS_TASK, taskId, statusTaskKey);
+    if (status.toUpperCase().equals(TaskStatus.IN_PROGRESS.toString())) {
+      log.info("(updateStatusTask)status: {}", status);
+      String statusTaskKey = taskId + UPDATE_STATUS_TASK_KEY;
+      redisCacheService.save(UPDATE_STATUS_TASK, taskId, statusTaskKey);
+    }
+
+    if (status.toUpperCase().equals(TaskStatus.DONE.toString())) {
+      log.info("(updateStatusTask)status: {}", status);
+      sprintProgressService.updateCompleteTask(taskId);
+    }
+
     return taskService.updateStatus(taskId, status.toUpperCase(), taskAssigneesService.findUserIdByTaskId(taskId));
   }
 
   @Override
-  public TaskResponse updateSprintTask(String userId, String projectId, String sprintId, String taskId) {
-    log.info("(updateSprintTask)sprintId: {}, taskId: {},projectId: {}", sprintId, taskId, projectId);
+  public TaskResponse updateSprintTask(String userId, String projectId, String sprintId,
+      String taskId) {
+    log.info("(updateSprintTask)sprintId: {}, taskId: {},projectId: {}", sprintId, taskId,
+        projectId);
     validateProjectId(projectId);
     validateSprintId(sprintId);
-    return taskService.updateSprintId(projectId, taskId, sprintId, taskAssigneesService.findUserIdByTaskId(taskId));
+    if (taskService.existsBySprintId(sprintId)) {
+      log.info("(updateSprintTask) sprintId already ");
+      var sprintProgress = sprintProgressService.findBySprintId(sprintId);
+      sprintProgress.setTotalTask(sprintProgress.getTotalTask() + 1);
+      sprintProgressService.save(sprintProgress);
+      return taskService.updateSprintId(projectId, taskId, sprintId, taskAssigneesService.findUserIdByTaskId(taskId));
+    } else {
+      log.info("(updateSprintTask) sprintId don't exist ");
+      SprintProgress sprintProgress = new SprintProgress();
+      sprintProgress.setSprintId(sprintId);
+      sprintProgress.setTotalTask(1);
+      sprintProgress.setCompleteTask(0);
+      sprintProgressService.save(sprintProgress);
+      return taskService.updateSprintId(projectId, taskId, sprintId, taskAssigneesService.findUserIdByTaskId(taskId));
+    }
   }
 
   void validateProjectId(String projectId) {
@@ -200,6 +228,29 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
     }
   }
 
+  @Override
+  public TaskResponse createTask(String userId, String projectId, String title) {
+    log.info("(createTask)userId: {},projectId: {}", userId, projectId);
+    validateProjectId(projectId);
+
+    Task task = new Task();
+    task.setTitle(title);
+    task.setUserId(userId);
+    task.setProjectId(projectId);
+    Task savedTask = taskService.save(task);
+
+    var user = authUserService.findByUnassigned();
+    agileTaskByUser(user.getId(), savedTask.getId());
+
+    return TaskResponse.builder()
+        .id(savedTask.getId())
+        .title(savedTask.getTitle())
+        .point(savedTask.getPoint())
+        .status(savedTask.getStatus())
+        .userId(savedTask.getUserId())
+        .build();
+  }
+
   void validateUserId(String userId) {
     log.info("(validateUserId)userId: {}", userId);
     if (!authUserService.existById(userId)) {
@@ -220,7 +271,7 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
     log.info("(validateDueDateTask)projectId: {}, sprintId: {}", projectId, sprintId);
     Sprint sprint = sprintService.findSprintByProjectIdAndSprintId(projectId, sprintId);
 
-    if(!LocalDate.now().isBefore(LocalDate.parse(dueDate))) {
+    if (!LocalDate.now().isBefore(LocalDate.parse(dueDate))) {
       log.error("(validateDueDateTask)dueDate: {} invalid", dueDate);
       throw new DueDateTaskInvalidStartDateException();
     }
@@ -231,7 +282,8 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
   }
 
   @Override
-  public List<TaskResponse> getAllTaskByProjectIdAndStatus(String userId, String projectId, String status) {
+  public List<TaskResponse> getAllTaskByProjectIdAndStatus(String userId, String projectId,
+      String status) {
     log.info("(getAllTaskByProjectIdAndStatus)projectId: {}, status: {}", projectId, status);
     String statusFormat = status.trim().toUpperCase();
     if (!TaskStatus.isValid(statusFormat)) {
