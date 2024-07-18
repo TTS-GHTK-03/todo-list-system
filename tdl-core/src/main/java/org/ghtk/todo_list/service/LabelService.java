@@ -7,4 +7,6 @@ public interface LabelService {
   Label save(Label label);
 
   boolean existByTypeIdAndTitle(String typeId, String title);
+
+  Label findById(String id);
 }
