@@ -22,4 +22,5 @@ public interface TaskFacadeService {
       String sprintId, String taskId, String statusTaskKey, String dueDate);
   List<TaskResponse> getAllTaskByProjectIdAndStatus(String userId,String projectId, String status);
   List<TaskResponse> getAllBySprintId(String projectId, String sprintId);
+  TaskResponse createTask(String userId, String projectId, String title);
 }
