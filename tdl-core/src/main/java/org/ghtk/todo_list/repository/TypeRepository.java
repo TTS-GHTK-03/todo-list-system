@@ -7,4 +7,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface TypeRepository extends JpaRepository<Type, String> {
 
+  boolean existsByProjectIdAndTitle(String projectId, String title);
 }

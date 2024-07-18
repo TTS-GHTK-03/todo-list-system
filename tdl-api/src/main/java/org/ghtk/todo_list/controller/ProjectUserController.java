@@ -2,6 +2,7 @@ package org.ghtk.todo_list.controller;
 
 import static org.ghtk.todo_list.util.SecurityUtil.getUserId;
 
+import jakarta.validation.Valid;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +28,7 @@ public class ProjectUserController {
   private final ProjectUserFacadeService projectUserFacadeService;
 
   @PostMapping("{project_id}/invite")
-  public BaseResponse inviteUser(@PathVariable(name = "project_id") String projectId, @RequestBody
+  public BaseResponse inviteUser(@PathVariable(name = "project_id") String projectId, @RequestBody @Valid
       InviteUserRequest inviteUserRequest){
     log.info("(inviteUser)projectId: {}", projectId);
     projectUserFacadeService.inviteUser(getUserId(), projectId, inviteUserRequest.getEmail(), inviteUserRequest.getRole());
@@ -35,7 +36,7 @@ public class ProjectUserController {
   }
 
   @GetMapping("/accept")
-  public BaseResponse accept(@RequestParam(value = "emailEncode") String emailEncode){
+  public BaseResponse accept(@Valid @RequestParam(value = "emailEncode") String emailEncode){
     log.info("(accept)");
     projectUserFacadeService.accept(emailEncode);
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(), "Đã chấp nhận lời mời!");

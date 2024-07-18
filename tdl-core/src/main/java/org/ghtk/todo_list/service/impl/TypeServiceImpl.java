@@ -17,8 +17,20 @@ public class TypeServiceImpl implements TypeService {
   private final TypeRepository typeRepository;
 
   @Override
+  public Type createType(Type type) {
+    log.info("(createType)type: {}", type);
+    return typeRepository.save(type);
+  }
+
+  @Override
   public boolean existById(String id) {
     return typeRepository.existsById(id);
+  }
+
+  @Override
+  public boolean existByProjectIdAndTitle(String projectId, String title) {
+    log.info("(existByTitle)title: {}", title);
+    return typeRepository.existsByProjectIdAndTitle(projectId, title);
   }
 
   @Override
