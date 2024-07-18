@@ -19,4 +19,6 @@ public interface CommentFacadeService {
   List<CommentResponse> getAllCommentsByParentId(String taskId, String parentId);
 
   CommentResponse findById(String taskId, String commentId);
+
+  String deleteComment(String userId, String taskId, String commentId);
 }

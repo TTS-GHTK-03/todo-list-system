@@ -11,6 +11,7 @@ import org.ghtk.todo_list.facade.CommentFacadeService;
 import org.ghtk.todo_list.model.request.CreateCommentRequest;
 import org.ghtk.todo_list.model.request.UpdateCommentRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -80,6 +81,14 @@ public class CommentController {
     log.info("(getAllCommentsByParentId)taskId: {}, parentId: {}", taskId, parentId);
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         commentFacadeService.getAllCommentsByParentId(taskId, parentId));
+  }
+
+  @DeleteMapping("/{task_id}/comments/{comment_id}")
+  public BaseResponse deleteComment(@PathVariable("task_id") String taskId,
+      @PathVariable("comment_id") String commentId) {
+    log.info("(deleteComment)taskId: {}, commentId: {}", taskId, commentId);
+    return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
+        commentFacadeService.deleteComment(getUserId(), taskId, commentId));
   }
 }
 

@@ -22,4 +22,6 @@ public interface CommentService {
 
   boolean existById(String id);
 
+  String deleteComment(String userId, String taskId, String commentId);
+
 }
