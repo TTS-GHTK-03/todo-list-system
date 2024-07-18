@@ -2,6 +2,7 @@ package org.ghtk.todo_list.service.impl;
 
 import java.time.LocalDate;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.entity.Task;
 import org.ghtk.todo_list.exception.TaskNotFoundException;
@@ -17,11 +18,10 @@ import java.util.List;
 
 @Slf4j
 @Service
+@RequiredArgsConstructor
 public class TaskServiceImp implements TaskService {
 
-  @Autowired
-  private TaskRepository taskRepository;
-
+  private final TaskRepository taskRepository;
 
   @Override
   public List<TaskResponse> getAllTasksByProjectId(String projectId) {
@@ -32,6 +32,12 @@ public class TaskServiceImp implements TaskService {
             task.getStatus()))
         .collect(Collectors.toList());
 
+  }
+
+  @Override
+  public List<Task> getAllTasksByProjectIdAndStatus(String projectId, String status) {
+    log.info("(getAllTasksByProjectIdAndStatus)");
+    return taskRepository.getAllTasksByProjectIdAndStatus(projectId, status);
   }
 
   @Override
@@ -85,6 +91,7 @@ public class TaskServiceImp implements TaskService {
     log.info("(existsByUserIdAndTaskId)");
     return taskRepository.existsByUserIdAndTaskId(userId, taskId);
   }
+
   @Override
   public boolean existById(String id) {
     log.info("(existById)id: {}", id);
