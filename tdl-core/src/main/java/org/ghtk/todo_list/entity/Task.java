@@ -29,5 +29,6 @@ public class Task extends BaseEntity {
   private String userId;
   private String columnId;
   private String projectId;
+  private String typeId;
   private Boolean isSendMail;
 }

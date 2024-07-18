@@ -293,4 +293,63 @@
     </addColumn>
   </changeSet>
 
+  <changeSet id="20240718-0915-type-table" author="Phan Kieu">
+    <createTable tableName="type">
+      <column name="id" type="varchar(255)">
+        <constraints primaryKey="true"/>
+      </column>
+      <column name="title" type="varchar(255)"/>
+      <column name="image" type="varchar(255)"/>
+      <column name="description" type="varchar(255)"/>
+      <column name="project_id" type="varchar(255)"/>
+      <column name="created_at" type="datetime"/>
+      <column name="last_updated_at" type="datetime"/>
+    </createTable>
+    <addForeignKeyConstraint baseTableName="type" baseColumnNames="project_id"
+      constraintName="FK_type_project"
+      referencedTableName="project" referencedColumnNames="id"/>
+  </changeSet>
+
+  <changeSet id="20240718-0915-label-table" author="Phan Kieu">
+    <createTable tableName="label">
+      <column name="id" type="varchar(255)">
+        <constraints primaryKey="true"/>
+      </column>
+      <column name="title" type="varchar(255)"/>
+      <column name="description" type="varchar(255)"/>
+      <column name="type_id" type="varchar(255)"/>
+      <column name="created_at" type="datetime"/>
+      <column name="last_updated_at" type="datetime"/>
+    </createTable>
+    <addForeignKeyConstraint baseTableName="label" baseColumnNames="type_id"
+      constraintName="FK_label_type"
+      referencedTableName="type" referencedColumnNames="id"/>
+  </changeSet>
+
+  <changeSet id="20240718-0915-label-attached-table" author="Phan Kieu">
+    <createTable tableName="label_attached">
+      <column name="id" type="varchar(255)">
+        <constraints primaryKey="true"/>
+      </column>
+      <column name="task_id" type="varchar(255)"/>
+      <column name="label_id" type="varchar(255)"/>
+      <column name="created_at" type="datetime"/>
+      <column name="last_updated_at" type="datetime"/>
+    </createTable>
+    <addForeignKeyConstraint baseTableName="label_attached" baseColumnNames="task_id"
+      constraintName="FK_label_attached_task"
+      referencedTableName="task" referencedColumnNames="id"/>
+    <addForeignKeyConstraint baseTableName="label_attached" baseColumnNames="label_id"
+      constraintName="FK_label_attached_label"
+      referencedTableName="label" referencedColumnNames="id"/>
+  </changeSet>
+
+  <changeSet id="20240718-0957-add-type-id" author="Phan Kieu">
+    <addColumn tableName="task">
+      <column name="type_id" type="varchar(255)"/>
+    </addColumn>
+    <addForeignKeyConstraint baseTableName="task" baseColumnNames="type_id"
+      constraintName="FK_task_type"
+      referencedTableName="type" referencedColumnNames="id"/>
+  </changeSet>
 </databaseChangeLog>
