@@ -1,10 +1,11 @@
 package org.ghtk.todo_list.exception;
 
+import org.ghtk.todo_list.core_exception.exception.BadRequestException;
 import org.ghtk.todo_list.core_exception.exception.ConflictException;
 
-public class ProjectTitleAlreadyExistedException extends ConflictException {
+public class ProjectTitleAlreadyExistedException extends BadRequestException {
     public ProjectTitleAlreadyExistedException(){
-        setStatus(409);
+        setStatus(400);
         setCode("org.ghtk.todo_list.exception.ProjectTitleAlreadyExistedException");
     }
 }
