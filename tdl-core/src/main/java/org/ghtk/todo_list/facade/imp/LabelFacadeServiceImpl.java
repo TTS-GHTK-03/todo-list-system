@@ -73,13 +73,13 @@ public class LabelFacadeServiceImpl implements LabelFacadeService {
   }
 
   @Override
-  public List<LabelResponse> getLabels(String projectId, String typeId) {
+  public List<LabelResponse> getLabelsByTypeId(String projectId, String typeId) {
 
-    log.info("(getLabels)");
+    log.info("(getLabelsByTypeId)");
     validProjectInType(projectId, typeId);
     List<Label> labels = labelService.getLabelsByType(typeId);
 
-    log.info("(getLabels)labels: {}", labels);
+    log.info("(getLabelsByTypeId)labels: {}", labels);
     return labelMapper.toLabelResponses(labels);
   }
 

@@ -48,10 +48,10 @@ public class LabelController {
   }
 
   @GetMapping()
-  public BaseResponse getLabels(@PathVariable("project_id") String projectId, @PathVariable("type_id") String typeId) {
-    log.info("(getLabels)");
+  public BaseResponse getLabelsByTypeId(@PathVariable("project_id") String projectId, @PathVariable("type_id") String typeId) {
+    log.info("(getLabelsByTypeId)");
     getUserId();
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
-        labelFacadeService.getLabels(projectId, typeId));
+        labelFacadeService.getLabelsByTypeId(projectId, typeId));
   }
 }
