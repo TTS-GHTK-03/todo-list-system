@@ -80,6 +80,16 @@ public class CommentServiceImp implements CommentService {
   }
 
   @Override
+  public List<CommentResponse> getAllCommentsByParentId(String taskId, String parentId) {
+    log.info("(findAllByParentId)taskId: {},parentId: {}", taskId, parentId);
+    List<Comment> comments = commentRepository.findAllByParentId(parentId);
+    return comments.stream()
+        .map(comment -> new CommentResponse(comment.getId(), comment.getText(),
+            comment.getParentId(), comment.getTaskId(), comment.getUserId(), comment.getCreatedAt(),
+            comment.getLastUpdatedAt())).collect(Collectors.toList());
+  }
+
+  @Override
   public List<CommentResponse> getAllCommentsByTaskId(String taskId) {
     log.info("(findAllByTaskId)taskId: {}", taskId);
     List<Comment> comments = commentRepository.findAllByTaskId(taskId);
@@ -113,5 +123,11 @@ public class CommentServiceImp implements CommentService {
         .createdAt(comment.getCreatedAt())
         .lastUpdatedAt(comment.getLastUpdatedAt())
         .build();
+  }
+
+  @Override
+  public boolean existById(String id) {
+    log.info("(existById)id: {}", id);
+    return commentRepository.existsById(id);
   }
 }

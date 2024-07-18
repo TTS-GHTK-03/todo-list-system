@@ -34,12 +34,14 @@ public class CommentController {
       @PathVariable("task_id") String taskId, @PathVariable("project_id") String projectId) {
     log.info("(CreateComment)taskId: {}", taskId);
     return BaseResponse.of(HttpStatus.CREATED.value(), LocalDate.now().toString(),
-        commentFacadeService.createComment(getUserId(), projectId, taskId, commentRequest.getText()));
+        commentFacadeService.createComment(getUserId(), projectId, taskId,
+            commentRequest.getText()));
   }
 
   @PutMapping("/{project_id}/tasks/{task_id}/comments/{comment_id}")
   public BaseResponse updateComment(
-      @Valid @RequestBody UpdateCommentRequest updateCommentRequest, @PathVariable("task_id") String taskId,
+      @Valid @RequestBody UpdateCommentRequest updateCommentRequest,
+      @PathVariable("task_id") String taskId,
       @PathVariable("comment_id") String commentId, @PathVariable("project_id") String projectId) {
     log.info("(UpdateComment)taskId: {}, commentId: {}", taskId, commentId);
     return BaseResponse.of(HttpStatus.CREATED.value(), LocalDate.now().toString(),
@@ -65,10 +67,19 @@ public class CommentController {
   }
 
   @GetMapping("/{task_id}/comments/{comment_id}")
-  public BaseResponse getCommentByCommentId(@PathVariable("task_id") String taskId, @PathVariable("comment_id") String commentId) {
+  public BaseResponse getCommentByCommentId(@PathVariable("task_id") String taskId,
+      @PathVariable("comment_id") String commentId) {
     log.info("(getCommentByCommentId)taskId: {}, commentId: {}", taskId, commentId);
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         commentFacadeService.findById(taskId, commentId));
+  }
+
+  @GetMapping("/{task_id}/comments/parent/{parent_id}")
+  public BaseResponse getAllCommentsByParentId(@PathVariable("task_id") String taskId,
+      @PathVariable("parent_id") String parentId) {
+    log.info("(getAllCommentsByParentId)taskId: {}, parentId: {}", taskId, parentId);
+    return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
+        commentFacadeService.getAllCommentsByParentId(taskId, parentId));
   }
 }
 
