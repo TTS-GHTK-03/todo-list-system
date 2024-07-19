@@ -63,9 +63,8 @@ public class LabelAttachedFacadeServiceImpl implements LabelAttachedFacadeServic
   }
 
   @Override
-  public void deleteLabelAttached(String projectId, String taskId, String labelId, String id) {
-    log.info("(deleteLabelAttached)projectId: {}, taskId: {}, labelId: {}, id: {}", projectId, taskId, labelId, id);
-    validateLabelId(labelId);
+  public void deleteLabelAttached(String projectId, String taskId, String id) {
+    log.info("(deleteLabelAttached)projectId: {}, taskId: {}, id: {}", projectId, taskId, id);
     validateProjectIdAndTaskId(projectId, taskId);
     labelAttachedService.deleteById(id);
   }
