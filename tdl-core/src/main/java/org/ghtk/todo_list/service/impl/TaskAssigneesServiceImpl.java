@@ -8,6 +8,7 @@ import org.ghtk.todo_list.repository.TaskAssigneesRepository;
 import org.ghtk.todo_list.service.TaskAssigneesService;
 import org.ghtk.todo_list.service.TaskService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -42,6 +43,7 @@ public class TaskAssigneesServiceImpl implements TaskAssigneesService {
   }
 
   @Override
+  @Transactional
   public void deleteAllByTaskId(String taskId) {
     taskAssigneesRepository.deleteAllByTaskId(taskId);
   }

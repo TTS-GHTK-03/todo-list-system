@@ -31,10 +31,6 @@ import java.util.List;
 public class TaskServiceImp implements TaskService {
 
   private final TaskRepository taskRepository;
-  private final CommentService commentService;
-  private final LabelAttachedService labelAttachedService;
-  private final TaskAssigneesService taskAssigneesService;
-  private final ActivityLogService activityLogService;
 
   @Override
   public List<TaskResponse> getAllTasksByProjectId(String projectId) {
@@ -164,10 +160,6 @@ public class TaskServiceImp implements TaskService {
   @Transactional
   public String deleteTask(String userId, String projectId, String taskId) {
     log.info("(deleteTask)projectId: {}, taskId: {}", projectId, taskId);
-    commentService.deleteAllCommentByTaskId(taskId);
-    labelAttachedService.deleteAllByTaskId(taskId);
-    taskAssigneesService.deleteAllByTaskId(taskId);
-    activityLogService.deleteAllByTaskId(taskId);
     taskRepository.deleteById(taskId);
     return "Successfull delete task!";
   }

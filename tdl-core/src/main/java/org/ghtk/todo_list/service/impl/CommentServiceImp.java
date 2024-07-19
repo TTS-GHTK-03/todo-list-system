@@ -1,6 +1,5 @@
 package org.ghtk.todo_list.service.impl;
 
-import jakarta.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,6 +17,7 @@ import org.ghtk.todo_list.repository.TaskRepository;
 import org.ghtk.todo_list.service.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -141,9 +141,11 @@ public class CommentServiceImp implements CommentService {
   }
 
   @Override
+  @Transactional
   public void deleteAllCommentByTaskId(String taskId) {
     log.info("(deleteAllCommentByTaskId)taskId: {}", taskId);
-    commentRepository.deleteCommentsByTaskId(taskId);
+    var comments = commentRepository.findAllByTaskId(taskId);
+    commentRepository.deleteAll(comments);
   }
 
 }

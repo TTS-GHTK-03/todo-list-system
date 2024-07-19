@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.entity.ActivityLog;
 import org.ghtk.todo_list.repository.ActivityLogRepository;
 import org.ghtk.todo_list.service.ActivityLogService;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -26,6 +27,7 @@ public class ActivityLogServiceImpl implements ActivityLogService {
   }
 
   @Override
+  @Transactional
   public void deleteAllByTaskId(String taskId) {
     log.info("(deleteAllByTaskId)taskId: {}", taskId);
     activityLogRepository.deleteAllByTaskId(taskId);

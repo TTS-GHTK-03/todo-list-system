@@ -110,7 +110,8 @@ public class TaskController {
   public BaseResponse deleteTask(@PathVariable("project_id") String projectId,
       @PathVariable("task_id") String taskId) {
     log.info("(deleteTask)projectId: {}, taskId: {}", projectId, taskId);
+    taskFacadeService.deleteTask(getUserId(), projectId, taskId);
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
-        taskFacadeService.deleteTask(getUserId(), projectId, taskId));
+        "Successfull delete task!");
   }
 }
