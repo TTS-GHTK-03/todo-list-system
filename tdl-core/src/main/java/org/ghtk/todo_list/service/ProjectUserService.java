@@ -7,5 +7,7 @@ public interface ProjectUserService {
 
   ProjectUser createProjectUser(String userId, String projectId, String role);
 
+  boolean existsByUserIdAndProjectId(String userId, String projectId);
+
   String getRoleProjectUser(String userId, String projectId);
 }

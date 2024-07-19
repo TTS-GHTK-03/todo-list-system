@@ -1,5 +1,6 @@
 package org.ghtk.todo_list.service;
 
+import java.util.List;
 import org.ghtk.todo_list.entity.Type;
 
 public interface TypeService {
@@ -12,4 +13,5 @@ public interface TypeService {
   boolean existByProjectIdAndTitle(String projectId, String title);
 
   Type findById(String id);
+  List<Type> findAllByProjectId(String projectId);
 }

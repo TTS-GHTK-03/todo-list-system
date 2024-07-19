@@ -1,5 +1,6 @@
 package org.ghtk.todo_list.service.impl;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.entity.Type;
@@ -45,5 +46,11 @@ public class TypeServiceImpl implements TypeService {
       log.error("(findById)typeId: {} not found", id);
       throw new TypeNotFoundException();
     });
+  }
+
+  @Override
+  public List<Type> findAllByProjectId(String projectId) {
+    log.info("(findAllByProjectId)projectId: {}", projectId);
+    return typeRepository.findAllByProjectId(projectId);
   }
 }

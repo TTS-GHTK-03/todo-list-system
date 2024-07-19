@@ -68,8 +68,8 @@ public class TdlCoreConfiguration {
   }
 
   @Bean
-  public TypeFacadeService typeFacadeService(ProjectService projectService, TypeService typeService, TypeMapper typeMapper){
-    return new TypeFacadeServiceImpl(projectService, typeService, typeMapper);
+  public TypeFacadeService typeFacadeService(ProjectService projectService, ProjectUserService projectUserService, TypeService typeService, TypeMapper typeMapper){
+    return new TypeFacadeServiceImpl(projectService, projectUserService, typeService, typeMapper);
   }
 
   @Bean
