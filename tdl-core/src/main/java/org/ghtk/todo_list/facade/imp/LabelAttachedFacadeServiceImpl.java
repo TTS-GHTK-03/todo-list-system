@@ -54,7 +54,7 @@ public class LabelAttachedFacadeServiceImpl implements LabelAttachedFacadeServic
     validateLabelId(labelId);
     validateProjectIdAndTaskId(projectId, taskId);
     List<LabelAttached> labelAttachedList = labelAttachedService.getLabelAttachedByTask(taskId);
-
+    log.info("(getLabelAttachedByType) LabelAttached: {}", labelAttachedList);
     return labelAttachedList.stream().map(labelAttached -> {
       return LabelAttachedResponse.builder()
           .id(labelAttached.getId())
