@@ -1,12 +1,17 @@
 package org.ghtk.todo_list.facade.imp;
 
+import static org.ghtk.todo_list.constant.URLImage.URL_IMAGE_BUG;
+import static org.ghtk.todo_list.constant.URLImage.URL_IMAGE_STORY;
+import static org.ghtk.todo_list.constant.URLImage.URL_IMAGE_TASK;
+
+import java.util.Arrays;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.constant.RoleProjectUser;
 import org.ghtk.todo_list.dto.response.UserNameResponse;
 import org.ghtk.todo_list.entity.Project;
-import org.ghtk.todo_list.entity.ProjectUser;
+import org.ghtk.todo_list.entity.Type;
 import org.ghtk.todo_list.exception.ProjectKeyAlreadyExistedException;
 import org.ghtk.todo_list.exception.ProjectNotFoundException;
 import org.ghtk.todo_list.exception.ProjectTitleAlreadyExistedException;
@@ -14,11 +19,13 @@ import org.ghtk.todo_list.exception.UserNotFoundException;
 import org.ghtk.todo_list.facade.ProjectFacadeService;
 import org.ghtk.todo_list.mapper.ProjectInformationResponseMapper;
 import org.ghtk.todo_list.mapper.ProjectMapper;
+import org.ghtk.todo_list.mapper.TypeMapper;
 import org.ghtk.todo_list.model.response.ProjectInformationResponse;
 import org.ghtk.todo_list.service.AuthUserService;
 import org.ghtk.todo_list.service.BoardService;
 import org.ghtk.todo_list.service.ProjectService;
 import org.ghtk.todo_list.service.ProjectUserService;
+import org.ghtk.todo_list.service.TypeService;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -30,6 +37,8 @@ public class ProjectFacadeServiceImpl implements ProjectFacadeService {
   private final AuthUserService authUserService;
   private final ProjectInformationResponseMapper projectInformationResponseMapper;
   private final ProjectMapper projectMapper;
+  private final TypeService typeService;
+  private final TypeMapper typeMapper;
 
   @Override
   public List<Project> getAllProject(String userId) {
@@ -70,9 +79,15 @@ public class ProjectFacadeServiceImpl implements ProjectFacadeService {
 
     Project projectSaved = projectService.createProject(userId, title);
     var user = authUserService.create("Unassigned");
-    ProjectUser projectUser = projectUserService.createProjectUser(userId, projectSaved.getId(),
+    projectUserService.createProjectUser(userId, projectSaved.getId(),
         RoleProjectUser.ADMIN.toString());
     projectUserService.createProjectUser(user.getId(), projectSaved.getId(), RoleProjectUser.VIEWER.toString());
+    List<String> urlImages = Arrays.asList(URL_IMAGE_BUG, URL_IMAGE_STORY, URL_IMAGE_TASK);
+    for (String urlImage : urlImages) {
+      Type type = typeMapper.toType(title, urlImage, null);
+      type.setProjectId(projectSaved.getId());
+      typeService.createType(type);
+    }
     return projectSaved;
   }
 

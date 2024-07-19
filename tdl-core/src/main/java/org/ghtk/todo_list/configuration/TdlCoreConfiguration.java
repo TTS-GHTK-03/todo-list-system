@@ -58,8 +58,9 @@ public class TdlCoreConfiguration {
 
   @Bean
   public ProjectFacadeService projectFacadeService(ProjectService projectService, ProjectUserService projectUserService, BoardService boardService,
-      AuthUserService authUserService, ProjectInformationResponseMapper projectInformationResponseMapper, ProjectMapper projectMapper){
-    return new ProjectFacadeServiceImpl(projectService, projectUserService, boardService, authUserService, projectInformationResponseMapper, projectMapper);
+      AuthUserService authUserService, ProjectInformationResponseMapper projectInformationResponseMapper, ProjectMapper projectMapper,
+      TypeService typeService, TypeMapper typeMapper){
+    return new ProjectFacadeServiceImpl(projectService, projectUserService, boardService, authUserService, projectInformationResponseMapper, projectMapper, typeService, typeMapper);
   }
 
   @Bean

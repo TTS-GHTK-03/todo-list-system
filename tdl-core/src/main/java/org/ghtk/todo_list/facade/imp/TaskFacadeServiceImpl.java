@@ -2,6 +2,7 @@ package org.ghtk.todo_list.facade.imp;
 
 import static org.ghtk.todo_list.constant.CacheConstant.UPDATE_STATUS_TASK;
 import static org.ghtk.todo_list.constant.CacheConstant.UPDATE_STATUS_TASK_KEY;
+import static org.ghtk.todo_list.constant.TaskStatus.TODO;
 
 import java.time.LocalDate;
 import java.time.LocalDate;
@@ -165,7 +166,7 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
 
     var clonedTask = new Task();
     clonedTask.setTitle(task.getTitle());
-    clonedTask.setStatus(TaskStatus.TODO.toString());
+    clonedTask.setStatus(TODO.toString());
     clonedTask.setUserId(userId);
     clonedTask.setChecklist(task.getChecklist());
     clonedTask.setDescription(task.getDescription());
@@ -237,6 +238,7 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
     task.setTitle(title);
     task.setUserId(userId);
     task.setProjectId(projectId);
+    task.setStatus(TODO.toString());
     Task savedTask = taskService.save(task);
 
     var user = authUserService.findByUnassigned();
