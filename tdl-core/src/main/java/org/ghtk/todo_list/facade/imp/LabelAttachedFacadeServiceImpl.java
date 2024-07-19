@@ -1,5 +1,7 @@
 package org.ghtk.todo_list.facade.imp;
 
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.entity.LabelAttached;
@@ -8,6 +10,7 @@ import org.ghtk.todo_list.exception.LabelNotFoundException;
 import org.ghtk.todo_list.exception.TaskNotFoundException;
 import org.ghtk.todo_list.facade.LabelAttachedFacadeService;
 import org.ghtk.todo_list.model.response.LabelAttachedResponse;
+import org.ghtk.todo_list.model.response.TaskResponse;
 import org.ghtk.todo_list.service.LabelAttachedService;
 import org.ghtk.todo_list.service.LabelService;
 import org.ghtk.todo_list.service.TaskService;
@@ -19,7 +22,6 @@ import org.springframework.stereotype.Component;
 public class LabelAttachedFacadeServiceImpl implements LabelAttachedFacadeService {
 
   private final LabelAttachedService labelAttachedService;
-
   private final TaskService taskService;
   private final LabelService labelService;
 
@@ -43,6 +45,23 @@ public class LabelAttachedFacadeServiceImpl implements LabelAttachedFacadeServic
         .labelId(labelAttached.getLabelId())
         .taskId(labelAttached.getTaskId())
         .build();
+  }
+
+  @Override
+  public List<LabelAttachedResponse> getLabelAttachedByTask(String projectId, String taskId,
+      String labelId) {
+    log.info("(getLabelAttachedByType) projectId: {}, labelId: {}, taskId: {}", projectId, labelId, taskId);
+    validateLabelId(labelId);
+    validateProjectIdAndTaskId(projectId, taskId);
+    List<LabelAttached> labelAttachedList = labelAttachedService.getLabelAttachedByTask(taskId);
+
+    return labelAttachedList.stream().map(labelAttached -> {
+      return LabelAttachedResponse.builder()
+          .id(labelAttached.getId())
+          .taskId(labelAttached.getTaskId())
+          .labelId(labelAttached.getLabelId())
+          .build();
+    }).collect(Collectors.toList());
   }
 
   private void validateProjectIdAndTaskId(String projectId, String taskId) {
