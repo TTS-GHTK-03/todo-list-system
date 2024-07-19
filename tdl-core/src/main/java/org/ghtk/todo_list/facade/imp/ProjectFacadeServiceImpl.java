@@ -1,8 +1,6 @@
 package org.ghtk.todo_list.facade.imp;
 
-import static org.ghtk.todo_list.constant.URLImage.URL_IMAGE_BUG;
-import static org.ghtk.todo_list.constant.URLImage.URL_IMAGE_STORY;
-import static org.ghtk.todo_list.constant.URLImage.URL_IMAGE_TASK;
+import static org.ghtk.todo_list.constant.ImageConstant.*;
 
 import java.util.Arrays;
 import java.util.List;
@@ -20,6 +18,7 @@ import org.ghtk.todo_list.facade.ProjectFacadeService;
 import org.ghtk.todo_list.mapper.ProjectInformationResponseMapper;
 import org.ghtk.todo_list.mapper.ProjectMapper;
 import org.ghtk.todo_list.mapper.TypeMapper;
+import org.ghtk.todo_list.model.request.TypeData;
 import org.ghtk.todo_list.model.response.ProjectInformationResponse;
 import org.ghtk.todo_list.service.AuthUserService;
 import org.ghtk.todo_list.service.BoardService;
@@ -82,9 +81,14 @@ public class ProjectFacadeServiceImpl implements ProjectFacadeService {
     projectUserService.createProjectUser(userId, projectSaved.getId(),
         RoleProjectUser.ADMIN.toString());
     projectUserService.createProjectUser(user.getId(), projectSaved.getId(), RoleProjectUser.VIEWER.toString());
-    List<String> urlImages = Arrays.asList(URL_IMAGE_BUG, URL_IMAGE_STORY, URL_IMAGE_TASK);
-    for (String urlImage : urlImages) {
-      Type type = typeMapper.toType(title, urlImage, null);
+    List<TypeData> typeDataList = Arrays.asList(
+        new TypeData(BUG, URL_IMAGE_BUG),
+        new TypeData(STORY, URL_IMAGE_STORY),
+        new TypeData(TASK, URL_IMAGE_TASK)
+    );
+
+    for (TypeData typeData : typeDataList) {
+      Type type = typeMapper.toType(typeData.getTitle(), typeData.getUrl(), null);
       type.setProjectId(projectSaved.getId());
       typeService.createType(type);
     }

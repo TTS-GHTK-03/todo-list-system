@@ -35,9 +35,9 @@ public class TypeFacadeServiceImpl implements TypeFacadeService {
     validateExistProjectUser(userId, projectId);
     validateRoleProjectUser(userId, projectId);
     validateProjectId(projectId);
-    validateTypeTitle(projectId, title);
+    validateTypeTitle(projectId, title.toUpperCase());
 
-    Type type = typeMapper.toType(title, image, description);
+    Type type = typeMapper.toType(title.toUpperCase(), image, description);
     type.setProjectId(projectId);
 
     return typeService.createType(type);
@@ -53,9 +53,9 @@ public class TypeFacadeServiceImpl implements TypeFacadeService {
     validateRoleProjectUser(userId, projectId);
     validateProjectId(projectId);
     validateTypeId(typeId);
-    validateTypeTitle(projectId, title);
+    validateTypeTitle(projectId, title.toUpperCase());
 
-    Type type = typeMapper.toType(title, image, description);
+    Type type = typeMapper.toType(title.toUpperCase(), image, description);
     type.setId(typeId);
 
     return typeService.updateType(type);

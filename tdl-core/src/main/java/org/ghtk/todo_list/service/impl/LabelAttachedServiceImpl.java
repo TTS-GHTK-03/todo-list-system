@@ -1,5 +1,6 @@
 package org.ghtk.todo_list.service.impl;
 
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.entity.LabelAttached;
@@ -35,5 +36,11 @@ public class LabelAttachedServiceImpl implements LabelAttachedService {
   public boolean existsByLabelIdAndTaskId(String labelId, String taskId) {
     log.info("(existsByLabelIdAndTaskId)labelId: {}, taskId: {}", labelId, taskId);
     return repository.existsByLabelIdAndTaskId(labelId, taskId);
+  }
+
+  @Override
+  public List<LabelAttached> getLabelAttachedByTask(String taskId) {
+    log.info("(getLabelAttachedByTask)taskId: {}", taskId);
+    return repository.findByTaskId(taskId);
   }
 }
