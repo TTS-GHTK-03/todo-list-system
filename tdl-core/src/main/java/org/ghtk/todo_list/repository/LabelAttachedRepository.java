@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface LabelAttachedRepository extends JpaRepository<LabelAttached, String> {
   void deleteByLabelId(String labelId);
+  void deleteAllByTaskId(String taskId);
   boolean existsByLabelIdAndTaskId(String labelId, String taskId);
 
   List<LabelAttached> findByTaskId(String taskId);

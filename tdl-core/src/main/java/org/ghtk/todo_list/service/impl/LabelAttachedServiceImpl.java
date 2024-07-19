@@ -7,6 +7,7 @@ import org.ghtk.todo_list.entity.LabelAttached;
 import org.ghtk.todo_list.repository.LabelAttachedRepository;
 import org.ghtk.todo_list.service.LabelAttachedService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -42,5 +43,12 @@ public class LabelAttachedServiceImpl implements LabelAttachedService {
   public List<LabelAttached> getLabelAttachedByTask(String taskId) {
     log.info("(getLabelAttachedByTask)taskId: {}", taskId);
     return repository.findByTaskId(taskId);
+  }
+
+  @Override
+  @Transactional
+  public void deleteAllByTaskId(String taskId) {
+    log.info("(deleteAllByTaskId)taskId: {}", taskId);
+    repository.deleteAllByTaskId(taskId);
   }
 }

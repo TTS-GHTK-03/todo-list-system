@@ -34,7 +34,10 @@ import org.ghtk.todo_list.model.response.StartSprintResponse;
 import org.ghtk.todo_list.mapper.TaskMapper;
 import org.ghtk.todo_list.model.response.TaskResponse;
 import org.ghtk.todo_list.model.response.UpdateDueDateTaskResponse;
+import org.ghtk.todo_list.service.ActivityLogService;
 import org.ghtk.todo_list.service.AuthUserService;
+import org.ghtk.todo_list.service.CommentService;
+import org.ghtk.todo_list.service.LabelAttachedService;
 import org.ghtk.todo_list.service.ProjectService;
 import org.ghtk.todo_list.service.ProjectUserService;
 import org.ghtk.todo_list.service.RedisCacheService;
@@ -43,6 +46,7 @@ import org.ghtk.todo_list.service.SprintService;
 import org.ghtk.todo_list.service.TaskAssigneesService;
 import org.ghtk.todo_list.service.TaskService;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -58,6 +62,9 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
   private final RedisCacheService redisCacheService;
   private final TaskMapper taskMapper;
   private final SprintProgressService sprintProgressService;
+  private final CommentService commentService;
+  private final LabelAttachedService labelAttachedService;
+  private final ActivityLogService activityLogService;
 
   @Override
   public List<TaskResponse> getAllTaskByProjectId(String userId, String projectId) {
@@ -93,7 +100,8 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
       sprintProgressService.updateCompleteTask(taskId);
     }
 
-    return taskService.updateStatus(taskId, status.toUpperCase(), taskAssigneesService.findUserIdByTaskId(taskId));
+    return taskService.updateStatus(taskId, status.toUpperCase(),
+        taskAssigneesService.findUserIdByTaskId(taskId));
   }
 
   @Override
@@ -108,7 +116,8 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
       var sprintProgress = sprintProgressService.findBySprintId(sprintId);
       sprintProgress.setTotalTask(sprintProgress.getTotalTask() + 1);
       sprintProgressService.save(sprintProgress);
-      return taskService.updateSprintId(projectId, taskId, sprintId, taskAssigneesService.findUserIdByTaskId(taskId));
+      return taskService.updateSprintId(projectId, taskId, sprintId,
+          taskAssigneesService.findUserIdByTaskId(taskId));
     } else {
       log.info("(updateSprintTask) sprintId don't exist ");
       SprintProgress sprintProgress = new SprintProgress();
@@ -116,7 +125,8 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
       sprintProgress.setTotalTask(1);
       sprintProgress.setCompleteTask(0);
       sprintProgressService.save(sprintProgress);
-      return taskService.updateSprintId(projectId, taskId, sprintId, taskAssigneesService.findUserIdByTaskId(taskId));
+      return taskService.updateSprintId(projectId, taskId, sprintId,
+          taskAssigneesService.findUserIdByTaskId(taskId));
     }
   }
 
@@ -251,6 +261,20 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
         .status(savedTask.getStatus())
         .userId(savedTask.getUserId())
         .build();
+  }
+
+  @Override
+  @Transactional
+  public void deleteTask(String userId, String projectId, String taskId) {
+    log.info("(deleteTask)projectId: {}, taskId: {}", projectId, taskId);
+    validateProjectId(projectId);
+    validateTaskId(taskId);
+
+    taskAssigneesService.deleteAllByTaskId(taskId);
+    commentService.deleteAllCommentByTaskId(taskId);
+    labelAttachedService.deleteAllByTaskId(taskId);
+    activityLogService.deleteAllByTaskId(taskId);
+    taskService.deleteTask(userId, projectId, taskId);
   }
 
   void validateUserId(String userId) {
