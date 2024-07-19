@@ -26,4 +26,6 @@ public interface ProjectUserRepository extends JpaRepository<ProjectUser, String
     (SELECT s.id FROM AuthUser s)
   """)
   List<String> findProjectIdByUserId(String role);
+
+  String findRoleByUserIdAndProjectId(String userId, String projectId);
 }
