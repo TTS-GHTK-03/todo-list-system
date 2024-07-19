@@ -18,4 +18,10 @@ public class ActivityLogServiceImpl implements ActivityLogService {
     log.info("(getAllActivityLogsByTaskId)taskId: {}", taskId);
     return activityLogRepository.findAllByTaskIdOrderByCreatedAtDesc(taskId);
   }
+
+  @Override
+  public List<ActivityLog> getAllActivityLogsByUserId(String userId) {
+    log.info("(getAllActivityLogsByUserId)userId: {}", userId);
+    return activityLogRepository.findAllByUserIdOrderByCreatedAtDesc(userId);
+  }
 }
