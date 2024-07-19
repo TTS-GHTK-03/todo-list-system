@@ -10,4 +10,5 @@ public interface SprintService {
   List<Sprint> findSprintsByProjectIdAndStatus(String projectId, String status);
   Sprint findSprintByProjectIdAndSprintId(String projectId, String sprintId);
   boolean existById(String id);
+  boolean existsByProjectIdAndTitle(String projectId, String title);
 }

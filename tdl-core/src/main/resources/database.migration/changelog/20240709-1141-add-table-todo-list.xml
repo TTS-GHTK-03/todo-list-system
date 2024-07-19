@@ -361,4 +361,8 @@
       constraintName="FK_activity_log_sprint"
       referencedTableName="sprint" referencedColumnNames="id"/>
   </changeSet>
+
+  <changeSet id="20240719-1630-delete-column-project" author="Phan Kieu">
+    <dropColumn tableName="project" columnName="count_sprint"/>
+  </changeSet>
 </databaseChangeLog>

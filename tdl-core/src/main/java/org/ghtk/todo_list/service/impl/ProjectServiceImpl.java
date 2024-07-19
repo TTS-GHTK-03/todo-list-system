@@ -72,7 +72,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     int count = 1;
     String keyProjectCheck = stringBuilder.toString();
-    while (!projectRepository.existsByKeyProject(keyProjectCheck)){
+    while (projectRepository.existsByKeyProject(keyProjectCheck)){
       keyProjectCheck = stringBuilder.toString() + count;
       count++;
     }
@@ -113,12 +113,6 @@ public class ProjectServiceImpl implements ProjectService {
       log.error("(getProjectById)projectId: {} not found", projectId);
       throw new ProjectNotFoundException();
     });
-  }
-
-  @Override
-  public void updateCountSprint(String projectId, Long countSprint) {
-    log.info("(updateCountSprint)projectId: {}, countSprint: {}", projectId, countSprint);
-    projectRepository.updateCountSprint(projectId, countSprint);
   }
 
   private void validateProjectId(String projectId){

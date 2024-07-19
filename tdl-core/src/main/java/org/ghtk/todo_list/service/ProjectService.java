@@ -19,5 +19,4 @@ public interface ProjectService {
   Project createProject(String userId, String title);
   Project updateProject(Project project);
   Project getProjectById(String projectId);
-  void updateCountSprint(String projectId, Long countSprint);
 }
