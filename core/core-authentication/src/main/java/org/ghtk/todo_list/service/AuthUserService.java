@@ -20,6 +20,7 @@ public interface AuthUserService {
   AuthUserResponse getDetail(String userId);
   UserProjection getByUserId(String userId);
   List<UserNameResponse> getNameUser(String projectId);
+  UserNameResponse getNameUserById(String userId);
   AuthUser create(String lastName);
   AuthUser findByUnassigned();
 }

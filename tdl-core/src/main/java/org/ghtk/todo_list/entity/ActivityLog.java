@@ -24,6 +24,7 @@ public class ActivityLog {
   private String id;
   private String action;
   private String taskId;
+  private String sprintId;
   private String userId;
   @CreatedDate
   private LocalDateTime createdAt;

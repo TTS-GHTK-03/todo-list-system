@@ -352,4 +352,13 @@
       constraintName="FK_task_type"
       referencedTableName="type" referencedColumnNames="id"/>
   </changeSet>
+
+  <changeSet id="20240719-1358-add-sprint-id" author="Phan Kieu">
+    <addColumn tableName="activity_log">
+      <column name="sprint_id" type="varchar(255)"/>
+    </addColumn>
+    <addForeignKeyConstraint baseTableName="activity_log" baseColumnNames="sprint_id"
+      constraintName="FK_activity_log_sprint"
+      referencedTableName="sprint" referencedColumnNames="id"/>
+  </changeSet>
 </databaseChangeLog>
