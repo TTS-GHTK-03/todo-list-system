@@ -48,10 +48,8 @@ public class LabelAttachedFacadeServiceImpl implements LabelAttachedFacadeServic
   }
 
   @Override
-  public List<LabelAttachedResponse> getLabelAttachedByTask(String projectId, String taskId,
-      String labelId) {
-    log.info("(getLabelAttachedByType) projectId: {}, labelId: {}, taskId: {}", projectId, labelId, taskId);
-    validateLabelId(labelId);
+  public List<LabelAttachedResponse> getLabelAttachedByTask(String projectId, String taskId) {
+    log.info("(getLabelAttachedByType) projectId: {}, taskId: {}", projectId, taskId);
     validateProjectIdAndTaskId(projectId, taskId);
     List<LabelAttached> labelAttachedList = labelAttachedService.getLabelAttachedByTask(taskId);
     log.info("(getLabelAttachedByType) LabelAttached: {}", labelAttachedList);
@@ -62,6 +60,14 @@ public class LabelAttachedFacadeServiceImpl implements LabelAttachedFacadeServic
           .labelId(labelAttached.getLabelId())
           .build();
     }).collect(Collectors.toList());
+  }
+
+  @Override
+  public void deleteLabelAttached(String projectId, String taskId, String labelId, String id) {
+    log.info("(deleteLabelAttached)projectId: {}, taskId: {}, labelId: {}, id: {}", projectId, taskId, labelId, id);
+    validateLabelId(labelId);
+    validateProjectIdAndTaskId(projectId, taskId);
+    labelAttachedService.deleteById(id);
   }
 
   private void validateProjectIdAndTaskId(String projectId, String taskId) {
