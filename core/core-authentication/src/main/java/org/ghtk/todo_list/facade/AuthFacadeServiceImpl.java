@@ -132,6 +132,7 @@ public class AuthFacadeServiceImpl implements AuthFacadeService {
 
     var redisKey = request.getEmail() + RESET_PASSWORD_OTP_KEY;
     var cachedOtp = redisCacheService.get(redisKey);
+    log.error("(verifyResetPassword)otpCache: {}", cachedOtp);
 
     if (cachedOtp.isEmpty() || !cachedOtp.get().equals(request.getOtp())) {
       log.error("(verifyResetPassword) OTP not found for email: {}", request.getEmail());
