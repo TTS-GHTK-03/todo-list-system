@@ -7,4 +7,5 @@ public interface ActivityLogService {
 
   List<ActivityLog> getAllActivityLogsByTaskId(String taskId);
   List<ActivityLog> getAllActivityLogsByUserId(String userId);
+  void deleteAllByTaskId(String taskId);
 }

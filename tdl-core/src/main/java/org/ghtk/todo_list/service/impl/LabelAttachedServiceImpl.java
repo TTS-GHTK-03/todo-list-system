@@ -43,4 +43,10 @@ public class LabelAttachedServiceImpl implements LabelAttachedService {
     log.info("(getLabelAttachedByTask)taskId: {}", taskId);
     return repository.findByTaskId(taskId);
   }
+
+  @Override
+  public void deleteAllByTaskId(String taskId) {
+    log.info("(deleteAllByTaskId)taskId: {}", taskId);
+    repository.deleteAllByTaskId(taskId);
+  }
 }

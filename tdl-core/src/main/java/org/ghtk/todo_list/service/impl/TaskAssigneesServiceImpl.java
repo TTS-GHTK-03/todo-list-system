@@ -40,4 +40,9 @@ public class TaskAssigneesServiceImpl implements TaskAssigneesService {
   public boolean existsByUserIdAndTaskId(String userId, String taskId) {
     return taskAssigneesRepository.existsByUserIdAndTaskId(userId, taskId);
   }
+
+  @Override
+  public void deleteAllByTaskId(String taskId) {
+    taskAssigneesRepository.deleteAllByTaskId(taskId);
+  }
 }
