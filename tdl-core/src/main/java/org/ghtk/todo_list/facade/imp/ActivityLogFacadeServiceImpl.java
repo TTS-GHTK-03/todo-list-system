@@ -39,11 +39,7 @@ public class ActivityLogFacadeServiceImpl implements ActivityLogFacadeService {
 
     List<NotificationResponse> notificationResponseList = new ArrayList<>();
     for(ActivityLog activityLog : activityLogList){
-      UserNameResponse userNameResponse = authUserService.getNameUserById(activityLog.getUserId());
-      Sprint sprint = sprintService.findById(activityLog.getSprintId());
-      Task task = taskService.findById(activityLog.getTaskId());
-
-      NotificationResponse notificationResponse = activityLogMapper.toNotificationResponse(activityLog, userNameResponse, sprint, task);
+      NotificationResponse notificationResponse = activityLogMapper.toNotificationResponse(activityLog, authUserService.getNameUserById(activityLog.getUserId()), sprintService.findById(activityLog.getSprintId()), taskService.findById(activityLog.getTaskId()));
       notificationResponseList.add(notificationResponse);
     }
     return notificationResponseList;

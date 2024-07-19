@@ -120,6 +120,10 @@ public class AuthUserServiceImpl implements AuthUserService {
   @Override
   public UserNameResponse getNameUserById(String userId) {
     log.info("(getNameUserById)userId: {}", userId);
+    if(!repository.existsById(userId)){
+      log.error("(getNameUserById)userId: {} not found", userId);
+      throw new UserNotFoundException();
+    }
     return repository.getNameUserById(userId);
   }
 

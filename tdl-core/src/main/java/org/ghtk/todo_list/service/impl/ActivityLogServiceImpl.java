@@ -28,7 +28,7 @@ public class ActivityLogServiceImpl implements ActivityLogService {
 
   @Override
   public List<ActivityLog> getAllNotifications(String userId, int page) {
-    log.info("(getAllNotification)userId: {}, page: {}", userId, page);
+    log.info("(getAllNotifications)userId: {}, page: {}", userId, page);
     int offset = (page-1) * LIMIT;
     return activityLogRepository.findAllNotifications(userId, LIMIT, offset);
   }
