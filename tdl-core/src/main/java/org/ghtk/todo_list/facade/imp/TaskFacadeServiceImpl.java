@@ -253,6 +253,14 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
         .build();
   }
 
+  @Override
+  public String deleteTask(String userId, String projectId, String taskId) {
+    log.info("(deleteTask)projectId: {}, taskId: {}", projectId, taskId);
+    validateProjectId(projectId);
+    validateTaskId(taskId);
+    return taskService.deleteTask(userId, projectId, taskId);
+  }
+
   void validateUserId(String userId) {
     log.info("(validateUserId)userId: {}", userId);
     if (!authUserService.existById(userId)) {

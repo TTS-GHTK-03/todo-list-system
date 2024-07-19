@@ -137,7 +137,13 @@ public class CommentServiceImp implements CommentService {
     log.info("(deleteComment)taskId: {}, commentId: {}", taskId, commentId);
     commentRepository.deleteAllByParentId(commentId);
     commentRepository.deleteById(commentId);
-    return "Successfull delete!";
+    return "Successfull delete comment!";
+  }
+
+  @Override
+  public void deleteAllCommentByTaskId(String taskId) {
+    log.info("(deleteAllCommentByTaskId)taskId: {}", taskId);
+    commentRepository.deleteCommentsByTaskId(taskId);
   }
 
 }

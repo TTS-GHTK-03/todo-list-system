@@ -1,5 +1,6 @@
 package org.ghtk.todo_list.service.impl;
 
+import jakarta.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +15,7 @@ import org.ghtk.todo_list.model.response.UpdateDueDateTaskResponse;
 import org.ghtk.todo_list.repository.TaskRepository;
 import org.ghtk.todo_list.repository.UserProjection;
 import org.ghtk.todo_list.service.AuthUserService;
+import org.ghtk.todo_list.service.CommentService;
 import org.ghtk.todo_list.service.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,7 +28,7 @@ import java.util.List;
 public class TaskServiceImp implements TaskService {
 
   private final TaskRepository taskRepository;
-  private final AuthUserService authUserService;
+  private final CommentService commentService;
 
   @Override
   public List<TaskResponse> getAllTasksByProjectId(String projectId) {
@@ -150,5 +152,14 @@ public class TaskServiceImp implements TaskService {
   public boolean existByProjectIdAndTaskId(String projectId, String id) {
     log.info("(existByProjectIdAndTaskId)projectId: {}, id: {}", projectId, id);
     return taskRepository.existsByProjectIdAndId(projectId, id);
+  }
+
+  @Override
+  @Transactional
+  public String deleteTask(String userId, String projectId, String taskId) {
+    log.info("(deleteTask)projectId: {}, taskId: {}", projectId, taskId);
+    commentService.deleteAllCommentByTaskId(taskId);
+    taskRepository.deleteById(taskId);
+    return "Successfull delete task!";
   }
 }

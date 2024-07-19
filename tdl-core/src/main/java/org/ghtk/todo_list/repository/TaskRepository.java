@@ -54,5 +54,6 @@ public interface TaskRepository extends JpaRepository<Task, String> {
   boolean existsBySprintId(String sprintId);
 
   boolean existsByProjectIdAndId(String projectId, String id);
+  void deleteById(String taskId);
 
 }

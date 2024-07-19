@@ -34,4 +34,5 @@ public interface TaskService {
 
   boolean existsBySprintId(String sprintId);
   boolean existByProjectIdAndTaskId(String projectId, String id);
+  String deleteTask(String userId, String projectId, String taskId);
 }

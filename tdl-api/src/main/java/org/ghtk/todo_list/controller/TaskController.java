@@ -12,6 +12,7 @@ import org.ghtk.todo_list.model.request.CreateTaskRequest;
 import org.ghtk.todo_list.model.request.UpdateDueDateTaskRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -103,5 +104,13 @@ public class TaskController {
     getUserId();
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         taskFacadeService.getAllBySprintId(projectId, sprintId));
+  }
+
+  @DeleteMapping ("/{project_id}/tasks/{task_id}")
+  public BaseResponse deleteTask(@PathVariable("project_id") String projectId,
+      @PathVariable("task_id") String taskId) {
+    log.info("(deleteTask)projectId: {}, taskId: {}", projectId, taskId);
+    return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
+        taskFacadeService.deleteTask(getUserId(), projectId, taskId));
   }
 }
