@@ -12,10 +12,18 @@ import org.ghtk.todo_list.service.ActivityLogService;
 public class ActivityLogServiceImpl implements ActivityLogService {
 
   private final ActivityLogRepository activityLogRepository;
+  private final static int LIMIT = 20;
 
   @Override
   public List<ActivityLog> getAllActivityLogsByTaskId(String taskId) {
     log.info("(getAllActivityLogsByTaskId)taskId: {}", taskId);
     return activityLogRepository.findAllByTaskIdOrderByCreatedAtDesc(taskId);
+  }
+
+  @Override
+  public List<ActivityLog> getAllNotifications(String userId, int page) {
+    log.info("(getAllNotification)userId: {}, page: {}", userId, page);
+    int offset = (page-1) * LIMIT;
+    return activityLogRepository.findAllNotifications(userId, LIMIT, offset);
   }
 }

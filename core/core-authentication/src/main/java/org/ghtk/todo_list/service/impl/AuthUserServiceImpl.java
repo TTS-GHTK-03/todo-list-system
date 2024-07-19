@@ -118,6 +118,12 @@ public class AuthUserServiceImpl implements AuthUserService {
   }
 
   @Override
+  public UserNameResponse getNameUserById(String userId) {
+    log.info("(getNameUserById)userId: {}", userId);
+    return repository.getNameUserById(userId);
+  }
+
+  @Override
   public AuthUser create(String lastName) {
     log.info("(create)lastName: {}", lastName);
     AuthUser authUser = new AuthUser();
