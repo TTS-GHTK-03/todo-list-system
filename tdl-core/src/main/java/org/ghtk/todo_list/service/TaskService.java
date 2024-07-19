@@ -33,4 +33,5 @@ public interface TaskService {
   List<Task> getAllBySprintId(String sprintId);
 
   boolean existsBySprintId(String sprintId);
+  boolean existByProjectIdAndTaskId(String projectId, String id);
 }
