@@ -44,10 +44,10 @@ public class LabelAttachedController {
 
   @DeleteMapping("/attach/{id}")
   public BaseResponse deleteLabelAttached(@PathVariable("project_id") String projectId,
-      @PathVariable("task_id") String taskId, @PathVariable("label_id") String labelId, @PathVariable("id") String id) {
+      @PathVariable("task_id") String taskId, @PathVariable("id") String id) {
     log.info("(deleteLabelAttached)");
     getUserId();
-    service.deleteLabelAttached(projectId, taskId, labelId, id);
+    service.deleteLabelAttached(projectId, taskId, id);
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         "Delete label attached successfully!!");
   }
