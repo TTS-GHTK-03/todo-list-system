@@ -27,6 +27,12 @@ public class ActivityLogFacadeServiceImpl implements ActivityLogFacadeService {
     return activityLogService.getAllActivityLogsByTaskId(taskId);
   }
 
+  @Override
+  public List<ActivityLog> getAllActivityLogsByUserId(String userId) {
+    log.info("(getAllActivityLogsByUserId)userId: {}", userId);
+    return activityLogService.getAllActivityLogsByUserId(userId);
+  }
+
   void validateProjectId(String projectId) {
     log.info("(validateProjectId)projectId: {}", projectId);
     if (!projectService.existById(projectId)) {
