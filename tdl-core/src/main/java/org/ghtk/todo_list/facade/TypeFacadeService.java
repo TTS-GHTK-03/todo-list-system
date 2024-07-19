@@ -10,7 +10,7 @@ public interface TypeFacadeService {
 
   Type updateType(String userId, String projectId, String typeId, String title, String image, String description);
 
-  List<TypeResponse> getAllTypes(String projectId);
+  List<TypeResponse> getAllTypes(String userId, String projectId);
 
-  TypeResponse getType(String projectId, String typeId);
+  TypeResponse getType(String userId, String projectId, String typeId);
 }

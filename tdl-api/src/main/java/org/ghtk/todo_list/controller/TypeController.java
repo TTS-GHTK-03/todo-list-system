@@ -47,12 +47,12 @@ public class TypeController {
   @GetMapping()
   public BaseResponse getAllTypes(@PathVariable("project_id") String projectId){
     log.info("(getAllTypes)projectId: {}", projectId);
-    return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(), typeFacadeService.getAllTypes(projectId));
+    return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(), typeFacadeService.getAllTypes(getUserId(), projectId));
   }
 
   @GetMapping("/{type_id}")
   public BaseResponse getType(@PathVariable("project_id") String projectId, @PathVariable("type_id") String typeId){
     log.info("(getType)projectId: {}, typeId: {}", projectId, typeId);
-    return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(), typeFacadeService.getType(projectId, typeId));
+    return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(), typeFacadeService.getType(getUserId(), projectId, typeId));
   }
 }
