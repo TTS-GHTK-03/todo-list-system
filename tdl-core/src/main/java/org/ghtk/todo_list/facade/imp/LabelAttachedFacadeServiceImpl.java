@@ -3,12 +3,13 @@ package org.ghtk.todo_list.facade.imp;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.entity.LabelAttached;
-import org.ghtk.todo_list.exception.LabelAlreadyExistsException;
 import org.ghtk.todo_list.exception.LabelAttachedAlreadyExistsException;
+import org.ghtk.todo_list.exception.LabelNotFoundException;
 import org.ghtk.todo_list.exception.TaskNotFoundException;
 import org.ghtk.todo_list.facade.LabelAttachedFacadeService;
 import org.ghtk.todo_list.model.response.LabelAttachedResponse;
 import org.ghtk.todo_list.service.LabelAttachedService;
+import org.ghtk.todo_list.service.LabelService;
 import org.ghtk.todo_list.service.TaskService;
 import org.springframework.stereotype.Component;
 
@@ -20,16 +21,18 @@ public class LabelAttachedFacadeServiceImpl implements LabelAttachedFacadeServic
   private final LabelAttachedService labelAttachedService;
 
   private final TaskService taskService;
+  private final LabelService labelService;
 
   @Override
   public LabelAttachedResponse create(String projectId, String taskId, String labelId) {
     log.info("(create) projectId: {}, labelId: {}, taskId: {}", projectId, labelId, taskId);
-
+    validateLabelId(labelId);
     validateProjectIdAndTaskId(projectId, taskId);
     if(labelAttachedService.existsByLabelIdAndTaskId(labelId, taskId)) {
       log.error("(create)Label attached already exists labelId: {}, taskId: {}", labelId, taskId);
       throw new LabelAttachedAlreadyExistsException();
     }
+
     LabelAttached labelAttached = new LabelAttached();
     labelAttached.setLabelId(labelId);
     labelAttached.setTaskId(taskId);
@@ -47,6 +50,14 @@ public class LabelAttachedFacadeServiceImpl implements LabelAttachedFacadeServic
     if (!taskService.existByProjectIdAndTaskId(projectId, taskId)) {
       log.error("(validateProjectIdAndTaskId)taskId: {} not found", taskId);
       throw new TaskNotFoundException();
+    }
+  }
+
+  private void validateLabelId(String labelId) {
+    log.info("(validateLabelId)labelId: {}", labelId);
+    if (!labelService.existsById(labelId)) {
+      log.error("(validateLabelId)labelId: {} not found", labelId);
+      throw new LabelNotFoundException();
     }
   }
 }
