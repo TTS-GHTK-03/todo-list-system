@@ -1,5 +1,6 @@
 package org.ghtk.todo_list.service.impl;
 
+import jakarta.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -130,4 +131,13 @@ public class CommentServiceImp implements CommentService {
     log.info("(existById)id: {}", id);
     return commentRepository.existsById(id);
   }
+  @Transactional
+  @Override
+  public String deleteComment(String userId, String taskId, String commentId) {
+    log.info("(deleteComment)taskId: {}, commentId: {}", taskId, commentId);
+    commentRepository.deleteAllByParentId(commentId);
+    commentRepository.deleteById(commentId);
+    return "Successfull delete!";
+  }
+
 }

@@ -26,7 +26,8 @@ public class CommentFacadeServiceImp implements CommentFacadeService {
   private final ProjectService projectService;
 
   @Override
-  public CommentResponse createComment(String userId, String projectId, String taskid, String text) {
+  public CommentResponse createComment(String userId, String projectId, String taskid,
+      String text) {
     log.info("(createComment)userId: {},taskId: {}", userId, taskid);
     validateProjectId(projectId);
     validateTaskId(taskid);
@@ -34,7 +35,8 @@ public class CommentFacadeServiceImp implements CommentFacadeService {
   }
 
   @Override
-  public CommentResponse updateComment(String userId, String projectId, String taskId, String commentId,
+  public CommentResponse updateComment(String userId, String projectId, String taskId,
+      String commentId,
       String text) {
     log.info("(updateComment)userId: {},taskId: {}", userId, taskId);
     validateProjectId(projectId);
@@ -66,7 +68,7 @@ public class CommentFacadeServiceImp implements CommentFacadeService {
 
   @Override
   public List<CommentResponse> getAllCommentsByParentId(String taskId, String parentId) {
-    log.info("(getAllCommentsByParentId)taskId: {},parentId: {}",taskId, parentId);
+    log.info("(getAllCommentsByParentId)taskId: {},parentId: {}", taskId, parentId);
     validateTaskId(taskId);
     validateParentId(parentId);
     return commentService.getAllCommentsByParentId(taskId, parentId);
@@ -89,8 +91,18 @@ public class CommentFacadeServiceImp implements CommentFacadeService {
   }
 
   @Override
-  public CommentResponse replyComment(String userId, String projectId, String taskId, String commentId, String text) {
-    log.info("(replyComment)userId: {},taskId: {}, commentId: {}, text: {}", userId, taskId, commentId, text);
+  public String deleteComment(String userId, String taskId, String commentId) {
+    log.info("(deleteComment)userId: {},taskId: {}, commentId: {}", userId, taskId, commentId);
+    validateTaskId(taskId);
+    validateParentId(commentId);
+    return commentService.deleteComment(userId, taskId, commentId);
+  }
+
+  @Override
+  public CommentResponse replyComment(String userId, String projectId, String taskId,
+      String commentId, String text) {
+    log.info("(replyComment)userId: {},taskId: {}, commentId: {}, text: {}", userId, taskId,
+        commentId, text);
     validateProjectId(projectId);
     validateTaskId(taskId);
     return commentService.replyComment(userId, taskId, commentId, text);
@@ -105,7 +117,7 @@ public class CommentFacadeServiceImp implements CommentFacadeService {
   }
 
   void validateParentId(String parentId) {
-    log.info("(validateParentId)parentId: {}",parentId);
+    log.info("(validateParentId)parentId: {}", parentId);
     if (!commentService.existById(parentId)) {
       log.error("(validateParentId)parentId: {}", parentId);
       throw new CommentNotFoundException();
