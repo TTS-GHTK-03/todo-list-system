@@ -1,7 +1,6 @@
 package org.ghtk.todo_list.model.request;
 
 import jakarta.validation.constraints.NotBlank;
-import java.sql.Date;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

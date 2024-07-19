@@ -20,6 +20,7 @@ import org.ghtk.todo_list.mapper.ProjectMapper;
 import org.ghtk.todo_list.mapper.TypeMapper;
 import org.ghtk.todo_list.model.request.TypeData;
 import org.ghtk.todo_list.model.response.ProjectInformationResponse;
+import org.ghtk.todo_list.model.response.ProjectRoleResponse;
 import org.ghtk.todo_list.service.AuthUserService;
 import org.ghtk.todo_list.service.BoardService;
 import org.ghtk.todo_list.service.ProjectService;
@@ -49,12 +50,14 @@ public class ProjectFacadeServiceImpl implements ProjectFacadeService {
   }
 
   @Override
-  public Project getProject(String userId, String projectId) {
+  public ProjectRoleResponse getProject(String userId, String projectId) {
     log.info("(getProject)user: {}, project: {}", userId, projectId);
 
     validateUserId(userId);
 
-    return projectService.getProject(userId, projectId);
+    var project = projectService.getProject(userId, projectId);
+    return ProjectRoleResponse.of(project.getId(), project.getTitle(), project.getKeyProject(),
+        projectUserService.getRoleProjectUser(userId, projectId));
   }
 
   @Override
