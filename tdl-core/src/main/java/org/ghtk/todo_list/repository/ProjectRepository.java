@@ -32,11 +32,6 @@ public interface ProjectRepository extends JpaRepository<Project, String> {
   Project findByTitle(String title);
   Project findByKeyProject(String keyProject);
 
-  @Modifying
-  @Transactional
-  @Query("update Project p set p.countSprint = :countSprint where p.id = :id")
-  void updateCountSprint(@Param("id") String id, @Param("countSprint") Long countSprint);
-
   boolean existsByTitle(String title);
   boolean existsByKeyProject(String keyProject);
 }

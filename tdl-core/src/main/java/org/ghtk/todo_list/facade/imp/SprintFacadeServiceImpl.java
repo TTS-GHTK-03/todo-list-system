@@ -40,16 +40,19 @@ public class SprintFacadeServiceImpl implements SprintFacadeService {
     log.info("(createSprintByProject)");
     Project project = projectService.getProjectById(projectId);
 
-    Long counter = (project.getCountSprint() != null ? project.getCountSprint() : 0L) + 1;
-    log.info("(createSprintByProject)count: {}", counter);
+    int count = 1;
+    String title = project.getKeyProject() + " Sprint " + count;
+    while (sprintService.existsByProjectIdAndTitle(projectId, title)){
+      count++;
+      title = project.getKeyProject() + " Sprint " + count;
+    }
 
     Sprint sprint = new Sprint();
-    sprint.setTitle(project.getKeyProject() + " Sprint " + counter);
+    sprint.setTitle(title);
     sprint.setStatus(SprintStatus.TODO.toString());
     sprint.setProjectId(project.getId());
     sprint = sprintService.save(sprint);
 
-    projectService.updateCountSprint(project.getId(), counter);
     return sprintMapper.toCreateSprintResponse(sprint);
   }
 

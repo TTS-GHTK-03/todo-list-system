@@ -62,4 +62,10 @@ public class SprintServiceImpl implements SprintService {
     log.info("(existById)id: {}", id);
     return sprintRepository.existsById(id);
   }
+
+  @Override
+  public boolean existsByProjectIdAndTitle(String projectId, String title) {
+    log.info("(existsByProjectIdAndTitle)");
+    return sprintRepository.existsByProjectIdAndTitle(projectId, title);
+  }
 }
