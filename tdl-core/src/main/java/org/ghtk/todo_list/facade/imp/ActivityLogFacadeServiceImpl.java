@@ -5,9 +5,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.entity.ActivityLog;
 import org.ghtk.todo_list.exception.ProjectNotFoundException;
+import org.ghtk.todo_list.exception.TaskNotFoundException;
 import org.ghtk.todo_list.facade.ActivityLogFacadeService;
 import org.ghtk.todo_list.service.ActivityLogService;
 import org.ghtk.todo_list.service.ProjectService;
+import org.ghtk.todo_list.service.TaskService;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -15,12 +17,14 @@ public class ActivityLogFacadeServiceImpl implements ActivityLogFacadeService {
 
   private final ActivityLogService activityLogService;
   private final ProjectService projectService;
+  private final TaskService taskService;
 
   @Override
-  public List<ActivityLog> getAllActivityLogs(String userId, String projectId) {
+  public List<ActivityLog> getAllActivityLogsByTaskId(String userId, String projectId, String taskId) {
     log.info("(getAllActivityLogs)userId: {}, projectId: {}", userId, projectId);
     validateProjectId(projectId);
-    return activityLogService.getAllActivityLogs();
+    validateProjectIdAndTaskId(projectId, taskId);
+    return activityLogService.getAllActivityLogsByTaskId(taskId);
   }
 
   void validateProjectId(String projectId) {
@@ -28,6 +32,14 @@ public class ActivityLogFacadeServiceImpl implements ActivityLogFacadeService {
     if (!projectService.existById(projectId)) {
       log.error("(validateProjectId)projectId: {}", projectId);
       throw new ProjectNotFoundException();
+    }
+  }
+
+  void validateProjectIdAndTaskId(String projectId, String taskId) {
+    log.info("(validateProjectIdAndTaskId)projectId: {}, taskId: {}", projectId, taskId);
+    if (!taskService.existByProjectIdAndTaskId(projectId, taskId)) {
+      log.error("(validateProjectIdAndTaskId)taskId: {} not found", taskId);
+      throw new TaskNotFoundException();
     }
   }
 }

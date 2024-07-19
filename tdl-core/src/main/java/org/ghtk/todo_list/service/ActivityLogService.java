@@ -5,5 +5,5 @@ import org.ghtk.todo_list.entity.ActivityLog;
 
 public interface ActivityLogService {
 
-  List<ActivityLog> getAllActivityLogs();
+  List<ActivityLog> getAllActivityLogsByTaskId(String taskId);
 }
