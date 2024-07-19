@@ -9,4 +9,5 @@ import org.springframework.stereotype.Repository;
 public interface ActivityLogRepository extends JpaRepository<ActivityLog, String> {
 
   List<ActivityLog> findAllByTaskIdOrderByCreatedAtDesc(String taskId);
+  List<ActivityLog> findAllByUserIdOrderByCreatedAtDesc(String userId);
 }
