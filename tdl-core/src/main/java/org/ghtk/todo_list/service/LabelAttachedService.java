@@ -1,5 +1,6 @@
 package org.ghtk.todo_list.service;
 
+import java.util.List;
 import org.ghtk.todo_list.entity.LabelAttached;
 
 public interface LabelAttachedService {
@@ -7,4 +8,5 @@ public interface LabelAttachedService {
   void deleteByLabelId(String labelId);
   void deleteById(String id);
   boolean existsByLabelIdAndTaskId(String labelId, String taskId);
+  List<LabelAttached> getLabelAttachedByTask(String taskId);
 }

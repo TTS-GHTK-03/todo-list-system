@@ -1,5 +1,7 @@
 package org.ghtk.todo_list.facade.imp;
 
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.entity.LabelAttached;
@@ -8,6 +10,7 @@ import org.ghtk.todo_list.exception.LabelNotFoundException;
 import org.ghtk.todo_list.exception.TaskNotFoundException;
 import org.ghtk.todo_list.facade.LabelAttachedFacadeService;
 import org.ghtk.todo_list.model.response.LabelAttachedResponse;
+import org.ghtk.todo_list.model.response.TaskResponse;
 import org.ghtk.todo_list.service.LabelAttachedService;
 import org.ghtk.todo_list.service.LabelService;
 import org.ghtk.todo_list.service.TaskService;
@@ -19,7 +22,6 @@ import org.springframework.stereotype.Component;
 public class LabelAttachedFacadeServiceImpl implements LabelAttachedFacadeService {
 
   private final LabelAttachedService labelAttachedService;
-
   private final TaskService taskService;
   private final LabelService labelService;
 
@@ -43,6 +45,29 @@ public class LabelAttachedFacadeServiceImpl implements LabelAttachedFacadeServic
         .labelId(labelAttached.getLabelId())
         .taskId(labelAttached.getTaskId())
         .build();
+  }
+
+  @Override
+  public List<LabelAttachedResponse> getLabelAttachedByTask(String projectId, String taskId) {
+    log.info("(getLabelAttachedByType) projectId: {}, taskId: {}", projectId, taskId);
+    validateProjectIdAndTaskId(projectId, taskId);
+    List<LabelAttached> labelAttachedList = labelAttachedService.getLabelAttachedByTask(taskId);
+    log.info("(getLabelAttachedByType) LabelAttached: {}", labelAttachedList);
+    return labelAttachedList.stream().map(labelAttached -> {
+      return LabelAttachedResponse.builder()
+          .id(labelAttached.getId())
+          .taskId(labelAttached.getTaskId())
+          .labelId(labelAttached.getLabelId())
+          .build();
+    }).collect(Collectors.toList());
+  }
+
+  @Override
+  public void deleteLabelAttached(String projectId, String taskId, String labelId, String id) {
+    log.info("(deleteLabelAttached)projectId: {}, taskId: {}, labelId: {}, id: {}", projectId, taskId, labelId, id);
+    validateLabelId(labelId);
+    validateProjectIdAndTaskId(projectId, taskId);
+    labelAttachedService.deleteById(id);
   }
 
   private void validateProjectIdAndTaskId(String projectId, String taskId) {
