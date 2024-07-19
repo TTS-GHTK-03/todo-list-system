@@ -1,5 +1,6 @@
 package org.ghtk.todo_list.repository;
 
+import java.util.List;
 import org.ghtk.todo_list.entity.Type;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -8,4 +9,5 @@ import org.springframework.stereotype.Repository;
 public interface TypeRepository extends JpaRepository<Type, String> {
 
   boolean existsByProjectIdAndTitle(String projectId, String title);
+  List<Type> findAllByProjectId(String projectId);
 }
