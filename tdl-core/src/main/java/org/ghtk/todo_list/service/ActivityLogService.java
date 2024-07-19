@@ -6,6 +6,7 @@ import org.ghtk.todo_list.entity.ActivityLog;
 public interface ActivityLogService {
 
   List<ActivityLog> getAllActivityLogsByTaskId(String taskId);
+  List<ActivityLog> getAllActivityLogsByUserId(String userId);
 
   List<ActivityLog> getAllNotifications(String userId, int page);
 }

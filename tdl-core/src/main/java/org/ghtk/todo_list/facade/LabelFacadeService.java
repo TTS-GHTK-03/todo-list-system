@@ -8,4 +8,5 @@ public interface LabelFacadeService {
   LabelResponse createLabel(String projectId, String typeId, String title, String description);
   LabelResponse updateLabel(String projectId, String typeId, String labelId, String title, String description);
   List<LabelResponse> getLabelsByTypeId(String projectId, String typeId);
+  void deleteLabel(String projectId, String typeId, String labelId);
 }

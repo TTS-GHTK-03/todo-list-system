@@ -21,6 +21,12 @@ public class ActivityLogServiceImpl implements ActivityLogService {
   }
 
   @Override
+  public List<ActivityLog> getAllActivityLogsByUserId(String userId) {
+    log.info("(getAllActivityLogsByUserId)userId: {}", userId);
+    return activityLogRepository.findAllByUserIdOrderByCreatedAtDesc(userId);
+  }
+
+  @Override
   public List<ActivityLog> getAllNotifications(String userId, int page) {
     log.info("(getAllNotification)userId: {}, page: {}", userId, page);
     int offset = (page-1) * LIMIT;

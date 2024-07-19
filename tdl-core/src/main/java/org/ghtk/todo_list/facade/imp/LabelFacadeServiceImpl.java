@@ -1,5 +1,6 @@
 package org.ghtk.todo_list.facade.imp;
 
+import jakarta.transaction.Transactional;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,6 +12,7 @@ import org.ghtk.todo_list.exception.ProjectIdMismatchException;
 import org.ghtk.todo_list.facade.LabelFacadeService;
 import org.ghtk.todo_list.mapper.LabelMapper;
 import org.ghtk.todo_list.model.response.LabelResponse;
+import org.ghtk.todo_list.service.LabelAttachedService;
 import org.ghtk.todo_list.service.LabelService;
 import org.ghtk.todo_list.service.TypeService;
 import org.springframework.stereotype.Component;
@@ -23,6 +25,7 @@ public class LabelFacadeServiceImpl implements LabelFacadeService {
   private final LabelService labelService;
   private final LabelMapper labelMapper;
   private final TypeService typeService;
+  private final LabelAttachedService labelAttachedService;
 
   @Override
   public LabelResponse createLabel(String projectId, String typeId, String title,
@@ -81,6 +84,16 @@ public class LabelFacadeServiceImpl implements LabelFacadeService {
 
     log.info("(getLabelsByTypeId)labels: {}", labels);
     return labelMapper.toLabelResponses(labels);
+  }
+
+  @Override
+  @Transactional
+  public void deleteLabel(String projectId, String typeId, String labelId) {
+    log.info("(deleteLabel) label: {}", labelId);
+    validProjectInType(projectId, typeId);
+    labelAttachedService.deleteByLabelId(labelId);
+    labelService.deleteLabel(labelId);
+    log.info("(deleteLabel) successfully");
   }
 
   private void validProjectInType(String projectId, String typeId) {

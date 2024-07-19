@@ -8,4 +8,6 @@ public interface ActivityLogFacadeService {
 
   List<NotificationResponse> getAllNotifications(String userId, String projectId, int page);
   List<ActivityLog> getAllActivityLogsByTaskId(String userId, String projectId, String taskId);
+  List<ActivityLog> getAllActivityLogsByUserId(String userId);
+
 }
