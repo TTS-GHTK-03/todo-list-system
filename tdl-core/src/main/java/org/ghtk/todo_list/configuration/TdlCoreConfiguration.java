@@ -33,6 +33,7 @@ import org.ghtk.todo_list.service.SprintProgressService;
 import org.ghtk.todo_list.service.SprintService;
 import org.ghtk.todo_list.service.TaskAssigneesService;
 import org.ghtk.todo_list.service.RedisCacheService;
+import org.ghtk.todo_list.service.TaskService;
 import org.ghtk.todo_list.service.TypeService;
 import org.ghtk.todo_list.service.impl.ActivityLogServiceImpl;
 import org.ghtk.todo_list.service.impl.BoardServiceImpl;
@@ -68,8 +69,8 @@ public class TdlCoreConfiguration {
   }
 
   @Bean
-  public TypeFacadeService typeFacadeService(ProjectService projectService, TypeService typeService, TypeMapper typeMapper){
-    return new TypeFacadeServiceImpl(projectService, typeService, typeMapper);
+  public TypeFacadeService typeFacadeService(ProjectService projectService, ProjectUserService projectUserService, TypeService typeService, TypeMapper typeMapper){
+    return new TypeFacadeServiceImpl(projectService, projectUserService, typeService, typeMapper);
   }
 
   @Bean
@@ -111,8 +112,8 @@ public class TdlCoreConfiguration {
 
   @Bean
   public ActivityLogFacadeService activityLogFacadeService(ActivityLogService activityLogService,
-      ProjectService projectService) {
-    return new ActivityLogFacadeServiceImpl(activityLogService, projectService);
+      ProjectService projectService, TaskService taskService) {
+    return new ActivityLogFacadeServiceImpl(activityLogService, projectService, taskService);
   }
 
   @Bean

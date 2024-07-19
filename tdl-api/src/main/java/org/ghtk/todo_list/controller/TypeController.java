@@ -10,6 +10,7 @@ import org.ghtk.todo_list.dto.response.BaseResponse;
 import org.ghtk.todo_list.facade.TypeFacadeService;
 import org.ghtk.todo_list.model.request.TypeRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -41,5 +42,17 @@ public class TypeController {
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         typeFacadeService.updateType(getUserId(), projectId, typeId, typeRequest.getTitle(), typeRequest.getImage(),
             typeRequest.getDescription()));
+  }
+
+  @GetMapping()
+  public BaseResponse getAllTypes(@PathVariable("project_id") String projectId){
+    log.info("(getAllTypes)projectId: {}", projectId);
+    return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(), typeFacadeService.getAllTypes(getUserId(), projectId));
+  }
+
+  @GetMapping("/{type_id}")
+  public BaseResponse getType(@PathVariable("project_id") String projectId, @PathVariable("type_id") String typeId){
+    log.info("(getType)projectId: {}, typeId: {}", projectId, typeId);
+    return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(), typeFacadeService.getType(getUserId(), projectId, typeId));
   }
 }

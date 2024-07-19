@@ -24,6 +24,14 @@ public class ProjectUserServiceImpl implements ProjectUserService {
   }
 
   @Override
+  public boolean existsByUserIdAndProjectId(String userId, String projectId) {
+    log.info("(existsByUserIdAndProjectId)userId: {}, projectId: {}", userId, projectId);
+    if(projectUserRepository.existByUserIdAndProjectId(userId, projectId) != null)
+      return true;
+    return false;
+  }
+
+  @Override
   public String getRoleProjectUser(String userId, String projectId) {
     log.info("(getRoleProjectUser)user: {}, project: {}", userId, projectId);
     if(projectUserRepository.existByUserIdAndProjectId(userId, projectId) == null){
