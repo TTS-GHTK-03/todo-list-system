@@ -18,4 +18,5 @@ public interface SprintProgressRepository extends JpaRepository<SprintProgress, 
   Optional<SprintProgress> findSprintProgressByTaskId(String taskId);
 
   SprintProgress findBySprintId(String sprintId);
+  void deleteAllBySprintId(String sprintId);
 }

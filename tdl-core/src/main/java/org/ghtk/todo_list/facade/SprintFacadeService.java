@@ -18,4 +18,5 @@ public interface SprintFacadeService {
    SprintResponse getSprint(String projectId, String id);
 
    ProgressStatisticsResponse getProgressStatistics(String projectId, String sprintId);
+   void deleteSprint(String projectId, String id);
 }

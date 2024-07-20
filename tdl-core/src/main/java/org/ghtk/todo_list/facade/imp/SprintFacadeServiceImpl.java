@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.constant.SprintStatus;
 import org.ghtk.todo_list.entity.Project;
 import org.ghtk.todo_list.entity.Sprint;
+import org.ghtk.todo_list.entity.Task;
 import org.ghtk.todo_list.exception.InvalidDateRangeException;
 import org.ghtk.todo_list.exception.ProjectIdMismatchException;
 import org.ghtk.todo_list.exception.ProjectNotFoundException;
@@ -19,9 +20,14 @@ import org.ghtk.todo_list.model.response.CreateSprintResponse;
 import org.ghtk.todo_list.model.response.ProgressStatisticsResponse;
 import org.ghtk.todo_list.model.response.SprintResponse;
 import org.ghtk.todo_list.model.response.StartSprintResponse;
+import org.ghtk.todo_list.service.ActivityLogService;
+import org.ghtk.todo_list.service.CommentService;
+import org.ghtk.todo_list.service.LabelAttachedService;
 import org.ghtk.todo_list.service.ProjectService;
 import org.ghtk.todo_list.service.SprintProgressService;
 import org.ghtk.todo_list.service.SprintService;
+import org.ghtk.todo_list.service.TaskAssigneesService;
+import org.ghtk.todo_list.service.TaskService;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -33,6 +39,12 @@ public class SprintFacadeServiceImpl implements SprintFacadeService {
   private final SprintMapper sprintMapper;
   private final ProjectService projectService;
   private final SprintProgressService sprintProgressService;
+  private final TaskService taskService;
+
+  private final CommentService commentService;
+  private final LabelAttachedService labelAttachedService;
+  private final ActivityLogService activityLogService;
+  private final TaskAssigneesService taskAssigneesService;
 
   @Transactional
   @Override
@@ -168,6 +180,22 @@ public class SprintFacadeServiceImpl implements SprintFacadeService {
             sprintProgress.getTotalTask(),
             sprintProgress.getCompleteTask(),
             (completionRate + "%"));
+  }
+
+  @Override
+  @Transactional
+  public void deleteSprint(String projectId, String id) {
+    log.info("(deleteSprint) projectId: {}, sprintId {}", projectId, id);
+    sprintProgressService.deleteAllBySprintId(id);
+    List<Task> tasks = taskService.getAllBySprintId(id);
+    for(Task o : tasks) {
+      taskAssigneesService.deleteAllByTaskId(o.getId());
+      commentService.deleteAllCommentByTaskId(o.getId());
+      labelAttachedService.deleteAllByTaskId(o.getId());
+      activityLogService.deleteAllByTaskId(o.getId());
+      taskService.deleteById(o.getId());
+    }
+    sprintService.deleteById(id);
   }
 
   private boolean isValidDateRange(LocalDate startDate, LocalDate endDate) {

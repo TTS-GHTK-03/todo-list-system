@@ -36,4 +36,10 @@ public class SprintProgressServiceImpl implements SprintProgressService {
     log.info("(findBySprintId)sprintId: {}", sprintId);
     return sprintProgressRepository.findBySprintId(sprintId);
   }
+
+  @Override
+  public void deleteAllBySprintId(String sprintId) {
+    log.info("(deleteAllBySprintId)sprintId: {}", sprintId);
+    sprintProgressRepository.deleteAllBySprintId(sprintId);
+  }
 }

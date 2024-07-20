@@ -163,4 +163,10 @@ public class TaskServiceImp implements TaskService {
     taskRepository.deleteById(taskId);
     return "Successfull delete task!";
   }
+
+  @Override
+  public void deleteById(String id) {
+    log.info("(deleteById)id: {}", id);
+    taskRepository.deleteById(id);
+  }
 }

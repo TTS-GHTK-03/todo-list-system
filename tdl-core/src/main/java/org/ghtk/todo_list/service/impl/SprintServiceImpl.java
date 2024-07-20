@@ -68,4 +68,11 @@ public class SprintServiceImpl implements SprintService {
     log.info("(existsByProjectIdAndTitle)");
     return sprintRepository.existsByProjectIdAndTitle(projectId, title);
   }
+
+
+  @Override
+  public void deleteById(String id) {
+    log.info("(deleteById)");
+    sprintRepository.deleteById(id);
+  }
 }
