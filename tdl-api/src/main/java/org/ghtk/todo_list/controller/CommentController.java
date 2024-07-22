@@ -45,7 +45,7 @@ public class CommentController {
       @PathVariable("task_id") String taskId,
       @PathVariable("comment_id") String commentId, @PathVariable("project_id") String projectId) {
     log.info("(UpdateComment)taskId: {}, commentId: {}", taskId, commentId);
-    return BaseResponse.of(HttpStatus.CREATED.value(), LocalDate.now().toString(),
+    return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         commentFacadeService.updateComment(getUserId(), projectId, taskId, commentId,
             updateCommentRequest.getText()));
   }
@@ -87,8 +87,9 @@ public class CommentController {
   public BaseResponse deleteComment(@PathVariable("task_id") String taskId,
       @PathVariable("comment_id") String commentId) {
     log.info("(deleteComment)taskId: {}, commentId: {}", taskId, commentId);
+    commentFacadeService.deleteComment(getUserId(), taskId, commentId);
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
-        commentFacadeService.deleteComment(getUserId(), taskId, commentId));
+        "Delete comment successfully!!");
   }
 }
 
