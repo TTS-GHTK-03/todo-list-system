@@ -9,11 +9,13 @@ import org.ghtk.todo_list.entity.Type;
 import org.ghtk.todo_list.exception.InvalidTypeException;
 import org.ghtk.todo_list.exception.LabelAlreadyExistsException;
 import org.ghtk.todo_list.exception.ProjectIdMismatchException;
+import org.ghtk.todo_list.exception.ProjectNotFoundException;
 import org.ghtk.todo_list.facade.LabelFacadeService;
 import org.ghtk.todo_list.mapper.LabelMapper;
 import org.ghtk.todo_list.model.response.LabelResponse;
 import org.ghtk.todo_list.service.LabelAttachedService;
 import org.ghtk.todo_list.service.LabelService;
+import org.ghtk.todo_list.service.ProjectService;
 import org.ghtk.todo_list.service.TypeService;
 import org.springframework.stereotype.Component;
 
@@ -26,12 +28,13 @@ public class LabelFacadeServiceImpl implements LabelFacadeService {
   private final LabelMapper labelMapper;
   private final TypeService typeService;
   private final LabelAttachedService labelAttachedService;
+  private final ProjectService projectService;
 
   @Override
   public LabelResponse createLabel(String projectId, String typeId, String title,
       String description) {
     log.info("(createLabel)");
-
+    validProjectId(projectId);
     validProjectInType(projectId, typeId);
 
     if (labelService.existByTypeIdAndTitle(typeId, title)) {
@@ -53,7 +56,7 @@ public class LabelFacadeServiceImpl implements LabelFacadeService {
   public LabelResponse updateLabel(String projectId, String typeId, String labelId, String title,
       String description) {
     log.info("(updateLabel)");
-
+    validProjectId(projectId);
     validProjectInType(projectId, typeId);
 
     Label label = labelService.findById(labelId);
@@ -77,8 +80,8 @@ public class LabelFacadeServiceImpl implements LabelFacadeService {
 
   @Override
   public List<LabelResponse> getLabelsByTypeId(String projectId, String typeId) {
-
     log.info("(getLabelsByTypeId)");
+    validProjectId(projectId);
     validProjectInType(projectId, typeId);
     List<Label> labels = labelService.getLabelsByType(typeId);
 
@@ -90,12 +93,20 @@ public class LabelFacadeServiceImpl implements LabelFacadeService {
   @Transactional
   public void deleteLabel(String projectId, String typeId, String labelId) {
     log.info("(deleteLabel) label: {}", labelId);
+    validProjectId(projectId);
     validProjectInType(projectId, typeId);
     labelAttachedService.deleteByLabelId(labelId);
     labelService.deleteLabel(labelId);
     log.info("(deleteLabel) successfully");
   }
 
+  private void validProjectId(String projectId) {
+    log.info("(validProjectId) projectId: {}", projectId);
+    if(!projectService.existById(projectId)) {
+      log.error("(validProjectId) ProjectId: {} not found", projectId);
+      throw new ProjectNotFoundException();
+    }
+  }
   private void validProjectInType(String projectId, String typeId) {
     log.info("(validProjectInType)");
     Type type = typeService.findById(typeId);
