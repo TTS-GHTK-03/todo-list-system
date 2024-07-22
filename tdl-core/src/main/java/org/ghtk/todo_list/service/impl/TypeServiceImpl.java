@@ -76,13 +76,11 @@ public class TypeServiceImpl implements TypeService {
   }
 
   @Override
-  public boolean deleteById(String typeId) {
+  public void deleteById(String typeId) {
     log.info("(deleteById)typeId: {}", typeId);
     typeRepository.deleteById(typeId);
     if(typeRepository.existsById(typeId)){
       log.error("(deleteById)typeId: {} isn't deleted", typeId);
-      return false;
     }
-    return true;
   }
 }

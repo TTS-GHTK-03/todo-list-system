@@ -90,10 +90,10 @@ public class TypeFacadeServiceImpl implements TypeFacadeService {
 
     List<Label> labelList = labelService.getLabelsByType(typeId);
     for(Label label : labelList){
-      labelAttachedService.deleteByLabelId(label.getId());
+      labelAttachedService.deleteAllByLabelId(label.getId());
     }
 
-    labelService.deleteByTypeId(typeId);
+    labelService.deleteAllByTypeId(typeId);
 
     taskService.updateTaskTypeIdByTypeId(defaultType.getId(), typeId);
 
