@@ -52,6 +52,12 @@ public class LabelServiceImpl implements LabelService {
   }
 
   @Override
+  public void deleteByTypeId(String typeId) {
+    log.info("(deleteByTypeId)typeId: {}", typeId);
+    labelRepository.deleteByTypeId(typeId);
+  }
+
+  @Override
   public boolean existsById(String id) {
     log.info("(existsById)id: {}", id);
     return labelRepository.existsById(id);

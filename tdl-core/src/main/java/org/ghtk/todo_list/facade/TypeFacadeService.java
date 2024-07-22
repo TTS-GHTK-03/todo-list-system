@@ -10,6 +10,8 @@ public interface TypeFacadeService {
 
   Type updateType(String userId, String projectId, String typeId, String title, String image, String description);
 
+  void deleteType(String userId, String projectId, String typeId);
+
   List<TypeResponse> getAllTypes(String userId, String projectId);
 
   TypeResponse getType(String userId, String projectId, String typeId);

@@ -36,4 +36,6 @@ public interface TaskService {
   void deleteAllByProjectId(String projectId);
   void deleteById(String id);
   void deleteAllBySprintId(String sprintId);
+
+  void updateTaskTypeIdByTypeId(String defaultTypeId, String oldTypeId);
 }

@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 public interface TaskRepository extends JpaRepository<Task, String> {
@@ -58,4 +59,10 @@ public interface TaskRepository extends JpaRepository<Task, String> {
   void deleteAllByProjectId(String projectId);
   void deleteAllBySprintId(String sprintId);
 
+  @Transactional
+  @Modifying
+  @Query("""
+      UPDATE Task t SET t.typeId = :defaultTypeId WHERE t.typeId = :oldTypeId
+      """)
+  void updateTaskTypeIdByTypeId(String defaultTypeId, String oldTypeId);
 }

@@ -12,8 +12,11 @@ public interface TypeService {
 
   boolean existByProjectIdAndTitle(String projectId, String title);
 
+  boolean existsByIdAndProjectId(String typeId, String projectId);
   Type findById(String id);
   List<Type> findAllByProjectId(String projectId);
 
   void deleteAllByProjectId(String projectId);
+  Type findByProjectIdAndTitle(String projectId, String title);
+  void deleteById(String typeId);
 }
