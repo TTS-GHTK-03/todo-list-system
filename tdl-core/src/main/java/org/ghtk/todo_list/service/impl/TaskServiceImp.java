@@ -1,29 +1,19 @@
 package org.ghtk.todo_list.service.impl;
 
-import jakarta.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.ghtk.todo_list.constant.TaskStatus;
-import org.ghtk.todo_list.entity.Comment;
 import org.ghtk.todo_list.entity.Task;
 import org.ghtk.todo_list.exception.TaskNotFoundException;
-import org.ghtk.todo_list.model.response.CommentResponse;
 import org.ghtk.todo_list.model.response.TaskResponse;
 import org.ghtk.todo_list.model.response.UpdateDueDateTaskResponse;
 import org.ghtk.todo_list.repository.TaskRepository;
-import org.ghtk.todo_list.repository.UserProjection;
-import org.ghtk.todo_list.service.ActivityLogService;
-import org.ghtk.todo_list.service.AuthUserService;
-import org.ghtk.todo_list.service.CommentService;
-import org.ghtk.todo_list.service.LabelAttachedService;
-import org.ghtk.todo_list.service.TaskAssigneesService;
 import org.ghtk.todo_list.service.TaskService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -158,10 +148,29 @@ public class TaskServiceImp implements TaskService {
 
   @Override
   @Transactional
-  public String deleteTask(String userId, String projectId, String taskId) {
+  public void deleteTask(String userId, String projectId, String taskId) {
     log.info("(deleteTask)projectId: {}, taskId: {}", projectId, taskId);
     taskRepository.deleteById(taskId);
-    return "Successfull delete task!";
+  }
+
+  @Override
+  @Transactional
+  public void deleteAllByProjectId(String projectId) {
+    log.info("(deleteAllByProjectId)projectId: {}", projectId);
+    taskRepository.deleteAllByProjectId(projectId);
+  }
+
+  @Override
+  public void deleteById(String id) {
+    log.info("(deleteById)id: {}", id);
+    taskRepository.deleteById(id);
+  }
+
+  @Override
+  @Transactional
+  public void deleteAllBySprintId(String sprintId) {
+    log.info("(deleteAllBySprintId)sprintId: {}", sprintId);
+    taskRepository.deleteAllBySprintId(sprintId);
   }
 
   @Override

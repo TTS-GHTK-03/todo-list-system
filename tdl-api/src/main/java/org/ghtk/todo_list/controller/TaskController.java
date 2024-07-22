@@ -49,7 +49,7 @@ public class TaskController {
   public BaseResponse createTask(@PathVariable("project_id") String projectId, @Valid @RequestBody
       CreateTaskRequest createTaskRequest) {
     log.info("(createTask)projectId: {}", projectId);
-    return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
+    return BaseResponse.of(HttpStatus.CREATED.value(), LocalDate.now().toString(),
           taskFacadeService.createTask(getUserId(),projectId,createTaskRequest.getTitle()));
     }
 
