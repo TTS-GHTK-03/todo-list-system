@@ -96,10 +96,8 @@ public class ProjectFacadeServiceImpl implements ProjectFacadeService {
     validateUserId(userId);
 
     Project projectSaved = projectService.createProject(userId, title);
-    var user = authUserService.create("Unassigned");
     projectUserService.createProjectUser(userId, projectSaved.getId(),
         RoleProjectUser.ADMIN.toString());
-    projectUserService.createProjectUser(user.getId(), projectSaved.getId(), RoleProjectUser.VIEWER.toString());
     List<TypeData> typeDataList = Arrays.asList(
         new TypeData(BUG, URL_IMAGE_BUG),
         new TypeData(STORY, URL_IMAGE_STORY),

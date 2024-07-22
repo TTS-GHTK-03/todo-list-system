@@ -38,4 +38,5 @@ public interface TaskService {
   void deleteAllBySprintId(String sprintId);
 
   void updateTaskTypeIdByTypeId(String defaultTypeId, String oldTypeId);
+  void updateTitle(String taskId, String title);
 }
