@@ -40,4 +40,22 @@ public class ActivityLogServiceImpl implements ActivityLogService {
     log.info("(deleteAllByTaskId)taskId: {}", taskId);
     activityLogRepository.deleteAllByTaskId(taskId);
   }
+
+  @Override
+  public boolean existsByActivityLogId(String activityLogId) {
+    log.info("(existsByActivityLogId)activityLogId: {}", activityLogId);
+    return activityLogRepository.existsById(activityLogId);
+  }
+
+  @Override
+  public boolean existsByActivityLogIdAndUserId(String activityLogId, String userId) {
+    log.info("(existsByActivityLogIdAndUserId)activityLogId: {}, userId: {}", activityLogId, userId);
+    return activityLogRepository.existsByIdAndUserId(activityLogId, userId);
+  }
+
+  @Override
+  public void deleteById(String activityLogId) {
+    log.info("(deleteById)activityLogId: {}", activityLogId);
+    activityLogRepository.deleteById(activityLogId);
+  }
 }
