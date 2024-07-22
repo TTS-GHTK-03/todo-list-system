@@ -11,6 +11,7 @@ import org.ghtk.todo_list.facade.ProjectUserFacadeService;
 import org.ghtk.todo_list.model.request.AcceptUserRequest;
 import org.ghtk.todo_list.model.request.InviteUserRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,13 +22,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/projects")
+@RequestMapping("/api/v1")
 @RequiredArgsConstructor
 public class ProjectUserController {
 
   private final ProjectUserFacadeService projectUserFacadeService;
 
-  @PostMapping("{project_id}/invite")
+  @PostMapping("/projects/{project_id}/invite")
   public BaseResponse inviteUser(@PathVariable(name = "project_id") String projectId, @RequestBody @Valid
       InviteUserRequest inviteUserRequest){
     log.info("(inviteUser)projectId: {}", projectId);
@@ -35,10 +36,17 @@ public class ProjectUserController {
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(), "Đã gửi lời mời thành công!");
   }
 
-  @GetMapping("/accept")
+  @GetMapping("/projects/accept")
   public BaseResponse accept(@Valid @RequestParam(value = "emailEncode") String emailEncode){
     log.info("(accept)");
     projectUserFacadeService.accept(emailEncode);
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(), "Đã chấp nhận lời mời!");
+  }
+
+  @DeleteMapping("/users/{user_id}/projects/{project_id}")
+  public BaseResponse deleteUser(@PathVariable("project_id") String projectId, @PathVariable("user_id") String memberId){
+    log.info("(deleteUser)");
+    projectUserFacadeService.deleteUser(getUserId(), projectId, memberId);
+    return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(), "Kick user in project successfully!!");
   }
 }
