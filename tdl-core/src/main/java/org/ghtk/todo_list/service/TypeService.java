@@ -18,5 +18,5 @@ public interface TypeService {
 
   void deleteAllByProjectId(String projectId);
   Type findByProjectIdAndTitle(String projectId, String title);
-  boolean deleteById(String typeId);
+  void deleteById(String typeId);
 }

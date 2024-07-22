@@ -31,6 +31,8 @@ import org.ghtk.todo_list.service.BoardService;
 import org.ghtk.todo_list.service.CommentService;
 import org.ghtk.todo_list.service.LabelAttachedService;
 import org.ghtk.todo_list.service.LabelService;
+import org.ghtk.todo_list.service.LabelAttachedService;
+import org.ghtk.todo_list.service.LabelService;
 import org.ghtk.todo_list.service.ProjectService;
 import org.ghtk.todo_list.service.ProjectUserService;
 import org.ghtk.todo_list.service.SprintProgressService;
@@ -105,11 +107,26 @@ public class TdlCoreConfiguration {
 
   @Bean
   public SprintFacadeService sprintFacadeService(
-      SprintService sprintService, ProjectService projectService, SprintMapper sprintMapper,
-      SprintProgressService sprintProgressService
+      SprintService sprintService,
+      ProjectService projectService,
+      SprintMapper sprintMapper,
+      SprintProgressService sprintProgressService,
+      TaskService taskService,
+      CommentService commentService,
+      LabelAttachedService labelAttachedService,
+      ActivityLogService activityLogService,
+      TaskAssigneesService taskAssigneesService
   ) {
-    return new SprintFacadeServiceImpl(sprintService, sprintMapper, projectService,
-        sprintProgressService);
+    return new SprintFacadeServiceImpl(sprintService,
+        sprintMapper,
+        projectService,
+        sprintProgressService,
+        taskService,
+        commentService,
+        labelAttachedService,
+        activityLogService,
+        taskAssigneesService
+    );
   }
 
   @Bean
