@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@RequestMapping("/api/v1/projects/{project_id}/tasks/{task_id}/labels")
+@RequestMapping("/api/v1/projects/{project_id}")
 @RestController
 @Slf4j
 @RequiredArgsConstructor
@@ -23,17 +23,17 @@ public class LabelAttachedController {
 
   private final LabelAttachedFacadeService service;
 
-  @PostMapping("/{label_id}/attach")
-  public BaseResponse create(@PathVariable("project_id") String projectId,
+  @PostMapping("/types/{type_id}/tasks/{task_id}/labels/{label_id}/attach")
+  public BaseResponse create(@PathVariable("project_id") String projectId, @PathVariable("type_id") String typeId,
       @PathVariable("task_id") String taskId, @PathVariable("label_id") String labelId) {
     log.info("(create) Label attached");
 
     getUserId();
     return BaseResponse.of(HttpStatus.CREATED.value(), LocalDate.now().toString(),
-        service.create(projectId, taskId, labelId));
+        service.create(projectId, typeId, taskId, labelId));
   }
 
-  @GetMapping("/attach")
+  @GetMapping("/types/tasks/{task_id}/labels/attach")
   public BaseResponse getLabelAttachedByTask(@PathVariable("project_id") String projectId,
       @PathVariable("task_id") String taskId) {
     log.info("(getLabelAttachedByTask)");
@@ -42,7 +42,7 @@ public class LabelAttachedController {
         service.getLabelAttachedByTask(projectId, taskId));
   }
 
-  @DeleteMapping("/attach/{id}")
+  @DeleteMapping("/types/tasks/{task_id}/labels/attach/{id}")
   public BaseResponse deleteLabelAttached(@PathVariable("project_id") String projectId,
       @PathVariable("task_id") String taskId, @PathVariable("id") String id) {
     log.info("(deleteLabelAttached)");
@@ -50,6 +50,16 @@ public class LabelAttachedController {
     service.deleteLabelAttached(projectId, taskId, id);
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         "Delete label attached successfully!!");
+  }
+
+  @DeleteMapping("/types/tasks/{task_id}/labels/attach")
+  public BaseResponse deleteLabelAttachedByTask(@PathVariable("project_id") String projectId,
+                                          @PathVariable("task_id") String taskId) {
+    log.info("(deleteLabelAttachedByTask)");
+    getUserId();
+    service.deleteLabelAttachedByTask(projectId, taskId);
+    return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
+            "Delete label attached by task successfully!!");
   }
 
 }

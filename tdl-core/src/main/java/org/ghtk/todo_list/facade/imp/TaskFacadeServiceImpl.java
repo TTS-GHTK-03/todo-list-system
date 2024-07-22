@@ -154,11 +154,11 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
           userId);
       throw new TaskAssignmentExistsException();
     }
-//    if (!taskService.existsByUserIdAndTaskId(userId, taskId)) {
-//      log.error("(agileTaskByUser)Task with Id {} does not exist for user with Id {}", taskId,
-//          userId);
-//      throw new TaskNotExistUserException();
-//    }
+    if (!taskService.existsByUserIdAndTaskId(userId, taskId)) {
+      log.error("(agileTaskByUser)Task with Id {} does not exist for user with Id {}", taskId,
+          userId);
+      throw new TaskNotExistUserException();
+    }
     TaskAssignees taskAssignees = new TaskAssignees();
     taskAssignees.setUserId(userId);
     taskAssignees.setTaskId(taskId);

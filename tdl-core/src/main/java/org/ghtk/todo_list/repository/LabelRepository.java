@@ -15,4 +15,6 @@ public interface LabelRepository extends JpaRepository<Label, String> {
   void deleteAllByTypeId(String typeId);
 
   void deleteByTypeId(String typeId);
+
+  boolean existsByTypeId(String typeId);
 }
