@@ -14,4 +14,6 @@ public interface TypeService {
 
   Type findById(String id);
   List<Type> findAllByProjectId(String projectId);
+
+  void deleteAllByProjectId(String projectId);
 }

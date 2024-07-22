@@ -17,6 +17,7 @@ import org.ghtk.todo_list.model.response.StartSprintResponse;
 import org.ghtk.todo_list.repository.ProjectRepository;
 import org.ghtk.todo_list.repository.SprintRepository;
 import org.ghtk.todo_list.service.SprintService;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -67,5 +68,12 @@ public class SprintServiceImpl implements SprintService {
   public boolean existsByProjectIdAndTitle(String projectId, String title) {
     log.info("(existsByProjectIdAndTitle)");
     return sprintRepository.existsByProjectIdAndTitle(projectId, title);
+  }
+
+  @Override
+  @Transactional
+  public void deleteAllByProjectId(String projectId) {
+    log.info("(deleteAllByProjectId)projectId: {}", projectId);
+    sprintRepository.deleteAllByProjectId(projectId);
   }
 }

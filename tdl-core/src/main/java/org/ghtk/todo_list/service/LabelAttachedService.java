@@ -10,4 +10,5 @@ public interface LabelAttachedService {
   boolean existsByLabelIdAndTaskId(String labelId, String taskId);
   List<LabelAttached> getLabelAttachedByTask(String taskId);
   void deleteAllByTaskId(String taskId);
+  void deleteAllByLabelId(String labelId);
 }

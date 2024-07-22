@@ -9,6 +9,7 @@ import org.ghtk.todo_list.exception.TypeNotFoundException;
 import org.ghtk.todo_list.repository.TypeRepository;
 import org.ghtk.todo_list.service.TypeService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Slf4j
@@ -52,5 +53,12 @@ public class TypeServiceImpl implements TypeService {
   public List<Type> findAllByProjectId(String projectId) {
     log.info("(findAllByProjectId)projectId: {}", projectId);
     return typeRepository.findAllByProjectId(projectId);
+  }
+
+  @Override
+  @Transactional
+  public void deleteAllByProjectId(String projectId) {
+    log.info("(deleteAllByProjectId)projectId: {}", projectId);
+    typeRepository.deleteAllByProjectId(projectId);
   }
 }

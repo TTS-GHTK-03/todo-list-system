@@ -30,7 +30,7 @@ public class TypeController {
   public BaseResponse createType(@PathVariable("project_id") String projectId,
       @RequestBody @Valid TypeRequest typeRequest) {
     log.info("(createType)projectId: {}, typeRequest: {}", projectId, typeRequest);
-    return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
+    return BaseResponse.of(HttpStatus.CREATED.value(), LocalDate.now().toString(),
         typeFacadeService.createType(getUserId(), projectId, typeRequest.getTitle(), typeRequest.getImage(),
             typeRequest.getDescription()));
   }

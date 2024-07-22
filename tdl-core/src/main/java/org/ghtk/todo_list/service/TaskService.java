@@ -1,11 +1,9 @@
 package org.ghtk.todo_list.service;
 
 import java.util.List;
-import org.ghtk.todo_list.constant.TaskStatus;
 import org.ghtk.todo_list.entity.Task;
 import org.ghtk.todo_list.model.response.TaskResponse;
 import org.ghtk.todo_list.model.response.UpdateDueDateTaskResponse;
-import org.ghtk.todo_list.repository.UserProjection;
 
 public interface TaskService {
 
@@ -34,5 +32,6 @@ public interface TaskService {
 
   boolean existsBySprintId(String sprintId);
   boolean existByProjectIdAndTaskId(String projectId, String id);
-  String deleteTask(String userId, String projectId, String taskId);
+  void deleteTask(String userId, String projectId, String taskId);
+  void deleteAllByProjectId(String projectId);
 }

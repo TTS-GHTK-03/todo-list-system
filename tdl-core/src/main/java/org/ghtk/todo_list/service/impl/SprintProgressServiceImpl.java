@@ -7,6 +7,7 @@ import org.ghtk.todo_list.entity.SprintProgress;
 import org.ghtk.todo_list.exception.SprintNotFoundException;
 import org.ghtk.todo_list.repository.SprintProgressRepository;
 import org.ghtk.todo_list.service.SprintProgressService;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -35,5 +36,12 @@ public class SprintProgressServiceImpl implements SprintProgressService {
   public SprintProgress findBySprintId(String sprintId) {
     log.info("(findBySprintId)sprintId: {}", sprintId);
     return sprintProgressRepository.findBySprintId(sprintId);
+  }
+
+  @Override
+  @Transactional
+  public void deleteAllBySprintId(String sprintId) {
+    log.info("(deleteAllBySprintId)sprintId: {}", sprintId);
+    sprintProgressRepository.deleteAllBySprintId(sprintId);
   }
 }

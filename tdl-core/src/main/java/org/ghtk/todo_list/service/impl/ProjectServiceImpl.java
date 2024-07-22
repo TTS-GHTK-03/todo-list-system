@@ -18,6 +18,7 @@ import org.ghtk.todo_list.service.ProjectService;
 import java.util.List;
 import org.ghtk.todo_list.service.ProjectUserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -113,6 +114,13 @@ public class ProjectServiceImpl implements ProjectService {
       log.error("(getProjectById)projectId: {} not found", projectId);
       throw new ProjectNotFoundException();
     });
+  }
+
+  @Override
+  @Transactional
+  public void deleteProject(String projectId) {
+    log.info("(deleteProject)projectId: {}", projectId);
+    projectRepository.deleteById(projectId);
   }
 
   private void validateProjectId(String projectId){

@@ -10,4 +10,6 @@ public interface ProjectUserService {
   boolean existsByUserIdAndProjectId(String userId, String projectId);
 
   String getRoleProjectUser(String userId, String projectId);
+
+  void deleteAllByProjectId(String projectId);
 }
