@@ -259,7 +259,7 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
         .title(savedTask.getTitle())
         .point(savedTask.getPoint())
         .status(savedTask.getStatus())
-        .userId(savedTask.getUserId())
+        .userId(taskAssigneesService.findUserIdByTaskId(savedTask.getId()))
         .build();
   }
 
@@ -275,6 +275,19 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
     labelAttachedService.deleteAllByTaskId(taskId);
     activityLogService.deleteAllByTaskId(taskId);
     taskService.deleteTask(userId, projectId, taskId);
+  }
+
+  @Override
+  public TaskResponse updateTitleTask(String userId, String projectId, String taskId,
+      String title) {
+    log.info("(updateTitleTask)userId: {}, projectId: {}, taskId: {}", userId, projectId, taskId);
+    validateUserId(userId);
+    validateProjectId(projectId);
+    validateTaskId(taskId);
+    validateProjectIdAndTaskId(projectId, taskId);
+    taskService.updateTitle(taskId, title);
+    return TaskResponse.from(taskService.findById(taskId),
+        taskAssigneesService.findUserIdByTaskId(taskId));
   }
 
   void validateUserId(String userId) {
@@ -320,5 +333,13 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
 
     return taskMapper.toTaskResponses(
         taskService.getAllTasksByProjectIdAndStatus(projectId, statusFormat));
+  }
+
+  void validateProjectIdAndTaskId(String projectId, String taskId) {
+    log.info("(validateProjectIdAndTaskId)projectId: {}, taskId: {}", projectId, taskId);
+    if (!taskService.existByProjectIdAndTaskId(projectId, taskId)) {
+      log.error("(validateProjectIdAndTaskId)taskId: {} not found", taskId);
+      throw new TaskNotFoundException();
+    }
   }
 }

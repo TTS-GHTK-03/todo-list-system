@@ -9,6 +9,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.constant.RoleProjectUser;
 import org.ghtk.todo_list.constant.URL;
 import org.ghtk.todo_list.core_email.helper.EmailHelper;
+import org.ghtk.todo_list.entity.AuthUser;
+import org.ghtk.todo_list.entity.Project;
 import org.ghtk.todo_list.entity.ProjectUser;
 import org.ghtk.todo_list.exception.EmailNotInviteException;
 import org.ghtk.todo_list.exception.ProjectNotFoundException;
@@ -68,7 +70,7 @@ public class ProjectUserFacadeServiceImpl implements ProjectUserFacadeService {
     String email = decryptionEmailEncode(emailEncode);
     var redisRequest = redisCacheService.get(INVITE_KEY, email);
 
-    if(redisRequest.isEmpty()){
+    if (redisRequest.isEmpty()) {
       log.error("(accept)email: {} isn't invited", email);
       throw new EmailNotInviteException();
     }
@@ -77,17 +79,17 @@ public class ProjectUserFacadeServiceImpl implements ProjectUserFacadeService {
     String projectId = redisInviteUserRequest.getProjectId();
     String role = redisInviteUserRequest.getRole();
 
-    if(!projectService.existById(projectId)){
+    if (!projectService.existById(projectId)) {
       log.error("(accept)project: {} not found", projectId);
       throw new ProjectNotFoundException();
     }
 
-    if(!RoleProjectUser.isValid(role)){
+    if (!RoleProjectUser.isValid(role)) {
       log.error("(accept)role: {} not found", role);
       throw new RoleProjectUserNotFound();
     }
 
-    if(!authUserService.existsByEmail(email)){
+    if (!authUserService.existsByEmail(email)) {
       log.info("(accept)email: {} not found", email);
       //call login page
     } else {
@@ -101,16 +103,56 @@ public class ProjectUserFacadeServiceImpl implements ProjectUserFacadeService {
     return null;
   }
 
-  private String generateAcceptEmailKey(String email, String projectId, String role){
-    return Base64.getEncoder().encodeToString((email + projectId + role + System.currentTimeMillis()).getBytes());
+  @Override
+  public void deleteUser(String userId, String projectId, String memberId) {
+    log.info("(deleteUser)projectId: {}, memberId: {}", projectId, memberId);
+    AuthUser userMember = authUserService.findById(memberId);
+    AuthUser userAdmin = authUserService.findById(memberId);
+    Project project = projectService.getProjectById(projectId);
+
+    projectUserService.deleteByUserIdAndProjectId(memberId, projectId);
+
+    var subject = "Notice from the Todo List administrator in the project: " + project.getTitle();
+    var param = new HashMap<String, Object>();
+
+    String fullName = setFullName(userAdmin);
+    if (fullName == null || fullName.isEmpty()) {
+      fullName = "Admin";
+    }
+    param.put("email", userMember.getEmail());
+    param.put("title", fullName+" kicked you out of the project: " + project.getTitle());
+    param.put("subtitle", "If you want to join with our, contact me!");
+    emailHelper.send(subject, userMember.getEmail(), "email-kick-user-in-project-template", param);
+
   }
 
-  private String encodeEmail(String email){
+  private String generateAcceptEmailKey(String email, String projectId, String role) {
+    return Base64.getEncoder()
+        .encodeToString((email + projectId + role + System.currentTimeMillis()).getBytes());
+  }
+
+  private String encodeEmail(String email) {
     return Base64.getEncoder().encodeToString((email).getBytes());
   }
 
-  private String decryptionEmailEncode(String emailEncode){
+  private String decryptionEmailEncode(String emailEncode) {
     byte[] email = Base64.getDecoder().decode(emailEncode);
     return new String(email);
+  }
+
+  private String setFullName(AuthUser user) {
+    StringBuilder fullName = new StringBuilder();
+    fullName.append(capitalizeName(user.getFirstName())).append(" ")
+        .append(capitalizeName(user.getMiddleName())).append(" ")
+        .append(capitalizeName(user.getLastName()));
+
+    return fullName.toString().trim();
+  }
+
+  private String capitalizeName(String name) {
+    if (name == null || name.isEmpty()) {
+      return "";
+    }
+    return name.substring(0, 1).toUpperCase() + name.substring(1).toLowerCase();
   }
 }

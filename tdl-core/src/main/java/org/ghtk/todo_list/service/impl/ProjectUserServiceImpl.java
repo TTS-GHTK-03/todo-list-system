@@ -48,4 +48,14 @@ public class ProjectUserServiceImpl implements ProjectUserService {
     log.info("(deleteAllByProjectId)projectId: {}", projectId);
     projectUserRepository.deleteAllByProjectId(projectId);
   }
+
+  @Override
+  public void deleteByUserIdAndProjectId(String memberId, String projectId) {
+    log.info("(deleteByUserIdAndProjectId)user: {}, project: {}", memberId, projectId);
+    if(projectUserRepository.existByUserIdAndProjectId(memberId, projectId) == null){
+      log.error("(deleteByUserIdAndProjectId)project: {}", projectId);
+      throw new ProjectUserNotFoundException();
+    }
+    projectUserRepository.deleteByUserIdAndProjectId(memberId, projectId);
+  }
 }
