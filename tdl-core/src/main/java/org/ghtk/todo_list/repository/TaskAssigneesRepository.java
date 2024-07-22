@@ -13,4 +13,5 @@ public interface TaskAssigneesRepository extends JpaRepository<TaskAssignees, St
   String findUserIdByTaskId(String taskId);
 
   boolean existsByUserIdAndTaskId(String userId, String taskId);
+  void deleteAllByTaskId(String taskId);
 }

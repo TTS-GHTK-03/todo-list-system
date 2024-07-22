@@ -27,4 +27,5 @@ public interface ActivityLogRepository extends JpaRepository<ActivityLog, String
       join Sprint s on al.sprintId = s.id order by al.createdAt DESC LIMIT :end OFFSET :start
       """)
   List<ActivityLog> findAllNotifications(String userId, int end, int start);
+  void deleteAllByTaskId(String taskId);
 }
