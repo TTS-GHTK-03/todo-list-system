@@ -3,18 +3,26 @@ package org.ghtk.todo_list.facade.imp;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.ghtk.todo_list.constant.ImageConstant;
 import org.ghtk.todo_list.constant.RoleProjectUser;
+import org.ghtk.todo_list.entity.Label;
+import org.ghtk.todo_list.entity.LabelAttached;
 import org.ghtk.todo_list.entity.Type;
 import org.ghtk.todo_list.exception.ProjectNotFoundException;
 import org.ghtk.todo_list.exception.ProjectUserNotFoundException;
 import org.ghtk.todo_list.exception.RoleProjectNotAllowException;
+import org.ghtk.todo_list.exception.TypeNotAllowDeleteException;
+import org.ghtk.todo_list.exception.TypeNotExistedException;
 import org.ghtk.todo_list.exception.TypeNotFoundException;
 import org.ghtk.todo_list.exception.TypeTitleAlreadyExistedException;
 import org.ghtk.todo_list.facade.TypeFacadeService;
 import org.ghtk.todo_list.mapper.TypeMapper;
 import org.ghtk.todo_list.model.response.TypeResponse;
+import org.ghtk.todo_list.service.LabelAttachedService;
+import org.ghtk.todo_list.service.LabelService;
 import org.ghtk.todo_list.service.ProjectService;
 import org.ghtk.todo_list.service.ProjectUserService;
+import org.ghtk.todo_list.service.TaskService;
 import org.ghtk.todo_list.service.TypeService;
 
 @Slf4j
@@ -24,6 +32,9 @@ public class TypeFacadeServiceImpl implements TypeFacadeService {
   private final ProjectService projectService;
   private final ProjectUserService projectUserService;
   private final TypeService typeService;
+  private final TaskService taskService;
+  private final LabelService labelService;
+  private final LabelAttachedService labelAttachedService;
   private final TypeMapper typeMapper;
 
   @Override
@@ -62,6 +73,34 @@ public class TypeFacadeServiceImpl implements TypeFacadeService {
   }
 
   @Override
+  public void deleteType(String userId, String projectId, String typeId) {
+    log.info("(deleteType)userId: {}, projectId: {}, typeId: {}", userId, projectId, typeId);
+
+    validateProjectId(projectId);
+    validateTypeId(typeId);
+    validateTypeIdAndProjectId(typeId, projectId);
+
+    Type type = typeService.findById(typeId);
+    if(type.getTitle().equals(ImageConstant.TASK) || type.getTitle().equals(ImageConstant.STORY) || type.getTitle().equals(ImageConstant.BUG)){
+      log.error("(deleteType)type: {} cannot delete", type.getTitle());
+      throw new TypeNotAllowDeleteException();
+    }
+
+    Type defaultType = typeService.findByProjectIdAndTitle(projectId, ImageConstant.TASK);
+
+    List<Label> labelList = labelService.getLabelsByType(typeId);
+    for(Label label : labelList){
+      labelAttachedService.deleteByLabelId(label.getId());
+    }
+
+    labelService.deleteByTypeId(typeId);
+
+    taskService.updateTaskTypeIdByTypeId(defaultType.getId(), typeId);
+
+    typeService.deleteById(typeId);
+  }
+
+  @Override
   public List<TypeResponse> getAllTypes(String userId, String projectId) {
     log.info("(getAllTypes)projectId: {}", projectId);
     validateProjectId(projectId);
@@ -75,6 +114,7 @@ public class TypeFacadeServiceImpl implements TypeFacadeService {
     validateProjectId(projectId);
     validateExistProjectUser(userId, projectId);
     validateTypeId(typeId);
+    validateTypeIdAndProjectId(typeId, projectId);
     return typeMapper.toTypeResponse(typeService.findById(typeId));
   }
 
@@ -117,6 +157,14 @@ public class TypeFacadeServiceImpl implements TypeFacadeService {
     if (typeService.existByProjectIdAndTitle(projectId, title)) {
       log.error("(validateTypeTitle)title: {} already existed in projectId: {}", title, projectId);
       throw new TypeTitleAlreadyExistedException();
+    }
+  }
+
+  private void validateTypeIdAndProjectId(String typeId, String projectId){
+    log.info("(validateTypeIdAndProjectId)typeId: {}, projectId: {}", typeId, projectId);
+    if(!typeService.existsByIdAndProjectId(typeId, projectId)){
+      log.error("(validateTypeIdAndProjectId)typeId: {} not existed in projectId: {}", typeId, projectId);
+      throw new TypeNotExistedException();
     }
   }
 }

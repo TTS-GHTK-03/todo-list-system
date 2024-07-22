@@ -41,6 +41,12 @@ public class TypeServiceImpl implements TypeService {
   }
 
   @Override
+  public boolean existsByIdAndProjectId(String typeId, String projectId) {
+    log.info("(existByProjectIdAndTitle)typeId: {}, projectId: {}",typeId, projectId);
+    return typeRepository.existsByIdAndProjectId(typeId, projectId);
+  }
+
+  @Override
   public Type findById(String id) {
     return typeRepository.findById(id).orElseThrow(() -> {
       log.error("(findById)typeId: {} not found", id);
@@ -52,5 +58,24 @@ public class TypeServiceImpl implements TypeService {
   public List<Type> findAllByProjectId(String projectId) {
     log.info("(findAllByProjectId)projectId: {}", projectId);
     return typeRepository.findAllByProjectId(projectId);
+  }
+
+  @Override
+  public Type findByProjectIdAndTitle(String projectId, String title) {
+    log.info("(findIdByProjectIdAndTitle)projectId: {}, title: {}", projectId, title);
+    System.out.println(typeRepository.findByProjectIdAndTitle(projectId, title));
+    return typeRepository.findByProjectIdAndTitle(projectId, title);
+  }
+
+
+  @Override
+  public boolean deleteById(String typeId) {
+    log.info("(deleteById)typeId: {}", typeId);
+    typeRepository.deleteById(typeId);
+    if(typeRepository.existsById(typeId)){
+      log.error("(deleteById)typeId: {} isn't deleted", typeId);
+      return false;
+    }
+    return true;
   }
 }

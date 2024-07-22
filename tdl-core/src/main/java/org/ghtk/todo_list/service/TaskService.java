@@ -34,4 +34,6 @@ public interface TaskService {
 
   boolean existsBySprintId(String sprintId);
   boolean existByProjectIdAndTaskId(String projectId, String id);
+
+  void updateTaskTypeIdByTypeId(String defaultTypeId, String oldTypeId);
 }

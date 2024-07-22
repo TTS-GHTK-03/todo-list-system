@@ -10,6 +10,7 @@ import org.ghtk.todo_list.dto.response.BaseResponse;
 import org.ghtk.todo_list.facade.TypeFacadeService;
 import org.ghtk.todo_list.model.request.TypeRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -42,6 +43,13 @@ public class TypeController {
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         typeFacadeService.updateType(getUserId(), projectId, typeId, typeRequest.getTitle(), typeRequest.getImage(),
             typeRequest.getDescription()));
+  }
+
+  @DeleteMapping("/{type_id}")
+  public BaseResponse deleteType(@PathVariable("project_id") String projectId, @PathVariable("type_id") String typeId){
+    log.info("(deleteType)projectId: {}, typeId: {}", projectId, typeId);
+    typeFacadeService.deleteType(getUserId(), projectId, typeId);
+    return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(), "Đã xóa type thành công!");
   }
 
   @GetMapping()
