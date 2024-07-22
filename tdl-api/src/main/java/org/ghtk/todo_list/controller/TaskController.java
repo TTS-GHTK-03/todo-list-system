@@ -10,6 +10,7 @@ import org.ghtk.todo_list.dto.response.BaseResponse;
 import org.ghtk.todo_list.facade.TaskFacadeService;
 import org.ghtk.todo_list.model.request.CreateTaskRequest;
 import org.ghtk.todo_list.model.request.UpdateDueDateTaskRequest;
+import org.ghtk.todo_list.model.request.UpdateTitleTaskRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -113,5 +114,13 @@ public class TaskController {
     taskFacadeService.deleteTask(getUserId(), projectId, taskId);
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         "Successfull delete task!");
+  }
+
+  @PutMapping("/{project_id}/tasks/{task_id}")
+  public BaseResponse updateTitleTask(@PathVariable("project_id") String projectId,
+      @PathVariable("task_id") String taskId, @Valid @RequestBody UpdateTitleTaskRequest request) {
+    log.info("(updateTitleTask)project: {}, task: {}, title: {}", projectId, taskId, request.getTitle());
+    return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
+        taskFacadeService.updateTitleTask(getUserId(), projectId, taskId, request.getTitle()));
   }
 }
