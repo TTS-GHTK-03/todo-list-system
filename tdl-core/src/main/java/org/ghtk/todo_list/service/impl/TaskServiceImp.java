@@ -178,4 +178,10 @@ public class TaskServiceImp implements TaskService {
     log.info("(updateTaskTypeIdByTypeId)defaultTypeId: {}, oldTypeId: {}", defaultTypeId, oldTypeId);
     taskRepository.updateTaskTypeIdByTypeId(defaultTypeId, oldTypeId);
   }
+
+  @Override
+  public boolean existsByTypeId(String typeId) {
+    log.info("(existsByTypeId)typeId: {}", typeId);
+    return taskRepository.existsByTypeId(typeId);
+  }
 }

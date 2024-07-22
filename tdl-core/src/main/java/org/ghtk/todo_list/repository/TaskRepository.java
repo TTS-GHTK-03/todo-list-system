@@ -65,4 +65,6 @@ public interface TaskRepository extends JpaRepository<Task, String> {
       UPDATE Task t SET t.typeId = :defaultTypeId WHERE t.typeId = :oldTypeId
       """)
   void updateTaskTypeIdByTypeId(String defaultTypeId, String oldTypeId);
+
+  boolean existsByTypeId(String typeId);
 }

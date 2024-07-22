@@ -35,11 +35,6 @@ public class ProjectUserFacadeServiceImpl implements ProjectUserFacadeService {
   public void inviteUser(String userId, String projectId, String email, String role) {
     log.info("(inviteUser)user: {}, project: {}", userId, projectId);
 
-    if(!authUserService.existById(userId)){
-      log.error("(inviteUser)user: {} not found", userId);
-      throw new UserNotFoundException();
-    }
-
     if(!projectService.existById(projectId)){
       log.error("(inviteUser)project: {} not found", projectId);
       throw new ProjectNotFoundException();

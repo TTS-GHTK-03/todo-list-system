@@ -8,6 +8,7 @@ import org.ghtk.todo_list.entity.LabelAttached;
 import org.ghtk.todo_list.exception.LabelAttachedAlreadyExistsException;
 import org.ghtk.todo_list.exception.LabelNotFoundException;
 import org.ghtk.todo_list.exception.TaskNotFoundException;
+import org.ghtk.todo_list.exception.TypeNotFoundException;
 import org.ghtk.todo_list.facade.LabelAttachedFacadeService;
 import org.ghtk.todo_list.model.response.LabelAttachedResponse;
 import org.ghtk.todo_list.model.response.TaskResponse;
@@ -26,10 +27,11 @@ public class LabelAttachedFacadeServiceImpl implements LabelAttachedFacadeServic
   private final LabelService labelService;
 
   @Override
-  public LabelAttachedResponse create(String projectId, String taskId, String labelId) {
+  public LabelAttachedResponse create(String projectId, String typeId, String taskId, String labelId) {
     log.info("(create) projectId: {}, labelId: {}, taskId: {}", projectId, labelId, taskId);
     validateLabelId(labelId);
     validateProjectIdAndTaskId(projectId, taskId);
+    validateTypeId(typeId);
     if(labelAttachedService.existsByLabelIdAndTaskId(labelId, taskId)) {
       log.error("(create)Label attached already exists labelId: {}, taskId: {}", labelId, taskId);
       throw new LabelAttachedAlreadyExistsException();
@@ -69,6 +71,13 @@ public class LabelAttachedFacadeServiceImpl implements LabelAttachedFacadeServic
     labelAttachedService.deleteById(id);
   }
 
+  @Override
+  public void deleteLabelAttachedByTask(String projectId, String taskId) {
+    log.info("(deleteLabelAttachedByTask)projectId: {}, taskId: {}", projectId, taskId);
+    validateProjectIdAndTaskId(projectId, taskId);
+    labelAttachedService.deleteAllByTaskId(taskId);
+  }
+
   private void validateProjectIdAndTaskId(String projectId, String taskId) {
     log.info("(validateProjectIdAndTaskId)projectId: {}, taskId: {}", projectId, taskId);
     if (!taskService.existByProjectIdAndTaskId(projectId, taskId)) {
@@ -84,4 +93,13 @@ public class LabelAttachedFacadeServiceImpl implements LabelAttachedFacadeServic
       throw new LabelNotFoundException();
     }
   }
+  private void validateTypeId(String typeId) {
+    log.info("(validateTypeId)typeId: {}", typeId);
+
+    if (!labelService.existsByTypeId(typeId) || !taskService.existsByTypeId(typeId)) {
+      log.error("(validateTypeId)typeId: {} not found", typeId);
+      throw new TypeNotFoundException();
+    }
+  }
+
 }

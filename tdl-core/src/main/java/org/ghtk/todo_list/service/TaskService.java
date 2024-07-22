@@ -38,4 +38,6 @@ public interface TaskService {
   void deleteAllBySprintId(String sprintId);
 
   void updateTaskTypeIdByTypeId(String defaultTypeId, String oldTypeId);
+
+  boolean existsByTypeId(String typeId);
 }

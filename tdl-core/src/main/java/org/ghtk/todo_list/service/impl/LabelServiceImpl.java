@@ -69,4 +69,10 @@ public class LabelServiceImpl implements LabelService {
     log.info("(deleteAllByTypeId)typeId: {}", typeId);
     labelRepository.deleteAllByTypeId(typeId);
   }
+
+  @Override
+  public boolean existsByTypeId(String typeId) {
+    log.info("(existsByTypeId)typeId: {}", typeId);
+    return labelRepository.existsByTypeId(typeId);
+  }
 }
