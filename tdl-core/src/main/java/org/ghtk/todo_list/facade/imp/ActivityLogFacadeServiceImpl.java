@@ -8,6 +8,8 @@ import org.ghtk.todo_list.dto.response.UserNameResponse;
 import org.ghtk.todo_list.entity.ActivityLog;
 import org.ghtk.todo_list.entity.Sprint;
 import org.ghtk.todo_list.entity.Task;
+import org.ghtk.todo_list.exception.ActivityLogNotExistedException;
+import org.ghtk.todo_list.exception.ActivityLogNotFoundException;
 import org.ghtk.todo_list.exception.ProjectNotFoundException;
 import org.ghtk.todo_list.exception.TaskNotFoundException;
 import org.ghtk.todo_list.facade.ActivityLogFacadeService;
@@ -46,6 +48,17 @@ public class ActivityLogFacadeServiceImpl implements ActivityLogFacadeService {
   }
 
   @Override
+  public void deleteNotification(String userId, String projectId, String activityLogId) {
+    log.info("(deleteNotification)userId: {}, projectId: {}, activityLogId: {}", userId, projectId, activityLogId);
+    validateProjectId(projectId);
+    validateActivityLogId(activityLogId);
+    validateActivityLogIdAndUserId(activityLogId, userId);
+
+    activityLogService.deleteById(activityLogId);
+  }
+
+
+  @Override
   public List<ActivityLog> getAllActivityLogsByTaskId(String userId, String projectId, String taskId) {
     log.info("(getAllActivityLogs)userId: {}, projectId: {}", userId, projectId);
     validateProjectId(projectId);
@@ -72,6 +85,22 @@ public class ActivityLogFacadeServiceImpl implements ActivityLogFacadeService {
     if (!taskService.existByProjectIdAndTaskId(projectId, taskId)) {
       log.error("(validateProjectIdAndTaskId)taskId: {} not found", taskId);
       throw new TaskNotFoundException();
+    }
+  }
+
+  void validateActivityLogId(String activityLogId){
+    log.info("(validateActivityLogId)activityLogId: {}", activityLogId);
+    if(!activityLogService.existsByActivityLogId(activityLogId)){
+      log.error("(validateActivityLogId)activityLogId: {} not found", activityLogId);
+      throw new ActivityLogNotFoundException();
+    }
+  }
+
+  void validateActivityLogIdAndUserId(String activityLogId, String userId){
+    log.info("(validateActivityLogIdAndUserId)activityLogId: {}, userId: {}", activityLogId, userId);
+    if(!activityLogService.existsByActivityLogIdAndUserId(activityLogId, userId)){
+      log.error("(validateActivityLogIdAndUserId)activityLogId: {} not exists with userId {}", activityLogId, userId);
+      throw new ActivityLogNotExistedException();
     }
   }
 }

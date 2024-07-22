@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.dto.response.BaseResponse;
 import org.ghtk.todo_list.facade.ActivityLogFacadeService;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -26,9 +27,16 @@ public class ActivityLogController {
   @GetMapping("/projects/{project_id}/logs")
   public BaseResponse getAllNotifications(
       @PathVariable(name = "project_id") String projectId, @Valid @RequestParam("page") int page) {
-    log.info("(getAllActivityLogsRelateToUser)projectId: {}", projectId);
+    log.info("(getAllNotifications)projectId: {}", projectId);
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         activityLogFacadeService.getAllNotifications(getUserId(), projectId, page));
+  }
+
+  @DeleteMapping("/projects/{project_id}/logs/{activity_log_id}")
+  public BaseResponse deleteNotification(@PathVariable(name = "project_id") String projectId, @PathVariable(name = "activity_log_id") String activityLogId) {
+    log.info("(deleteNotification)projectId: {}, activityLogId: {}", projectId, activityLogId);
+    activityLogFacadeService.deleteNotification(getUserId(), projectId, activityLogId);
+    return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(), "Đã xóa thành công thông báo!");
   }
 
   @GetMapping("/projects/{project_id}/tasks/{task_id}/logs")
