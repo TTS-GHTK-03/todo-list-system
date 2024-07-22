@@ -59,4 +59,12 @@ public class ProjectController {
         projectService.updateProject(getUserId(), projectId, updateProjectRequest.getTitle(),
             updateProjectRequest.getKeyProject()));
   }
+
+  @DeleteMapping("/{project_id}")
+  public BaseResponse deleteProject(@PathVariable("project_id") String projectId) {
+    log.info("(deleteProject)projectId: {}", projectId);
+    projectService.deleteProject(getUserId(), projectId);
+    return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
+        "Deleted project successfully!!!");
+  }
 }

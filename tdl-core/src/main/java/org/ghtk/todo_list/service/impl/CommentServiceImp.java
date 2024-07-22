@@ -133,11 +133,10 @@ public class CommentServiceImp implements CommentService {
   }
   @Transactional
   @Override
-  public String deleteComment(String userId, String taskId, String commentId) {
+  public void deleteComment(String userId, String taskId, String commentId) {
     log.info("(deleteComment)taskId: {}, commentId: {}", taskId, commentId);
     commentRepository.deleteAllByParentId(commentId);
     commentRepository.deleteById(commentId);
-    return "Successfull delete comment!";
   }
 
   @Override

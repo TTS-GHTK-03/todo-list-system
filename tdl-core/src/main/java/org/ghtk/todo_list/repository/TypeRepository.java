@@ -10,4 +10,5 @@ public interface TypeRepository extends JpaRepository<Type, String> {
 
   boolean existsByProjectIdAndTitle(String projectId, String title);
   List<Type> findAllByProjectId(String projectId);
+  void deleteAllByProjectId(String projectId);
 }
