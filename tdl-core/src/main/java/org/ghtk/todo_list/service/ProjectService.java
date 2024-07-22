@@ -19,4 +19,5 @@ public interface ProjectService {
   Project createProject(String userId, String title);
   Project updateProject(Project project);
   Project getProjectById(String projectId);
+  void deleteProject(String projectId);
 }

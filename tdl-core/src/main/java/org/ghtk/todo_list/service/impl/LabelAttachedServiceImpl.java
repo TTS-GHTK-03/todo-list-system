@@ -51,4 +51,11 @@ public class LabelAttachedServiceImpl implements LabelAttachedService {
     log.info("(deleteAllByTaskId)taskId: {}", taskId);
     repository.deleteAllByTaskId(taskId);
   }
+
+  @Override
+  @Transactional
+  public void deleteAllByLabelId(String labelId) {
+    log.info("(deleteAllByLabelId)labelId: {}", labelId);
+    repository.deleteAllByLabelId(labelId);
+  }
 }

@@ -12,4 +12,5 @@ public interface LabelAttachedRepository extends JpaRepository<LabelAttached, St
   boolean existsByLabelIdAndTaskId(String labelId, String taskId);
 
   List<LabelAttached> findByTaskId(String taskId);
+  void deleteAllByLabelId(String labelId);
 }

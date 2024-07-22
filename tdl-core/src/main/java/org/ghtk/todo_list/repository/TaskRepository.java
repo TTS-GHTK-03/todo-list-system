@@ -56,6 +56,7 @@ public interface TaskRepository extends JpaRepository<Task, String> {
 
   boolean existsByProjectIdAndId(String projectId, String id);
 
+  void deleteAllByProjectId(String projectId);
   @Transactional
   @Modifying
   @Query("""

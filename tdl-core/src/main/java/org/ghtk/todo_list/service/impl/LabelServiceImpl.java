@@ -9,6 +9,7 @@ import org.ghtk.todo_list.exception.TypeNotFoundException;
 import org.ghtk.todo_list.repository.LabelRepository;
 import org.ghtk.todo_list.service.LabelService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @Service
@@ -60,5 +61,12 @@ public class LabelServiceImpl implements LabelService {
   public boolean existsById(String id) {
     log.info("(existsById)id: {}", id);
     return labelRepository.existsById(id);
+  }
+
+  @Override
+  @Transactional
+  public void deleteAllByTypeId(String typeId) {
+    log.info("(deleteAllByTypeId)typeId: {}", typeId);
+    labelRepository.deleteAllByTypeId(typeId);
   }
 }

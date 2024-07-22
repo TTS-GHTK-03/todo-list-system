@@ -28,4 +28,6 @@ public interface SprintRepository extends JpaRepository<Sprint, String> {
   Sprint findByProjectIdAndSprintId(String projectId, String sprintId);
 
   boolean existsByProjectIdAndTitle(String projectId, String title);
+
+  void deleteAllByProjectId(String projectId);
 }

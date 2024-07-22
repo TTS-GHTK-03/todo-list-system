@@ -16,4 +16,6 @@ public interface ProjectFacadeService {
   Project createProject(String userId, String title);
 
   Project updateProject(String userId, String projectId, String title, String keyProject);
+
+  void deleteProject(String userId, String projectId);
 }

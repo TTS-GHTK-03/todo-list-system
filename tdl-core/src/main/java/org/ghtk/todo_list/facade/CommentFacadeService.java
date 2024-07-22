@@ -20,5 +20,5 @@ public interface CommentFacadeService {
 
   CommentResponse findById(String taskId, String commentId);
 
-  String deleteComment(String userId, String taskId, String commentId);
+  void deleteComment(String userId, String taskId, String commentId);
 }
