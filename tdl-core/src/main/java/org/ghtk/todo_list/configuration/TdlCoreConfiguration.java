@@ -30,6 +30,7 @@ import org.ghtk.todo_list.repository.SprintRepository;
 import org.ghtk.todo_list.service.BoardService;
 import org.ghtk.todo_list.service.CommentService;
 import org.ghtk.todo_list.service.LabelAttachedService;
+import org.ghtk.todo_list.service.LabelService;
 import org.ghtk.todo_list.service.ProjectService;
 import org.ghtk.todo_list.service.ProjectUserService;
 import org.ghtk.todo_list.service.SprintProgressService;
@@ -60,34 +61,30 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 public class TdlCoreConfiguration {
 
   @Bean
-  public ProjectFacadeService projectFacadeService(ProjectService projectService,
-      ProjectUserService projectUserService, BoardService boardService,
-      AuthUserService authUserService,
-      ProjectInformationResponseMapper projectInformationResponseMapper,
-      ProjectMapper projectMapper,
-      TypeService typeService, TypeMapper typeMapper) {
+  public ProjectFacadeService projectFacadeService(ProjectService projectService, ProjectUserService projectUserService, BoardService boardService,
+      AuthUserService authUserService, ProjectInformationResponseMapper projectInformationResponseMapper, ProjectMapper projectMapper,
+      TypeService typeService, TypeMapper typeMapper, LabelService labelService, LabelAttachedService labelAttachedService,
+      TaskService taskService, ActivityLogService activityLogService, TaskAssigneesService taskAssigneesService,
+      CommentService commentService, SprintService sprintService, SprintProgressService sprintProgressService){
     return new ProjectFacadeServiceImpl(projectService, projectUserService, boardService,
-        authUserService, projectInformationResponseMapper, projectMapper, typeService, typeMapper);
+        authUserService, projectInformationResponseMapper, projectMapper, typeService, typeMapper,
+        labelService, labelAttachedService, taskService, activityLogService, taskAssigneesService,
+        commentService, sprintService, sprintProgressService);
   }
 
   @Bean
-  public ProjectUserFacadeService projectUserFacadeService(ProjectUserService projectUserService,
-      ProjectService projectService,
-      AuthUserService authUserService, RedisCacheService redisCacheService,
-      EmailHelper emailHelper) {
-    return new ProjectUserFacadeServiceImpl(projectUserService, projectService, authUserService,
-        redisCacheService, emailHelper);
+  public ProjectUserFacadeService projectUserFacadeService(ProjectUserService projectUserService, ProjectService projectService,
+      AuthUserService authUserService, RedisCacheService redisCacheService, EmailHelper emailHelper) {
+    return new ProjectUserFacadeServiceImpl(projectUserService, projectService, authUserService, redisCacheService, emailHelper);
   }
 
   @Bean
-  public TypeFacadeService typeFacadeService(ProjectService projectService,
-      ProjectUserService projectUserService, TypeService typeService, TypeMapper typeMapper) {
+  public TypeFacadeService typeFacadeService(ProjectService projectService, ProjectUserService projectUserService, TypeService typeService, TypeMapper typeMapper){
     return new TypeFacadeServiceImpl(projectService, projectUserService, typeService, typeMapper);
   }
 
   @Bean
-  public ProjectService projectService(ProjectRepository projectRepository,
-      ProjectMapper projectMapper) {
+  public ProjectService projectService(ProjectRepository projectRepository, ProjectMapper projectMapper) {
     return new ProjectServiceImpl(projectRepository, projectMapper);
   }
 
@@ -115,6 +112,7 @@ public class TdlCoreConfiguration {
     );
   }
 
+
   @Bean
   public ProjectUserService projectUserService(ProjectUserRepository projectUserRepository,
       ProjectUserMapper projectUserMapper) {
@@ -132,8 +130,7 @@ public class TdlCoreConfiguration {
   }
 
   @Bean
-  public TaskAssigneesService taskAssigneesService(
-      TaskAssigneesRepository taskAssigneesRepository) {
+  public TaskAssigneesService taskAssigneesService(TaskAssigneesRepository taskAssigneesRepository) {
     return new TaskAssigneesServiceImpl(taskAssigneesRepository);
   }
 
@@ -143,12 +140,9 @@ public class TdlCoreConfiguration {
   }
 
   @Bean
-  public ActivityLogFacadeService activityLogFacadeService(ActivityLogService activityLogService,
-      AuthUserService authUserService,
-      ProjectService projectService, SprintService sprintService, TaskService taskService,
-      ActivityLogMapper activityLogMapper) {
-    return new ActivityLogFacadeServiceImpl(activityLogService, authUserService, projectService,
-        sprintService, taskService, activityLogMapper);
+  public ActivityLogFacadeService activityLogFacadeService(ActivityLogService activityLogService, AuthUserService authUserService,
+      ProjectService projectService, SprintService sprintService, TaskService taskService, ActivityLogMapper activityLogMapper) {
+    return new ActivityLogFacadeServiceImpl(activityLogService, authUserService, projectService, sprintService, taskService, activityLogMapper);
   }
 
   @Bean

@@ -32,6 +32,8 @@ public interface ProjectUserRepository extends JpaRepository<ProjectUser, String
 
   String findRoleByUserIdAndProjectId(String userId, String projectId);
 
+  void deleteAllByProjectId(String projectId);
+
   @Modifying
   @Transactional
   @Query("""

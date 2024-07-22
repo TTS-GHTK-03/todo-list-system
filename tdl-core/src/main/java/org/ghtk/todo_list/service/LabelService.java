@@ -14,4 +14,5 @@ public interface LabelService {
   List<Label> getLabelsByType(String typeId);
   void deleteLabel(String id);
   boolean existsById(String id);
+  void deleteAllByTypeId(String typeId);
 }

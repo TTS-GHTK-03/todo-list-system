@@ -91,11 +91,11 @@ public class CommentFacadeServiceImp implements CommentFacadeService {
   }
 
   @Override
-  public String deleteComment(String userId, String taskId, String commentId) {
+  public void deleteComment(String userId, String taskId, String commentId) {
     log.info("(deleteComment)userId: {},taskId: {}, commentId: {}", userId, taskId, commentId);
     validateTaskId(taskId);
     validateParentId(commentId);
-    return commentService.deleteComment(userId, taskId, commentId);
+    commentService.deleteComment(userId, taskId, commentId);
   }
 
   @Override

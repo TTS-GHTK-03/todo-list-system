@@ -8,6 +8,7 @@ import org.ghtk.todo_list.exception.ProjectUserNotFoundException;
 import org.ghtk.todo_list.mapper.ProjectUserMapper;
 import org.ghtk.todo_list.repository.ProjectUserRepository;
 import org.ghtk.todo_list.service.ProjectUserService;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -39,6 +40,13 @@ public class ProjectUserServiceImpl implements ProjectUserService {
       throw new ProjectUserNotFoundException();
     }
     return projectUserRepository.getRoleProjectUser(userId, projectId);
+  }
+
+  @Override
+  @Transactional
+  public void deleteAllByProjectId(String projectId) {
+    log.info("(deleteAllByProjectId)projectId: {}", projectId);
+    projectUserRepository.deleteAllByProjectId(projectId);
   }
 
   @Override
