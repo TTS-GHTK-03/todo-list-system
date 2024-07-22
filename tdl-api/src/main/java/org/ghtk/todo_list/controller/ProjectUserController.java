@@ -47,6 +47,6 @@ public class ProjectUserController {
   public BaseResponse deleteUser(@PathVariable("project_id") String projectId, @PathVariable("user_id") String memberId){
     log.info("(deleteUser)");
     projectUserFacadeService.deleteUser(getUserId(), projectId, memberId);
-    return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(), "Delete sprint successfully!!");
+    return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(), "Kick user in project successfully!!");
   }
 }
