@@ -199,8 +199,8 @@ public class SprintFacadeServiceImpl implements SprintFacadeService {
       commentService.deleteAllCommentByTaskId(o.getId());
       labelAttachedService.deleteAllByTaskId(o.getId());
       activityLogService.deleteAllByTaskId(o.getId());
-      taskService.deleteById(o.getId());
     }
+    taskService.deleteAllBySprintId(id);
     sprintService.deleteById(id);
   }
 

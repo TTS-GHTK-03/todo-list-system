@@ -169,4 +169,11 @@ public class TaskServiceImp implements TaskService {
     log.info("(deleteById)id: {}", id);
     taskRepository.deleteById(id);
   }
+
+  @Override
+  @Transactional
+  public void deleteAllBySprintId(String sprintId) {
+    log.info("(deleteAllBySprintId)sprintId: {}", sprintId);
+    taskRepository.deleteAllBySprintId(sprintId);
+  }
 }
