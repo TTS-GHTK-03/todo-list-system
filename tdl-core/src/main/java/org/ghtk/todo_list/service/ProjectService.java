@@ -3,6 +3,8 @@ package org.ghtk.todo_list.service;
 import org.ghtk.todo_list.entity.Project;
 
 import java.util.List;
+import org.ghtk.todo_list.paging.PagingRes;
+import org.springframework.data.domain.Pageable;
 
 public interface ProjectService {
 
@@ -20,4 +22,5 @@ public interface ProjectService {
   Project updateProject(Project project);
   Project getProjectById(String projectId);
   void deleteProject(String projectId);
+  PagingRes<Project> searchProjects(String title, String keyProject, Pageable pageable, String userId);
 }

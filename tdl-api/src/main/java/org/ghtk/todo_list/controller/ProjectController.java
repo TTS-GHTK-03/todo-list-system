@@ -9,6 +9,7 @@ import org.ghtk.todo_list.dto.response.BaseResponse;
 import org.ghtk.todo_list.facade.ProjectFacadeService;
 import org.ghtk.todo_list.model.request.CreateProjectRequest;
 import org.ghtk.todo_list.model.request.UpdateProjectRequest;
+import org.ghtk.todo_list.paging.PagingReq;
 import org.ghtk.todo_list.service.ProjectService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -66,5 +67,15 @@ public class ProjectController {
     projectService.deleteProject(getUserId(), projectId);
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         "Deleted project successfully!!!");
+  }
+
+  @GetMapping("/search")
+  public BaseResponse searchProjects(
+      @RequestParam(required = false) String title,
+      @RequestParam(required = false) String keyProject,
+      @Valid PagingReq pageable) {
+    log.info("(searchProjects)title: {}, keyProject: {}, pageable: {}", title, keyProject, pageable);
+    return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
+        projectService.searchProjects(title, keyProject, pageable.makePageable(), getUserId()));
   }
 }
