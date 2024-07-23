@@ -25,6 +25,7 @@ public class Task extends BaseEntity {
   private String status;
   private LocalDate startDate;
   private LocalDate dueDate;
+  private String keyProjectTask;
   private String sprintId;
   private String userId;
   private String columnId;

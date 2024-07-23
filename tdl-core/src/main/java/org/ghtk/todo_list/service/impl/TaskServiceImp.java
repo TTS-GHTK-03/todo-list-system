@@ -28,7 +28,7 @@ public class TaskServiceImp implements TaskService {
     List<Task> tasks = taskRepository.getAllTasksByProjectId(projectId);
     return tasks.stream()
         .map(task -> new TaskResponse(task.getId(), task.getTitle(), task.getPoint(),
-            task.getStatus()))
+            task.getStatus(), task.getKeyProjectTask()))
         .collect(Collectors.toList());
 
   }
@@ -46,7 +46,7 @@ public class TaskServiceImp implements TaskService {
       throw new TaskNotFoundException();
     });
 
-    return TaskResponse.of(task.getId(), task.getTitle(), task.getPoint(), task.getStatus(), userId);
+    return TaskResponse.of(task.getId(), task.getTitle(), task.getPoint(), task.getStatus(), task.getKeyProjectTask(), userId);
   }
 
   @Override
@@ -60,7 +60,7 @@ public class TaskServiceImp implements TaskService {
         });
     task.setStatus(taskStatus);
     taskRepository.save(task);
-    return TaskResponse.of(task.getId(), task.getTitle(), task.getPoint(), task.getStatus(), userId);
+    return TaskResponse.of(task.getId(), task.getTitle(), task.getPoint(), task.getStatus(), task.getKeyProjectTask(), userId);
   }
 
   @Override
@@ -82,7 +82,7 @@ public class TaskServiceImp implements TaskService {
         });
     task.setSprintId(sprintId);
     taskRepository.save(task);
-    return TaskResponse.of(task.getId(), task.getTitle(), task.getPoint(), task.getStatus(), userId);
+    return TaskResponse.of(task.getId(), task.getTitle(), task.getPoint(), task.getStatus(), task.getKeyProjectTask(), userId);
   }
 
   @Override
@@ -190,5 +190,11 @@ public class TaskServiceImp implements TaskService {
   public boolean existsByTypeId(String typeId) {
     log.info("(existsByTypeId)typeId: {}", typeId);
     return taskRepository.existsByTypeId(typeId);
+  }
+
+  @Override
+  public Task getTaskLastestByProjectId(String projectId) {
+    log.info("(getTaskLastestByProjectId)projectId: {}", projectId);
+    return taskRepository.getTaskLastestByProjectId(projectId);
   }
 }

@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.constant.CacheConstant;
 import org.ghtk.todo_list.constant.RoleProjectUser;
 import org.ghtk.todo_list.constant.TaskStatus;
+import org.ghtk.todo_list.entity.Project;
 import org.ghtk.todo_list.entity.SprintProgress;
 import org.ghtk.todo_list.entity.Task;
 import org.ghtk.todo_list.entity.TaskAssignees;
@@ -189,6 +190,7 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
         taskClone.getTitle(),
         0,
         taskClone.getStatus(),
+        taskClone.getKeyProjectTask(),
         user.getId());
   }
 
@@ -229,7 +231,8 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
       var tasks = taskService.getAllBySprintId(sprintId);
       for (Task task : tasks) {
         TaskResponse taskResponse = TaskResponse.of(task.getId(), task.getTitle(), task.getPoint(),
-            task.getStatus(), taskAssigneesService.findUserIdByTaskId(task.getId()));
+            task.getStatus(), task.getKeyProjectTask(),
+            taskAssigneesService.findUserIdByTaskId(task.getId()));
         responses.add(taskResponse);
       }
       return responses;
@@ -249,6 +252,7 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
     task.setUserId(userId);
     task.setProjectId(projectId);
     task.setStatus(TODO.toString());
+    task.setKeyProjectTask(generateKeyProjectTask(projectId));
     Task savedTask = taskService.save(task);
 
     var user = authUserService.findByUnassigned();
@@ -259,6 +263,7 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
         .title(savedTask.getTitle())
         .point(savedTask.getPoint())
         .status(savedTask.getStatus())
+        .keyProjectTask(savedTask.getKeyProjectTask())
         .userId(taskAssigneesService.findUserIdByTaskId(savedTask.getId()))
         .build();
   }
@@ -341,5 +346,13 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
       log.error("(validateProjectIdAndTaskId)taskId: {} not found", taskId);
       throw new TaskNotFoundException();
     }
+  }
+
+  private String generateKeyProjectTask(String projectId){
+    Project project = projectService.getProjectById(projectId);
+    int counterTask = project.getCounterTask();
+    project.setCounterTask(++counterTask);
+    projectService.updateProject(project);
+    return project.getKeyProject() + "-" + project.getCounterTask();
   }
 }

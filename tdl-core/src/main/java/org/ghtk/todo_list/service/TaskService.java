@@ -41,4 +41,6 @@ public interface TaskService {
   void updateTitle(String taskId, String title);
 
   boolean existsByTypeId(String typeId);
+
+  Task getTaskLastestByProjectId(String projectId);
 }
