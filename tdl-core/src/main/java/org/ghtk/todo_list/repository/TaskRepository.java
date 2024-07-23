@@ -72,4 +72,16 @@ public interface TaskRepository extends JpaRepository<Task, String> {
 
 
   boolean existsByTypeId(String typeId);
+
+  @Query("""
+      SELECT t FROM Task t WHERE t.projectId = :projectId ORDER BY t.createdAt DESC LIMIT 1
+      """)
+  Task getTaskLastestByProjectId(String projectId);
+
+  @Query("""
+      SELECT t FROM Task t 
+      JOIN TaskAssignees ta ON t.id = ta.taskId AND ta.userId = :userId
+      WHERE t.status != :taskStatusDone ORDER BY t.status, t.createdAt
+      """)
+  List<Task> getAllTaskAssigneesForUser(String userId, String taskStatusDone);
 }

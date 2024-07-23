@@ -13,6 +13,7 @@ public class ProjectMapperImpl implements ProjectMapper {
     Project project = new Project();
     project.setTitle(title);
     project.setKeyProject(key);
+    project.setCounterTask(0);
     return project;
   }
 }

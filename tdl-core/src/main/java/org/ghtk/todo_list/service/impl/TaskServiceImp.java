@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.ghtk.todo_list.constant.TaskStatus;
 import org.ghtk.todo_list.entity.Task;
 import org.ghtk.todo_list.exception.TaskNotFoundException;
 import org.ghtk.todo_list.model.response.TaskResponse;
@@ -28,7 +29,7 @@ public class TaskServiceImp implements TaskService {
     List<Task> tasks = taskRepository.getAllTasksByProjectId(projectId);
     return tasks.stream()
         .map(task -> new TaskResponse(task.getId(), task.getTitle(), task.getPoint(),
-            task.getStatus()))
+            task.getStatus(), task.getKeyProjectTask()))
         .collect(Collectors.toList());
 
   }
@@ -46,7 +47,7 @@ public class TaskServiceImp implements TaskService {
       throw new TaskNotFoundException();
     });
 
-    return TaskResponse.of(task.getId(), task.getTitle(), task.getPoint(), task.getStatus(), userId);
+    return TaskResponse.of(task.getId(), task.getTitle(), task.getPoint(), task.getStatus(), task.getKeyProjectTask(), userId);
   }
 
   @Override
@@ -60,7 +61,7 @@ public class TaskServiceImp implements TaskService {
         });
     task.setStatus(taskStatus);
     taskRepository.save(task);
-    return TaskResponse.of(task.getId(), task.getTitle(), task.getPoint(), task.getStatus(), userId);
+    return TaskResponse.of(task.getId(), task.getTitle(), task.getPoint(), task.getStatus(), task.getKeyProjectTask(), userId);
   }
 
   @Override
@@ -82,7 +83,7 @@ public class TaskServiceImp implements TaskService {
         });
     task.setSprintId(sprintId);
     taskRepository.save(task);
-    return TaskResponse.of(task.getId(), task.getTitle(), task.getPoint(), task.getStatus(), userId);
+    return TaskResponse.of(task.getId(), task.getTitle(), task.getPoint(), task.getStatus(), task.getKeyProjectTask(), userId);
   }
 
   @Override
@@ -190,5 +191,17 @@ public class TaskServiceImp implements TaskService {
   public boolean existsByTypeId(String typeId) {
     log.info("(existsByTypeId)typeId: {}", typeId);
     return taskRepository.existsByTypeId(typeId);
+  }
+
+  @Override
+  public Task getTaskLastestByProjectId(String projectId) {
+    log.info("(getTaskLastestByProjectId)projectId: {}", projectId);
+    return taskRepository.getTaskLastestByProjectId(projectId);
+  }
+
+  @Override
+  public List<Task> getAllTaskAssigneesForUser(String userId) {
+    log.info("(getAllTaskAssigneesForUser)userId: {}", userId);
+    return taskRepository.getAllTaskAssigneesForUser(userId, TaskStatus.DONE.toString());
   }
 }
