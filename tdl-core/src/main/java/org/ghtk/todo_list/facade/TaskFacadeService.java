@@ -2,6 +2,7 @@ package org.ghtk.todo_list.facade;
 
 import java.util.Date;
 import java.util.List;
+import org.ghtk.todo_list.entity.Task;
 import org.ghtk.todo_list.entity.TaskAssignees;
 import org.ghtk.todo_list.model.response.TaskResponse;
 import org.ghtk.todo_list.model.response.UpdateDueDateTaskResponse;
@@ -26,4 +27,5 @@ public interface TaskFacadeService {
   void deleteTask(String userId, String projectId, String taskId);
   TaskResponse updateTitleTask(String userId, String projectId, String taskId, String title);
   List<TaskResponse> getAllTaskAssigneesForUser(String userId);
+  List<TaskResponse> searchTask(String searchValue, String userId, String projectId);
 }

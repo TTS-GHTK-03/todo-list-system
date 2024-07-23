@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.constant.TaskStatus;
 import org.ghtk.todo_list.entity.Task;
 import org.ghtk.todo_list.exception.TaskNotFoundException;
+import org.ghtk.todo_list.filter.FilterTask;
 import org.ghtk.todo_list.model.response.TaskResponse;
 import org.ghtk.todo_list.model.response.UpdateDueDateTaskResponse;
 import org.ghtk.todo_list.repository.TaskRepository;
@@ -203,5 +204,10 @@ public class TaskServiceImp implements TaskService {
   public List<Task> getAllTaskAssigneesForUser(String userId) {
     log.info("(getAllTaskAssigneesForUser)userId: {}", userId);
     return taskRepository.getAllTaskAssigneesForUser(userId, TaskStatus.DONE.toString());
+  }
+
+  @Override
+  public List<Task> searchTask(String searchValue, String userId, String projectId) {
+    return taskRepository.findAll(FilterTask.getTasksByCriteria(searchValue, userId, projectId));
   }
 }
