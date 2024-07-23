@@ -43,4 +43,6 @@ public interface TaskService {
   boolean existsByTypeId(String typeId);
 
   Task getTaskLastestByProjectId(String projectId);
+
+  List<Task> getAllTaskAssigneesForUser(String userId);
 }
