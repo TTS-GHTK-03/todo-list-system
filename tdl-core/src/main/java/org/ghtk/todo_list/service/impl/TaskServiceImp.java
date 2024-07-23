@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.ghtk.todo_list.constant.TaskStatus;
 import org.ghtk.todo_list.entity.Task;
 import org.ghtk.todo_list.exception.TaskNotFoundException;
 import org.ghtk.todo_list.model.response.TaskResponse;
@@ -196,5 +197,11 @@ public class TaskServiceImp implements TaskService {
   public Task getTaskLastestByProjectId(String projectId) {
     log.info("(getTaskLastestByProjectId)projectId: {}", projectId);
     return taskRepository.getTaskLastestByProjectId(projectId);
+  }
+
+  @Override
+  public List<Task> getAllTaskAssigneesForUser(String userId) {
+    log.info("(getAllTaskAssigneesForUser)userId: {}", userId);
+    return taskRepository.getAllTaskAssigneesForUser(userId, TaskStatus.DONE.toString());
   }
 }
