@@ -365,4 +365,16 @@
   <changeSet id="20240719-1630-delete-column-project" author="Phan Kieu">
     <dropColumn tableName="project" columnName="count_sprint"/>
   </changeSet>
+
+  <changeSet id="20240723-1000-add-key-project-task" author="Phan Kieu">
+    <addColumn tableName="task">
+      <column name="key_project_task" type="varchar(255)"/>
+    </addColumn>
+  </changeSet>
+
+  <changeSet id="20240723-1050-add-counter-task" author="Phan Kieu">
+    <addColumn tableName="project">
+      <column name="counter_task" type="integer"/>
+    </addColumn>
+  </changeSet>
 </databaseChangeLog>

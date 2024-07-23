@@ -17,4 +17,5 @@ public class Project extends BaseEntity {
 
   private String title;
   private String keyProject;
+  private int counterTask;
 }
