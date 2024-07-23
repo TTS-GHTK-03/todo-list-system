@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.constant.RoleProjectUser;
 import org.ghtk.todo_list.dto.response.UserNameResponse;
+import org.ghtk.todo_list.entity.AuthUser;
 import org.ghtk.todo_list.entity.Project;
 import org.ghtk.todo_list.entity.Type;
 import org.ghtk.todo_list.exception.ProjectKeyAlreadyExistedException;
@@ -98,6 +99,10 @@ public class ProjectFacadeServiceImpl implements ProjectFacadeService {
     Project projectSaved = projectService.createProject(userId, title);
     projectUserService.createProjectUser(userId, projectSaved.getId(),
         RoleProjectUser.ADMIN.toString());
+
+    AuthUser unassigned = authUserService.findByUnassigned();
+    projectUserService.createProjectUser(unassigned.getId(), projectSaved.getId(), RoleProjectUser.VIEWER.toString());
+
     List<TypeData> typeDataList = Arrays.asList(
         new TypeData(BUG, URL_IMAGE_BUG),
         new TypeData(STORY, URL_IMAGE_STORY),
