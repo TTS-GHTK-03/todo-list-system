@@ -200,23 +200,24 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
     log.info("(updateStartDateDueDateTask)projectId: {}, sprintId: {}, taskId: {}", projectId,
         sprintId, taskId);
 
+    validateUserId(userId);
+    validateProjectId(projectId);
+    validateSprintId(sprintId);
+    validateTaskId(taskId);
+    validateDueDateTask(projectId, sprintId, dueDate);
+
     var redisStatusTaskKey = redisCacheService.get(UPDATE_STATUS_TASK, taskId);
     if (redisStatusTaskKey.isEmpty()) {
       log.error("(updateStartDateDueDateTask)statusTaskKey: {} not found", statusTaskKey);
       throw new StatusTaskKeyNotFoundException();
     }
+    redisCacheService.delete(UPDATE_STATUS_TASK, taskId);
 
-    validateUserId(userId);
     String roleProjectUser = projectUserService.getRoleProjectUser(userId, projectId);
     if (roleProjectUser.equals(RoleProjectUser.VIEWER.toString())) {
       log.error("(updateStartDateDueDateTask)role: {} not allowed", roleProjectUser);
       throw new RoleProjectNotAllowException();
     }
-
-    validateProjectId(projectId);
-    validateSprintId(sprintId);
-    validateDueDateTask(projectId, sprintId, dueDate);
-    validateTaskId(taskId);
 
     return taskService.updateDueDate(projectId, sprintId, taskId, dueDate);
   }
