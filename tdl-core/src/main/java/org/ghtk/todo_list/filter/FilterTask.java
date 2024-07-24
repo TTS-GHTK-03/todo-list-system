@@ -13,7 +13,7 @@ import org.springframework.data.jpa.domain.Specification;
 
 public class FilterTask {
 
-  public static Specification<Task> getTasksByCriteria(String searchValue,
+  public static Specification<Task> getTasksByCriteria(String searchValue, String typeId, String labelId,
       String userId, String projectId) {
     return (root, query, criteriaBuilder) -> {
       List<Predicate> predicates = new ArrayList<>();
@@ -23,33 +23,6 @@ public class FilterTask {
         Predicate keyProjectTaskPredicate = criteriaBuilder.like(criteriaBuilder.lower(root.get("keyProjectTask")), "%" + searchValue.toLowerCase() + "%");
         predicates.add(criteriaBuilder.or(titlePredicate, keyProjectTaskPredicate));
       }
-
-      if (userId != null && !userId.isEmpty()) {
-        Subquery<String> subquery = query.subquery(String.class);
-        Root<ProjectUser> projectUserRoot = subquery.from(ProjectUser.class);
-        subquery.select(projectUserRoot.get("projectId"));
-        subquery.where(
-            criteriaBuilder.equal(projectUserRoot.get("userId"), userId),
-            criteriaBuilder.equal(projectUserRoot.get("projectId"), root.get("projectId"))
-        );
-
-        predicates.add(criteriaBuilder.exists(subquery));
-      }
-
-      if (projectId != null && !projectId.isEmpty()) {
-        predicates.add(criteriaBuilder.equal(root.get("projectId"), projectId));
-      }
-
-      query.distinct(true);
-
-      return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
-    };
-  }
-
-  public static Specification<Task> getTasksByTypeOrLabelAndCriteria(String typeId, String labelId,
-      String userId, String projectId) {
-    return (root, query, criteriaBuilder) -> {
-      List<Predicate> predicates = new ArrayList<>();
 
       if (typeId != null && !typeId.isEmpty()) {
         predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("typeId")), "%" + typeId.toLowerCase() + "%"));
@@ -65,15 +38,15 @@ public class FilterTask {
       }
 
       if (userId != null && !userId.isEmpty()) {
-        Subquery<String> userSubquery = query.subquery(String.class);
-        Root<ProjectUser> projectUserRoot = userSubquery.from(ProjectUser.class);
-        userSubquery.select(projectUserRoot.get("taskId"));
-        userSubquery.where(
+        Subquery<String> subquery = query.subquery(String.class);
+        Root<ProjectUser> projectUserRoot = subquery.from(ProjectUser.class);
+        subquery.select(projectUserRoot.get("projectId"));
+        subquery.where(
             criteriaBuilder.equal(projectUserRoot.get("userId"), userId),
             criteriaBuilder.equal(projectUserRoot.get("projectId"), root.get("projectId"))
         );
 
-        predicates.add(criteriaBuilder.exists(userSubquery));
+        predicates.add(criteriaBuilder.exists(subquery));
       }
 
       if (projectId != null && !projectId.isEmpty()) {

@@ -125,18 +125,11 @@ public class TaskController {
   }
   @GetMapping("/{project_id}/tasks/search")
   public BaseResponse searchTask(@PathVariable("project_id") String projectId,
-      @RequestParam(required = false)  String search) {
-    log.info("(searchTask)project: {}, search: {}", projectId, search);
-    return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
-        taskFacadeService.searchTask(search, getUserId(), projectId));
-  }
-
-  @GetMapping("/{project_id}/tasks/search-panel")
-  public BaseResponse searchTaskByLabelOrType(@PathVariable("project_id") String projectId,
+      @RequestParam(required = false)  String search,
       @RequestParam(required = false)  String typeId,
       @RequestParam(required = false)  String labelId) {
-    log.info("(searchTaskByLabelOrType)project: {}, typeId: {}, labelId: {}", projectId, typeId, labelId);
+    log.info("(searchTask)project: {}, search: {}", projectId, search);
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
-        taskFacadeService.searchTaskByTypeAndLabel(typeId, labelId, getUserId(), projectId));
+        taskFacadeService.searchTask(search, typeId, labelId, getUserId(), projectId));
   }
 }

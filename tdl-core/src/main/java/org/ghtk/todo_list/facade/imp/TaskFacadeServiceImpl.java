@@ -302,29 +302,10 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
   }
 
   @Override
-  public List<TaskResponse> searchTask(String searchValue, String userId, String projectId) {
+  public List<TaskResponse> searchTask(String searchValue, String typeId, String labelId, String userId, String projectId) {
     log.info("(searchTask)searchValue: {}, userId: {}, projectId: {}", searchValue, userId, projectId);
 
-    var taskSearch = taskService.searchTask(searchValue, userId, projectId);
-    List<TaskResponse> responses = new ArrayList<>();
-    for (var task : taskSearch) {
-      TaskResponse response = new TaskResponse();
-      response.setId(task.getId());
-      response.setTitle(task.getTitle());
-      response.setPoint(task.getPoint());
-      response.setStatus(task.getStatus());
-      response.setKeyProjectTask(task.getKeyProjectTask());
-      response.setUserId(taskAssigneesService.findUserIdByTaskId(task.getId()));
-      responses.add(response);
-    }
-    return responses;
-  }
-
-  @Override
-  public List<TaskResponse> searchTaskByTypeAndLabel(String type, String label, String userId,
-      String projectId) {
-    log.info("(searchTaskByTypeAndLabel)type: {}, label: {}, userId: {}, projectId: {}", type, label, userId, projectId);
-    var taskSearch = taskService.searchTaskByTypeAndLabel(type, label, userId, projectId);
+    var taskSearch = taskService.searchTask(searchValue, typeId, labelId, userId, projectId);
     List<TaskResponse> responses = new ArrayList<>();
     for (var task : taskSearch) {
       TaskResponse response = new TaskResponse();
