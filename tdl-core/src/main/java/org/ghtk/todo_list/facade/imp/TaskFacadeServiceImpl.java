@@ -111,24 +111,40 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
     log.info("(updateSprintTask)sprintId: {}, taskId: {},projectId: {}", sprintId, taskId,
         projectId);
     validateProjectId(projectId);
-    validateSprintId(sprintId);
-    if (taskService.existsBySprintId(sprintId)) {
-      log.info("(updateSprintTask) sprintId already ");
+    validateTaskId(taskId);
+    var task = taskService.findById(taskId);
+    if (task.getSprintId() == null && sprintId != null) {
+      validateSprintId(sprintId);
+      log.info("(updateSprintTask)task not in sprintId ");
       var sprintProgress = sprintProgressService.findBySprintId(sprintId);
       sprintProgress.setTotalTask(sprintProgress.getTotalTask() + 1);
       sprintProgressService.save(sprintProgress);
       return taskService.updateSprintId(projectId, taskId, sprintId,
           taskAssigneesService.findUserIdByTaskId(taskId));
-    } else {
-      log.info("(updateSprintTask) sprintId don't exist ");
-      SprintProgress sprintProgress = new SprintProgress();
-      sprintProgress.setSprintId(sprintId);
-      sprintProgress.setTotalTask(1);
-      sprintProgress.setCompleteTask(0);
+    } else if (task.getSprintId() != null && sprintId != null) {
+      validateSprintId(sprintId);
+      log.info("(updateSprintTask)task allocated to another sprint");
+      var sprintProgress = sprintProgressService.findBySprintId(task.getSprintId());
+      sprintProgress.setTotalTask(sprintProgress.getTotalTask() - 1);
       sprintProgressService.save(sprintProgress);
+      var sprintProgress1 = sprintProgressService.findBySprintId(sprintId);
+      sprintProgress1.setTotalTask(sprintProgress1.getTotalTask() + 1);
+      sprintProgressService.save(sprintProgress1);
       return taskService.updateSprintId(projectId, taskId, sprintId,
           taskAssigneesService.findUserIdByTaskId(taskId));
+    } else if (task.getSprintId() != null) {
+      log.info("(updateSprintTask)task out sprint");
+      var sprintProgress = sprintProgressService.findBySprintId(task.getSprintId());
+      sprintProgress.setTotalTask(sprintProgress.getTotalTask() - 1);
+      sprintProgressService.save(sprintProgress);
+      return taskService.updateSprintId(projectId, taskId, null,
+          taskAssigneesService.findUserIdByTaskId(taskId));
+    } else {
+      log.info("(updateSprintTask)move position");
+      return taskService.updateSprintId(projectId, taskId, null,
+          taskAssigneesService.findUserIdByTaskId(taskId));
     }
+
   }
 
   void validateProjectId(String projectId) {
