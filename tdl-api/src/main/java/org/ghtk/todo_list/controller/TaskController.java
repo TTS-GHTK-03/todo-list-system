@@ -123,4 +123,11 @@ public class TaskController {
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         taskFacadeService.updateTitleTask(getUserId(), projectId, taskId, request.getTitle()));
   }
+  @GetMapping("/{project_id}/tasks/search")
+  public BaseResponse searchTask(@PathVariable("project_id") String projectId,
+      @RequestParam(required = false)  String search) {
+    log.info("(searchTask)project: {}, search: {}", projectId, search);
+    return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
+        taskFacadeService.searchTask(search, getUserId(), projectId));
+  }
 }

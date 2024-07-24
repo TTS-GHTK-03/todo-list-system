@@ -8,8 +8,10 @@ import org.ghtk.todo_list.entity.ProjectUser;
 import org.ghtk.todo_list.exception.ProjectNotFoundException;
 import org.ghtk.todo_list.exception.ProjectTitleAlreadyExistedException;
 import org.ghtk.todo_list.exception.ProjectUserNotFoundException;
+import org.ghtk.todo_list.filter.FilterProject;
 import org.ghtk.todo_list.mapper.ProjectInformationResponseMapper;
 import org.ghtk.todo_list.mapper.ProjectMapper;
+import org.ghtk.todo_list.paging.PagingRes;
 import org.ghtk.todo_list.repository.ProjectRepository;
 import org.ghtk.todo_list.service.AuthUserService;
 import org.ghtk.todo_list.service.BoardService;
@@ -18,6 +20,9 @@ import org.ghtk.todo_list.service.ProjectService;
 import java.util.List;
 import org.ghtk.todo_list.service.ProjectUserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
@@ -138,4 +143,11 @@ public class ProjectServiceImpl implements ProjectService {
        throw new ProjectTitleAlreadyExistedException();
      }
    }
+
+  @Override
+  @Transactional
+  public PagingRes<Project> searchProjects(String title, String keyProject, Pageable pageable, String userId) {
+    log.info("(searchProjects)title: {}, keyProject: {}", title, keyProject);
+    return new PagingRes<>(projectRepository.findAll(FilterProject.getProjectsByCriteria(title, keyProject, userId), pageable));
+  }
 }

@@ -22,6 +22,7 @@ import org.ghtk.todo_list.mapper.TypeMapper;
 import org.ghtk.todo_list.model.request.TypeData;
 import org.ghtk.todo_list.model.response.ProjectInformationResponse;
 import org.ghtk.todo_list.model.response.ProjectRoleResponse;
+import org.ghtk.todo_list.paging.PagingRes;
 import org.ghtk.todo_list.service.ActivityLogService;
 import org.ghtk.todo_list.service.AuthUserService;
 import org.ghtk.todo_list.service.BoardService;
@@ -35,6 +36,8 @@ import org.ghtk.todo_list.service.SprintService;
 import org.ghtk.todo_list.service.TaskAssigneesService;
 import org.ghtk.todo_list.service.TaskService;
 import org.ghtk.todo_list.service.TypeService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -160,6 +163,12 @@ public class ProjectFacadeServiceImpl implements ProjectFacadeService {
     sprintService.deleteAllByProjectId(projectId);
     projectUserService.deleteAllByProjectId(projectId);
     projectService.deleteProject(projectId);
+  }
+
+  @Override
+  public PagingRes<Project> searchProjects(String title, String keyProject, Pageable pageable, String userId) {
+    log.info("(searchProjects)title: {}, keyProject: {}", title, keyProject);
+    return projectService.searchProjects(title, keyProject, pageable, userId);
   }
 
   private void validateUserId(String userId){

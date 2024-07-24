@@ -4,6 +4,9 @@ import java.util.List;
 import org.ghtk.todo_list.entity.Project;
 import org.ghtk.todo_list.model.response.ProjectInformationResponse;
 import org.ghtk.todo_list.model.response.ProjectRoleResponse;
+import org.ghtk.todo_list.paging.PagingRes;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface ProjectFacadeService {
 
@@ -18,4 +21,6 @@ public interface ProjectFacadeService {
   Project updateProject(String userId, String projectId, String title, String keyProject);
 
   void deleteProject(String userId, String projectId);
+
+  PagingRes<Project> searchProjects(String title, String keyProject, Pageable pageable, String userId);
 }
