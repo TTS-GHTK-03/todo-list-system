@@ -8,6 +8,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.constant.SprintStatus;
 import org.ghtk.todo_list.entity.Project;
 import org.ghtk.todo_list.entity.Sprint;
+import org.ghtk.todo_list.entity.SprintProgress;
 import org.ghtk.todo_list.entity.Task;
 import org.ghtk.todo_list.exception.InvalidDateRangeException;
 import org.ghtk.todo_list.exception.ProjectNotFoundException;
@@ -66,6 +67,11 @@ public class SprintFacadeServiceImpl implements SprintFacadeService {
     sprint.setProjectId(project.getId());
     sprint = sprintService.save(sprint);
 
+    SprintProgress sprintProgress = new SprintProgress();
+    sprintProgress.setSprintId(sprint.getId());
+    sprintProgress.setTotalTask(0);
+    sprintProgress.setCompleteTask(0);
+    sprintProgressService.save(sprintProgress);
     return sprintMapper.toCreateSprintResponse(sprint);
   }
 
