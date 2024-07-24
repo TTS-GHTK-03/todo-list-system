@@ -29,5 +29,6 @@ public interface TaskFacadeService {
   List<TaskResponse> getAllTaskAssigneesForUser(String userId);
   List<TaskResponse> searchTask(String searchValue, String typeId, String labelId, String userId, String projectId);
   List<TaskResponse> searchTaskBoard(String searchValue, String sprintId, String userId, String projectId);
+  List<TaskResponse> searchTaskFilter(String searchValue, String typeId, String status, String assignee, String userId, String projectId);
 
 }

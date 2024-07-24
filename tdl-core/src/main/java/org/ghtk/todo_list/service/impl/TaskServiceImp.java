@@ -219,4 +219,13 @@ public class TaskServiceImp implements TaskService {
 
     return taskRepository.findAll(FilterTask.getTasksBoardByCriteria(searchValue, sprintId, userId, projectId));
   }
+
+  @Override
+  public List<Task> searchTaskFilter(String searchValue, String typeId, String status,
+      String assignee, String userId, String projectId) {
+    log.info("(searchTaskFilter)searchValue: {}, typeId: {}, status: {}, assignee: {}, "
+        + "userId: {}, projectId: {}", searchValue, typeId, status, assignee, userId, projectId);
+    return taskRepository.findAll(FilterTask.getTasksFilterByCriteria(searchValue, typeId, status,
+        assignee, userId, projectId));
+  }
 }
