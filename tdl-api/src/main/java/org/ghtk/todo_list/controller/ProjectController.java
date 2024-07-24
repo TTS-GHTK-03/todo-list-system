@@ -71,11 +71,10 @@ public class ProjectController {
 
   @GetMapping("/search")
   public BaseResponse searchProjects(
-      @RequestParam(required = false) String title,
-      @RequestParam(required = false) String keyProject,
+      @RequestParam(required = false) String searchValue,
       @Valid PagingReq pageable) {
-    log.info("(searchProjects)title: {}, keyProject: {}, pageable: {}", title, keyProject, pageable);
+    log.info("(searchProjects)searchValue: {}, pageable: {}", searchValue, pageable);
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
-        projectService.searchProjects(title, keyProject, pageable.makePageable(), getUserId()));
+        projectService.searchProjects(searchValue, pageable.makePageable(), getUserId()));
   }
 }
