@@ -323,7 +323,7 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
   @Override
   public List<TaskResponse> searchTaskBoard(String searchValue, String sprintId, String userId,
       String projectId) {
-    log.info("(searchTask)searchValue: {}, userId: {}, projectId: {}", searchValue, userId, projectId);
+    log.info("(searchTaskBoard)searchValue: {}, userId: {}, projectId: {}", searchValue, userId, projectId);
 
     var taskSearch = taskService.searchTaskBoard(searchValue, sprintId, userId, projectId);
     List<TaskResponse> responses = new ArrayList<>();
