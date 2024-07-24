@@ -4,11 +4,13 @@ import static org.ghtk.todo_list.constant.CacheConstant.INVITE_KEY;
 
 import java.util.Base64;
 import java.util.HashMap;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.constant.RoleProjectUser;
 import org.ghtk.todo_list.constant.URL;
 import org.ghtk.todo_list.core_email.helper.EmailHelper;
+import org.ghtk.todo_list.dto.response.AuthUserResponse;
 import org.ghtk.todo_list.entity.AuthUser;
 import org.ghtk.todo_list.entity.Project;
 import org.ghtk.todo_list.entity.ProjectUser;
@@ -37,10 +39,7 @@ public class ProjectUserFacadeServiceImpl implements ProjectUserFacadeService {
   public void inviteUser(String userId, String projectId, String email, String role) {
     log.info("(inviteUser)user: {}, project: {}", userId, projectId);
 
-    if(!projectService.existById(projectId)){
-      log.error("(inviteUser)project: {} not found", projectId);
-      throw new ProjectNotFoundException();
-    }
+    validateProjectId(projectId);
 
     if(!RoleProjectUser.isValid(role)){
       log.error("(inviteUser)role: {} not found", role);
@@ -79,10 +78,7 @@ public class ProjectUserFacadeServiceImpl implements ProjectUserFacadeService {
     String projectId = redisInviteUserRequest.getProjectId();
     String role = redisInviteUserRequest.getRole();
 
-    if (!projectService.existById(projectId)) {
-      log.error("(accept)project: {} not found", projectId);
-      throw new ProjectNotFoundException();
-    }
+    validateProjectId(projectId);
 
     if (!RoleProjectUser.isValid(role)) {
       log.error("(accept)role: {} not found", role);
@@ -101,6 +97,14 @@ public class ProjectUserFacadeServiceImpl implements ProjectUserFacadeService {
     }
 
     return null;
+  }
+
+  @Override
+  public List<AuthUserResponse> getAllUserByProject(String userId, String projectId) {
+    log.info("(getAllUserByProject)user: {}, project: {}", userId, projectId);
+    validateProjectId(projectId);
+
+    return authUserService.getAllUserByProject(projectId);
   }
 
   @Override
@@ -124,6 +128,14 @@ public class ProjectUserFacadeServiceImpl implements ProjectUserFacadeService {
     param.put("subtitle", "If you want to join with our, contact me!");
     emailHelper.send(subject, userMember.getEmail(), "email-kick-user-in-project-template", param);
 
+  }
+
+  private void validateProjectId(String projectId) {
+    log.info("(validateProjectId)projectId: {}", projectId);
+    if (!projectService.existById(projectId)) {
+      log.error("(validateProjectId)project: {} not found", projectId);
+      throw new ProjectNotFoundException();
+    }
   }
 
   private String generateAcceptEmailKey(String email, String projectId, String role) {

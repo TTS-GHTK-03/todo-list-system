@@ -13,6 +13,7 @@ import org.ghtk.todo_list.exception.AccountAlreadyHasUserException;
 import org.ghtk.todo_list.exception.EmailAlreadyExistedException;
 import org.ghtk.todo_list.exception.EmailNotFoundException;
 import org.ghtk.todo_list.exception.UserNotFoundException;
+import org.ghtk.todo_list.mapper.AuthUserResponseMapper;
 import org.ghtk.todo_list.repository.AuthUserRepository;
 import org.ghtk.todo_list.repository.UserProjection;
 import org.ghtk.todo_list.service.AuthUserService;
@@ -22,6 +23,7 @@ import org.ghtk.todo_list.service.AuthUserService;
 public class AuthUserServiceImpl implements AuthUserService {
 
   private final AuthUserRepository repository;
+  private final AuthUserResponseMapper authUserResponseMapper;
   private static final String ADMIN_ROLE = "ADMIN";
   private static final String UNASSIGNED = "Unassigned";
 
@@ -139,6 +141,13 @@ public class AuthUserServiceImpl implements AuthUserService {
   public AuthUser findByUnassigned() {
     log.info("(findByUnassigned)");
     return repository.findByLastName(UNASSIGNED);
+  }
+
+  @Override
+  public List<AuthUserResponse> getAllUserByProject(String projectId) {
+    log.info("(getAllUserByProject)projectId: {}", projectId);
+    List<AuthUser> authUserList = repository.getAllUserByProject(projectId);
+    return authUserResponseMapper.toAuthUserResponseList(authUserList);
   }
 
   @Override

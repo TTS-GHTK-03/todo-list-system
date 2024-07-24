@@ -43,6 +43,12 @@ public class ProjectUserController {
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(), "Đã chấp nhận lời mời!");
   }
 
+  @GetMapping("/users/projects/{project_id}")
+  public BaseResponse getAllUserByProject(@PathVariable("project_id") String projectId){
+    log.info("(getAllUserByProject)projectId: {}", projectId);
+    return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(), projectUserFacadeService.getAllUserByProject(getUserId(), projectId));
+  }
+
   @DeleteMapping("/users/{user_id}/projects/{project_id}")
   public BaseResponse deleteUser(@PathVariable("project_id") String projectId, @PathVariable("user_id") String memberId){
     log.info("(deleteUser)");
