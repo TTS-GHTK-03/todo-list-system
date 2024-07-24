@@ -166,9 +166,9 @@ public class ProjectFacadeServiceImpl implements ProjectFacadeService {
   }
 
   @Override
-  public PagingRes<Project> searchProjects(String title, String keyProject, Pageable pageable, String userId) {
-    log.info("(searchProjects)title: {}, keyProject: {}", title, keyProject);
-    return projectService.searchProjects(title, keyProject, pageable, userId);
+  public PagingRes<Project> searchProjects(String searchValue, Pageable pageable, String userId) {
+    log.info("(searchProjects)searchValue: {}", searchValue);
+    return projectService.searchProjects(searchValue, pageable, userId);
   }
 
   private void validateUserId(String userId){

@@ -22,5 +22,5 @@ public interface ProjectService {
   Project updateProject(Project project);
   Project getProjectById(String projectId);
   void deleteProject(String projectId);
-  PagingRes<Project> searchProjects(String title, String keyProject, Pageable pageable, String userId);
+  PagingRes<Project> searchProjects(String searchValue, Pageable pageable, String userId);
 }

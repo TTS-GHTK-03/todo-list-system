@@ -146,8 +146,8 @@ public class ProjectServiceImpl implements ProjectService {
 
   @Override
   @Transactional
-  public PagingRes<Project> searchProjects(String title, String keyProject, Pageable pageable, String userId) {
-    log.info("(searchProjects)title: {}, keyProject: {}", title, keyProject);
-    return new PagingRes<>(projectRepository.findAll(FilterProject.getProjectsByCriteria(title, keyProject, userId), pageable));
+  public PagingRes<Project> searchProjects(String searchValue, Pageable pageable, String userId) {
+    log.info("(searchProjects)searchValue: {}", searchValue);
+    return new PagingRes<>(projectRepository.findAll(FilterProject.getProjectsByCriteria(searchValue, userId), pageable));
   }
 }
