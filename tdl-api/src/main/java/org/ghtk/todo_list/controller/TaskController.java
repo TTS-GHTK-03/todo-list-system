@@ -130,4 +130,13 @@ public class TaskController {
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         taskFacadeService.searchTask(search, getUserId(), projectId));
   }
+
+  @GetMapping("/{project_id}/tasks/search-panel")
+  public BaseResponse searchTaskByLabelOrType(@PathVariable("project_id") String projectId,
+      @RequestParam(required = false)  String typeId,
+      @RequestParam(required = false)  String labelId) {
+    log.info("(searchTaskByLabelOrType)project: {}, typeId: {}, labelId: {}", projectId, typeId, labelId);
+    return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
+        taskFacadeService.searchTaskByTypeAndLabel(typeId, labelId, getUserId(), projectId));
+  }
 }

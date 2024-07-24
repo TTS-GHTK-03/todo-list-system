@@ -320,6 +320,25 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
     return responses;
   }
 
+  @Override
+  public List<TaskResponse> searchTaskByTypeAndLabel(String type, String label, String userId,
+      String projectId) {
+    log.info("(searchTaskByTypeAndLabel)type: {}, label: {}, userId: {}, projectId: {}", type, label, userId, projectId);
+    var taskSearch = taskService.searchTaskByTypeAndLabel(type, label, userId, projectId);
+    List<TaskResponse> responses = new ArrayList<>();
+    for (var task : taskSearch) {
+      TaskResponse response = new TaskResponse();
+      response.setId(task.getId());
+      response.setTitle(task.getTitle());
+      response.setPoint(task.getPoint());
+      response.setStatus(task.getStatus());
+      response.setKeyProjectTask(task.getKeyProjectTask());
+      response.setUserId(taskAssigneesService.findUserIdByTaskId(task.getId()));
+      responses.add(response);
+    }
+    return responses;
+  }
+
   void validateUserId(String userId) {
     log.info("(validateUserId)userId: {}", userId);
     if (!authUserService.existById(userId)) {
