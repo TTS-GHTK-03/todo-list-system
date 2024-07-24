@@ -44,4 +44,10 @@ public interface AuthUserRepository extends JpaRepository<AuthUser, String> {
   Optional<UserProjection> findByUserId(String userId);
   AuthUser findByLastName(String lastName);
 
+  @Query("""
+      SELECT au FROM AuthUser au 
+      JOIN ProjectUser pu ON pu.userId = au.id AND pu.projectId = :projectId 
+      WHERE au.email != ''
+      """)
+  List<AuthUser> getAllUserByProject(String projectId);
 }

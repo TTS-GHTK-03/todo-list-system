@@ -4,6 +4,7 @@ import org.ghtk.todo_list.core_email.configuration.EnableCoreEmail;
 import org.ghtk.todo_list.core_email.helper.EmailHelper;
 import org.ghtk.todo_list.facade.AuthFacadeService;
 import org.ghtk.todo_list.facade.AuthFacadeServiceImpl;
+import org.ghtk.todo_list.mapper.AuthUserResponseMapper;
 import org.ghtk.todo_list.repository.AuthAccountRepository;
 import org.ghtk.todo_list.repository.AuthUserRepository;
 import org.ghtk.todo_list.service.AuthAccountService;
@@ -43,7 +44,7 @@ public class CoreAuthenticationConfiguration {
   }
 
   @Bean
-  public AuthUserService authUserService(AuthUserRepository repository) {
-    return new AuthUserServiceImpl(repository);
+  public AuthUserService authUserService(AuthUserRepository repository, AuthUserResponseMapper authUserResponseMapper) {
+    return new AuthUserServiceImpl(repository, authUserResponseMapper);
   }
 }
