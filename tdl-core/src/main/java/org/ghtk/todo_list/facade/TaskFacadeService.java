@@ -27,5 +27,5 @@ public interface TaskFacadeService {
   void deleteTask(String userId, String projectId, String taskId);
   TaskResponse updateTitleTask(String userId, String projectId, String taskId, String title);
   List<TaskResponse> getAllTaskAssigneesForUser(String userId);
-  List<TaskResponse> searchTask(String searchValue, String userId, String projectId);
+  List<TaskResponse> searchTask(String searchValue, String typeId, String labelId, String userId, String projectId);
 }
