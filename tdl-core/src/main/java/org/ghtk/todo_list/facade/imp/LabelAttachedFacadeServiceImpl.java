@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.entity.LabelAttached;
 import org.ghtk.todo_list.exception.LabelAttachedAlreadyExistsException;
 import org.ghtk.todo_list.exception.LabelNotFoundException;
+import org.ghtk.todo_list.exception.ProjectNotFoundException;
 import org.ghtk.todo_list.exception.TaskNotFoundException;
 import org.ghtk.todo_list.exception.TypeNotFoundException;
 import org.ghtk.todo_list.facade.LabelAttachedFacadeService;
@@ -14,6 +15,7 @@ import org.ghtk.todo_list.model.response.LabelAttachedResponse;
 import org.ghtk.todo_list.model.response.TaskResponse;
 import org.ghtk.todo_list.service.LabelAttachedService;
 import org.ghtk.todo_list.service.LabelService;
+import org.ghtk.todo_list.service.ProjectService;
 import org.ghtk.todo_list.service.TaskService;
 import org.springframework.stereotype.Component;
 
@@ -22,6 +24,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class LabelAttachedFacadeServiceImpl implements LabelAttachedFacadeService {
 
+  private final ProjectService projectService;
   private final LabelAttachedService labelAttachedService;
   private final TaskService taskService;
   private final LabelService labelService;
@@ -29,9 +32,13 @@ public class LabelAttachedFacadeServiceImpl implements LabelAttachedFacadeServic
   @Override
   public LabelAttachedResponse create(String projectId, String typeId, String taskId, String labelId) {
     log.info("(create) projectId: {}, labelId: {}, taskId: {}", projectId, labelId, taskId);
+
+    validateProjectId(projectId);
+    validateTypeId(typeId);
+    validateTaskId(taskId);
     validateLabelId(labelId);
     validateProjectIdAndTaskId(projectId, taskId);
-    validateTypeId(typeId);
+
     if(labelAttachedService.existsByLabelIdAndTaskId(labelId, taskId)) {
       log.error("(create)Label attached already exists labelId: {}, taskId: {}", labelId, taskId);
       throw new LabelAttachedAlreadyExistsException();
@@ -78,10 +85,26 @@ public class LabelAttachedFacadeServiceImpl implements LabelAttachedFacadeServic
     labelAttachedService.deleteAllByTaskId(taskId);
   }
 
+  private void validateProjectId(String projectId){
+    log.info("(validateProjectId)projectId: {}", projectId);
+    if(!projectService.existById(projectId)){
+      log.info("(validateProjectId)projectId: {} not found", projectId);
+      throw new ProjectNotFoundException();
+    }
+  }
+
   private void validateProjectIdAndTaskId(String projectId, String taskId) {
     log.info("(validateProjectIdAndTaskId)projectId: {}, taskId: {}", projectId, taskId);
     if (!taskService.existByProjectIdAndTaskId(projectId, taskId)) {
       log.error("(validateProjectIdAndTaskId)taskId: {} not found", taskId);
+      throw new TaskNotFoundException();
+    }
+  }
+
+  private void validateTaskId(String taskId) {
+    log.info("(validateTaskId)taskId: {}", taskId);
+    if (!taskService.existById(taskId)) {
+      log.error("(validateTaskId)taskId: {} not found", taskId);
       throw new TaskNotFoundException();
     }
   }
@@ -93,9 +116,9 @@ public class LabelAttachedFacadeServiceImpl implements LabelAttachedFacadeServic
       throw new LabelNotFoundException();
     }
   }
+
   private void validateTypeId(String typeId) {
     log.info("(validateTypeId)typeId: {}", typeId);
-
     if (!labelService.existsByTypeId(typeId) || !taskService.existsByTypeId(typeId)) {
       log.error("(validateTypeId)typeId: {} not found", typeId);
       throw new TypeNotFoundException();

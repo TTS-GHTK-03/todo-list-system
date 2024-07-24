@@ -95,8 +95,8 @@ public class SprintFacadeServiceImpl implements SprintFacadeService {
       sprint.setTitle(title);
     }
 
-    if(LocalDate.now().isBefore(LocalDate.parse(startDate))){
-      sprint.setStartDate(LocalDate.now());
+    if(LocalDate.now().isBefore(LocalDate.parse(startDate)) || LocalDate.now().isAfter(LocalDate.parse(startDate))){
+      sprint.setStartDate(LocalDate.now().plusDays(2));
     } else {
       sprint.setStartDate(LocalDate.parse(startDate));
     }
@@ -126,7 +126,17 @@ public class SprintFacadeServiceImpl implements SprintFacadeService {
     if (title != null && !title.isEmpty()) {
       sprint.setTitle(title);
     }
-    sprint.setStartDate(LocalDate.parse(startDate));
+
+    if(LocalDate.now().isBefore(LocalDate.parse(startDate)) || LocalDate.now().isAfter(LocalDate.parse(startDate))){
+      if(sprint.getStatus().equals(SprintStatus.TODO.toString())){
+        sprint.setStartDate(LocalDate.now().plusDays(2));
+      } else {
+        sprint.setStartDate(LocalDate.parse(startDate));
+      }
+    } else {
+      sprint.setStartDate(LocalDate.parse(startDate));
+    }
+
     sprint.setEndDate(LocalDate.parse(endDate));
     sprintService.save(sprint);
 
@@ -199,6 +209,11 @@ public class SprintFacadeServiceImpl implements SprintFacadeService {
   @Transactional
   public void deleteSprint(String projectId, String id) {
     log.info("(deleteSprint) projectId: {}, sprintId {}", projectId, id);
+
+    validateProjectId(projectId);
+    validateSprintId(id);
+    validateProjectIdAndSprintId(projectId, id);
+
     sprintProgressService.deleteAllBySprintId(id);
     List<Task> tasks = taskService.getAllBySprintId(id);
     for (Task o : tasks) {
