@@ -10,9 +10,11 @@ import org.ghtk.todo_list.entity.Project;
 import org.ghtk.todo_list.entity.Sprint;
 import org.ghtk.todo_list.entity.Task;
 import org.ghtk.todo_list.exception.InvalidDateRangeException;
-import org.ghtk.todo_list.exception.ProjectIdMismatchException;
 import org.ghtk.todo_list.exception.ProjectNotFoundException;
+import org.ghtk.todo_list.exception.SprintNotExistProjectException;
+import org.ghtk.todo_list.exception.SprintNotFoundException;
 import org.ghtk.todo_list.exception.SprintStatusNotFoundException;
+import org.ghtk.todo_list.exception.SprintStatusTodoInvalidException;
 import org.ghtk.todo_list.facade.SprintFacadeService;
 import org.ghtk.todo_list.mapper.SprintMapper;
 import org.ghtk.todo_list.model.response.CreateSprintResponse;
@@ -77,19 +79,28 @@ public class SprintFacadeServiceImpl implements SprintFacadeService {
       throw new InvalidDateRangeException();
     }
 
+    validateProjectId(projectId);
+    validateSprintId(sprintId);
+    validateProjectIdAndSprintId(projectId, sprintId);
+
     Sprint sprint = sprintService.findById(sprintId);
-    if (!sprint.getProjectId().equals(projectId)) {
-      log.error(
-          "(startSprint) projectId mismatch: sprintId {}, expected projectId {}, but found projectId {}",
-          sprintId, projectId, sprint.getProjectId());
-      throw new ProjectIdMismatchException();
+
+    if(!sprint.getStatus().equals(SprintStatus.TODO.toString())) {
+      log.error("(startSprint)invalid sprint status: {}", sprint.getStatus());
+      throw new SprintStatusTodoInvalidException();
     }
 
     sprint.setStatus(SprintStatus.START.toString());
     if (title != null && !title.isEmpty()) {
       sprint.setTitle(title);
     }
-    sprint.setStartDate(LocalDate.parse(startDate));
+
+    if(LocalDate.now().isBefore(LocalDate.parse(startDate))){
+      sprint.setStartDate(LocalDate.now());
+    } else {
+      sprint.setStartDate(LocalDate.parse(startDate));
+    }
+
     sprint.setEndDate(LocalDate.parse(endDate));
     sprintService.save(sprint);
 
@@ -106,13 +117,11 @@ public class SprintFacadeServiceImpl implements SprintFacadeService {
       throw new InvalidDateRangeException();
     }
 
+    validateProjectId(projectId);
+    validateSprintId(sprintId);
+    validateProjectIdAndSprintId(projectId, sprintId);
+
     Sprint sprint = sprintService.findById(sprintId);
-    if (!sprint.getProjectId().equals(projectId)) {
-      log.error(
-          "(updateSprint) projectId mismatch: sprintId {}, expected projectId {}, but found projectId {}",
-          sprintId, projectId, sprint.getProjectId());
-      throw new ProjectIdMismatchException();
-    }
 
     if (title != null && !title.isEmpty()) {
       sprint.setTitle(title);
@@ -159,13 +168,11 @@ public class SprintFacadeServiceImpl implements SprintFacadeService {
   @Override
   public SprintResponse getSprint(String projectId, String id) {
     log.info("(getSprint)");
+    validateProjectId(projectId);
+    validateSprintId(id);
+    validateProjectIdAndSprintId(projectId, id);
     Sprint sprint = sprintService.findById(id);
-    if (!sprint.getProjectId().equals(projectId)) {
-      log.error(
-          "(getSprint) projectId mismatch: sprintId {}, expected projectId {}, but found projectId {}",
-          id, projectId, sprint.getProjectId());
-      throw new ProjectIdMismatchException();
-    }
+
     log.info("(getSprint)sprint: {}", sprint);
     return sprintMapper.toSprintResponse(sprint);
   }
@@ -206,5 +213,30 @@ public class SprintFacadeServiceImpl implements SprintFacadeService {
 
   private boolean isValidDateRange(LocalDate startDate, LocalDate endDate) {
     return !startDate.isBefore(endDate);
+  }
+
+  private void validateProjectId(String projectId){
+    log.info("(validateProjectId)projectId: {}", projectId);
+    if(!projectService.existById(projectId)){
+      log.error("(validateProjectId) project not found: projectId {}", projectId);
+      throw new ProjectNotFoundException();
+    }
+  }
+
+  private void validateSprintId(String sprintId){
+    log.info("(validateSprintId)sprintId: {}", sprintId);
+    if(!sprintService.existById(sprintId)){
+      log.error("(validateSprintId) sprintId not found: sprintId {}", sprintId);
+      throw new SprintNotFoundException();
+    }
+  }
+
+  private void validateProjectIdAndSprintId(String projectId, String sprintId) {
+    log.info("(validateProjectIdAndSprintId)projectId: {}, sprintId: {}", projectId, sprintId);
+    Sprint sprint = sprintService.findById(sprintId);
+    if (!sprint.getProjectId().equals(projectId)) {
+      log.error("(validateProjectIdAndSprintId)sprintId {} not part of projectId {}", sprintId, projectId);
+      throw new SprintNotExistProjectException();
+    }
   }
 }

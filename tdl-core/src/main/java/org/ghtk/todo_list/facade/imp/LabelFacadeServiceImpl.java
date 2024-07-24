@@ -10,6 +10,8 @@ import org.ghtk.todo_list.exception.InvalidTypeException;
 import org.ghtk.todo_list.exception.LabelAlreadyExistsException;
 import org.ghtk.todo_list.exception.ProjectIdMismatchException;
 import org.ghtk.todo_list.exception.ProjectNotFoundException;
+import org.ghtk.todo_list.exception.SprintNotExistProjectException;
+import org.ghtk.todo_list.exception.TypeNotExistProjectException;
 import org.ghtk.todo_list.facade.LabelFacadeService;
 import org.ghtk.todo_list.mapper.LabelMapper;
 import org.ghtk.todo_list.model.response.LabelResponse;
@@ -111,8 +113,8 @@ public class LabelFacadeServiceImpl implements LabelFacadeService {
     log.info("(validProjectInType)");
     Type type = typeService.findById(typeId);
     if (!type.getProjectId().equals(projectId)) {
-      log.error("(validProjectInType) ProjectId: {} Mismatch", typeId);
-      throw new ProjectIdMismatchException();
+      log.error("(validProjectInType)typeId {} not part of projectId {}", typeId, projectId);
+      throw new TypeNotExistProjectException();
     }
   }
 }
