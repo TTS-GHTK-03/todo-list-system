@@ -6,13 +6,14 @@ import jakarta.persistence.criteria.Root;
 import jakarta.persistence.criteria.Subquery;
 import java.util.ArrayList;
 import java.util.List;
+import org.ghtk.todo_list.entity.LabelAttached;
 import org.ghtk.todo_list.entity.ProjectUser;
 import org.ghtk.todo_list.entity.Task;
 import org.springframework.data.jpa.domain.Specification;
 
 public class FilterTask {
 
-  public static Specification<Task> getTasksByCriteria(String searchValue,
+  public static Specification<Task> getTasksByCriteria(String searchValue, String typeId, String labelId,
       String userId, String projectId) {
     return (root, query, criteriaBuilder) -> {
       List<Predicate> predicates = new ArrayList<>();
@@ -21,6 +22,19 @@ public class FilterTask {
         Predicate titlePredicate = criteriaBuilder.like(criteriaBuilder.lower(root.get("title")), "%" + searchValue.toLowerCase() + "%");
         Predicate keyProjectTaskPredicate = criteriaBuilder.like(criteriaBuilder.lower(root.get("keyProjectTask")), "%" + searchValue.toLowerCase() + "%");
         predicates.add(criteriaBuilder.or(titlePredicate, keyProjectTaskPredicate));
+      }
+
+      if (typeId != null && !typeId.isEmpty()) {
+        predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("typeId")), "%" + typeId.toLowerCase() + "%"));
+      }
+
+      if (labelId != null && !labelId.isEmpty()) {
+        Subquery<String> labelSubquery = query.subquery(String.class);
+        Root<LabelAttached> labelAttachedRoot = labelSubquery.from(LabelAttached.class);
+        labelSubquery.select(labelAttachedRoot.get("taskId"));
+        labelSubquery.where(criteriaBuilder.equal(labelAttachedRoot.get("labelId"), labelId));
+
+        predicates.add(criteriaBuilder.in(root.get("id")).value(labelSubquery));
       }
 
       if (userId != null && !userId.isEmpty()) {

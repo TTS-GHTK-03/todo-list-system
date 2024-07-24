@@ -11,16 +11,14 @@ import org.springframework.data.jpa.domain.Specification;
 
 public class FilterProject {
 
-  public static Specification<Project> getProjectsByCriteria(String title, String keyProject, String userId) {
+  public static Specification<Project> getProjectsByCriteria(String searchValue, String userId) {
     return (root, query, criteriaBuilder) -> {
       List<Predicate> predicates = new ArrayList<>();
 
-      if (title != null && !title.isEmpty()) {
-        predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("title")), "%" + title.toLowerCase() + "%"));
-      }
-
-      if (keyProject != null && !keyProject.isEmpty()) {
-        predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("keyProject")), "%" + keyProject.toLowerCase() + "%"));
+      if (searchValue != null && !searchValue.isEmpty()) {
+        Predicate titlePredicate = criteriaBuilder.like(criteriaBuilder.lower(root.get("title")), "%" + searchValue.toLowerCase() + "%");
+        Predicate keyProjectPredicate = criteriaBuilder.like(criteriaBuilder.lower(root.get("keyProject")), "%" + searchValue.toLowerCase() + "%");
+        predicates.add(criteriaBuilder.or(titlePredicate, keyProjectPredicate));
       }
 
       if (userId != null && !userId.isEmpty()) {

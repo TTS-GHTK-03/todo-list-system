@@ -207,7 +207,8 @@ public class TaskServiceImp implements TaskService {
   }
 
   @Override
-  public List<Task> searchTask(String searchValue, String userId, String projectId) {
-    return taskRepository.findAll(FilterTask.getTasksByCriteria(searchValue, userId, projectId));
+  public List<Task> searchTask(String searchValue, String typeId, String labelId, String userId, String projectId) {
+    log.info("(searchTask)searchValue: {}", searchValue);
+    return taskRepository.findAll(FilterTask.getTasksByCriteria(searchValue, typeId, labelId, userId, projectId));
   }
 }

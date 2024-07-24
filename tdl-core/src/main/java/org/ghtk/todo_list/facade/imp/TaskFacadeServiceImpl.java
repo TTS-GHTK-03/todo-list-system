@@ -302,10 +302,10 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
   }
 
   @Override
-  public List<TaskResponse> searchTask(String searchValue, String userId, String projectId) {
+  public List<TaskResponse> searchTask(String searchValue, String typeId, String labelId, String userId, String projectId) {
     log.info("(searchTask)searchValue: {}, userId: {}, projectId: {}", searchValue, userId, projectId);
 
-    var taskSearch = taskService.searchTask(searchValue, userId, projectId);
+    var taskSearch = taskService.searchTask(searchValue, typeId, labelId, userId, projectId);
     List<TaskResponse> responses = new ArrayList<>();
     for (var task : taskSearch) {
       TaskResponse response = new TaskResponse();

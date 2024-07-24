@@ -22,5 +22,5 @@ public interface ProjectFacadeService {
 
   void deleteProject(String userId, String projectId);
 
-  PagingRes<Project> searchProjects(String title, String keyProject, Pageable pageable, String userId);
+  PagingRes<Project> searchProjects(String searchValue, Pageable pageable, String userId);
 }
