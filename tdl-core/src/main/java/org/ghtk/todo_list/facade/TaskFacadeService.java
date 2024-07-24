@@ -28,4 +28,6 @@ public interface TaskFacadeService {
   TaskResponse updateTitleTask(String userId, String projectId, String taskId, String title);
   List<TaskResponse> getAllTaskAssigneesForUser(String userId);
   List<TaskResponse> searchTask(String searchValue, String typeId, String labelId, String userId, String projectId);
+  List<TaskResponse> searchTaskBoard(String searchValue, String sprintId, String userId, String projectId);
+
 }
