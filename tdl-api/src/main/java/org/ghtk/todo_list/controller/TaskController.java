@@ -132,4 +132,25 @@ public class TaskController {
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         taskFacadeService.searchTask(search, typeId, labelId, getUserId(), projectId));
   }
+
+  @GetMapping("/{project_id}/tasks/search-board")
+  public BaseResponse searchTaskBoard(@PathVariable("project_id") String projectId,
+      @RequestParam(required = false)  String search,
+      @RequestParam(required = false)  String sprintId) {
+    log.info("(searchTaskBoard)project: {}, search: {}, sprintId: {}", projectId, search, sprintId);
+    return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
+        taskFacadeService.searchTaskBoard(search, sprintId, getUserId(), projectId));
+  }
+
+  @GetMapping("/tasks/search-filter")
+  public BaseResponse searchTaskBoard(
+      @RequestParam(required = false)  String projectId,
+      @RequestParam(required = false)  String search,
+      @RequestParam(required = false)  String typeId,
+      @RequestParam(required = false)  String status,
+      @RequestParam(required = false)  String assignee) {
+    log.info("(searchTaskBoard)project: {}, search: {}, typeId: {}, status: {}, assignee: {}", projectId, search, typeId, status, assignee);
+    return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
+        taskFacadeService.searchTaskFilter(search, typeId, status, assignee, getUserId(), projectId));
+  }
 }

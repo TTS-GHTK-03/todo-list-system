@@ -37,7 +37,7 @@ public class SprintController {
         sprintFacadeService.createSprintByProject(projectId));
   }
 
-  @PutMapping("/start/{sprint_id}")
+  @PutMapping("/{sprint_id}/start")
   public BaseResponse startSprint(@RequestBody @Valid StartSprintRequest request,
       @PathVariable("project_id") String projectId, @PathVariable("sprint_id") String sprintId) {
     log.info("(startSprint) projectId {}, sprintId {}", projectId, sprintId);

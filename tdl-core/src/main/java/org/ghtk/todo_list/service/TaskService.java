@@ -46,4 +46,7 @@ public interface TaskService {
 
   List<Task> getAllTaskAssigneesForUser(String userId);
   List<Task> searchTask(String searchValue, String typeId, String labelId, String userId, String projectId);
+  List<Task> searchTaskBoard(String searchValue, String sprintId, String userId, String projectId);
+  List<Task> searchTaskFilter(String searchValue, String typeId,
+      String status, String assignee, String userId, String projectId);
 }

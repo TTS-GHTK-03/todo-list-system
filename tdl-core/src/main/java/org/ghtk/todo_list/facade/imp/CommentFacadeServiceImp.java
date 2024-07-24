@@ -104,6 +104,7 @@ public class CommentFacadeServiceImp implements CommentFacadeService {
     log.info("(replyComment)userId: {},taskId: {}, commentId: {}, text: {}", userId, taskId,
         commentId, text);
     validateProjectId(projectId);
+    validateParentId(commentId);
     validateTaskId(taskId);
     return commentService.replyComment(userId, taskId, commentId, text);
   }
