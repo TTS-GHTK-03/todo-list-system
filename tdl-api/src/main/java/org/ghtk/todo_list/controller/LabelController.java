@@ -22,13 +22,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
-@RequestMapping("/api/v1/projects/{project_id}/types/{type_id}/labels")
+@RequestMapping("/api/v1/projects/{project_id}")
 @RequiredArgsConstructor
 public class LabelController {
 
   private final LabelFacadeService labelFacadeService;
 
-  @PostMapping()
+  @PostMapping("/types/{type_id}/labels")
   public BaseResponse createLabel(@RequestBody @Valid CreateLabelRequest request,
       @PathVariable("project_id") String projectId, @PathVariable("type_id") String typeId) {
     log.info("(createLabel)");
@@ -39,7 +39,7 @@ public class LabelController {
             request.getDescription()));
   }
 
-  @PutMapping("/{id}")
+  @PutMapping("/types/{type_id}/labels/{id}")
   public BaseResponse updateLabel(@RequestBody @Valid UpdateLabelRequest request,
       @PathVariable("project_id") String projectId, @PathVariable("type_id") String typeId,
       @PathVariable("id") String labelId) {
@@ -51,7 +51,7 @@ public class LabelController {
             request.getDescription()));
   }
 
-  @GetMapping()
+  @GetMapping("/types/{type_id}/labels")
   public BaseResponse getLabelsByTypeId(@PathVariable("project_id") String projectId,
       @PathVariable("type_id") String typeId) {
     log.info("(getLabelsByTypeId)");
@@ -60,7 +60,13 @@ public class LabelController {
         labelFacadeService.getLabelsByTypeId(projectId, typeId));
   }
 
-  @DeleteMapping("/{id}")
+  @GetMapping("/labels/attached")
+  public BaseResponse getAllLabelAttachedByProject(@PathVariable("project_id") String projectId) {
+    log.info("(getAllLabelAttachedByProject)projectId: {}", projectId);
+    return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(), labelFacadeService.getAllLabelAttachedByProject(getUserId(), projectId));
+  }
+
+  @DeleteMapping("/types/{type_id}/labels/{id}")
   public BaseResponse deleteLabel(@PathVariable("project_id") String projectId,
       @PathVariable("type_id") String typeId, @PathVariable("id") String labelId) {
     log.info("(deleteLabel)");

@@ -2,6 +2,7 @@ package org.ghtk.todo_list.service;
 
 import java.util.List;
 import org.ghtk.todo_list.entity.Label;
+import org.ghtk.todo_list.model.response.LabelResponse;
 
 public interface LabelService {
 
@@ -12,6 +13,7 @@ public interface LabelService {
   Label findById(String id);
 
   List<Label> getLabelsByType(String typeId);
+  List<LabelResponse> getAllLabelAttachedByProject(String projectId);
   void deleteLabel(String id);
   void deleteByTypeId(String typeId);
   boolean existsById(String id);
