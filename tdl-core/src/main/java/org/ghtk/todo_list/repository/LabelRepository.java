@@ -19,7 +19,7 @@ public interface LabelRepository extends JpaRepository<Label, String> {
       JOIN LabelAttached la ON la.labelId = l.id
       JOIN Type t ON t.id = l.typeId AND t.projectId = :projectId
       """)
-  List<Label> getAllLabelAttachedByProjectId(String projectId);
+  List<Label> getAllLabelByProjectIdAndLabelAttached(String projectId);
 
   void deleteAllByTypeId(String typeId);
 
