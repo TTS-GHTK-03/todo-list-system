@@ -9,9 +9,9 @@ import lombok.Getter;
 @Getter
 public class UpdatePointTaskRequest {
 
-  @NotNull(message = "Trường điểm không thể trống")
-  @Min(value = 0, message = "Điểm phải lớn hơn hoặc bằng 0")
-  @Max(value = 5, message = "Điểm phải nhỏ hơn hoặc bằng 5")
+  @NotNull(message = "Point is required!")
+  @Min(value = 0, message = "Point must be greater or equal 0!")
+  @Max(value = 5, message = "Point must be less or equal 5!")
   private Integer point;
 
 }
