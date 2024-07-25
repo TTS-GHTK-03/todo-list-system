@@ -55,7 +55,7 @@ public interface TaskRepository extends JpaRepository<Task, String>,
   @Modifying
   @Transactional
   @Query("UPDATE Task t SET t.point = :point WHERE t.id = :taskId")
-  int updatePoint(@Param("taskId") String taskId, @Param("point") int point);
+  void updatePoint(@Param("taskId") String taskId, @Param("point") int point);
 
   List<Task> findAllBySprintId(String sprintId);
 

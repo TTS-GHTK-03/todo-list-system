@@ -66,6 +66,7 @@ public class TaskServiceImp implements TaskService {
   }
 
   @Override
+  @Transactional
   public TaskResponse updatePoint(String taskId, int point, String userId) {
     log.info("(updatePoint)taskId: {}, userId: {}", taskId, userId);
     var task = taskRepository
@@ -75,7 +76,7 @@ public class TaskServiceImp implements TaskService {
           throw new TaskNotFoundException();
         });
     taskRepository.updatePoint(task.getId(),point);
-    return TaskResponse.of(task.getId(), task.getTitle(), task.getPoint(), task.getStatus(), task.getKeyProjectTask(), userId);
+    return TaskResponse.from(task, userId);
   }
 
   @Override
