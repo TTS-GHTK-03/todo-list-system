@@ -61,9 +61,9 @@ public class LabelController {
   }
 
   @GetMapping("/labels/attached")
-  public BaseResponse getAllLabelAttachedByProject(@PathVariable("project_id") String projectId) {
-    log.info("(getAllLabelAttachedByProject)projectId: {}", projectId);
-    return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(), labelFacadeService.getAllLabelAttachedByProject(getUserId(), projectId));
+  public BaseResponse getAllLabelByProjectIdAndLabelAttached(@PathVariable("project_id") String projectId) {
+    log.info("(getAllLabelByProjectIdAndLabelAttached)projectId: {}", projectId);
+    return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(), labelFacadeService.getAllLabelByProjectIdAndLabelAttached(getUserId(), projectId));
   }
 
   @DeleteMapping("/types/{type_id}/labels/{id}")

@@ -49,8 +49,8 @@ public class LabelServiceImpl implements LabelService {
   }
 
   @Override
-  public List<Label> getAllLabelAttachedByProject(String projectId) {
-    log.info("(getAllLabelAttachedByProject)projectId: {}", projectId);
+  public List<Label> getAllLabelByProjectIdAndLabelAttached(String projectId) {
+    log.info("(getAllLabelByProjectIdAndLabelAttached)projectId: {}", projectId);
     return labelRepository.getAllLabelByProjectIdAndLabelAttached(projectId);
   }
 

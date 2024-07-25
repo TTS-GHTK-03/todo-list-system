@@ -9,6 +9,6 @@ public interface LabelFacadeService {
   LabelResponse createLabel(String projectId, String typeId, String title, String description);
   LabelResponse updateLabel(String projectId, String typeId, String labelId, String title, String description);
   List<LabelResponse> getLabelsByTypeId(String projectId, String typeId);
-  List<LabelResponse> getAllLabelAttachedByProject(String userId, String projectId);
+  List<LabelResponse> getAllLabelByProjectIdAndLabelAttached(String userId, String projectId);
   void deleteLabel(String projectId, String typeId, String labelId);
 }
