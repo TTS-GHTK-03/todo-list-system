@@ -76,6 +76,7 @@ public class TaskServiceImp implements TaskService {
           throw new TaskNotFoundException();
         });
     taskRepository.updatePoint(task.getId(),point);
+    task.setPoint(point);
     return TaskResponse.from(task, userId);
   }
 
