@@ -19,9 +19,9 @@ spring:
   liquibase:
     changelog: classpath:/database.migration/master-changelog.xml
   datasource:
-    url: jdbc:mysql://localhost:3306/tdl
-    username:
-    password:
+    url: ${DATABASE_URL}
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
 
   cache:
@@ -35,8 +35,8 @@ spring:
   mail:
     default-encoding: UTF-8
     host: smtp.gmail.com
-    username:
-    password:
+    username: ${EMAIL_USERNAME}
+    password: ${EMAIL_PASSWORD}
     port: 587
     properties:
       mail:
