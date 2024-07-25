@@ -74,8 +74,7 @@ public class TaskServiceImp implements TaskService {
           log.error("(updateStatus)taskId: {}, userID: {}", taskId, userId);
           throw new TaskNotFoundException();
         });
-    task.setPoint(point);
-    taskRepository.save(task);
+    taskRepository.updatePoint(task.getId(),point);
     return TaskResponse.of(task.getId(), task.getTitle(), task.getPoint(), task.getStatus(), task.getKeyProjectTask(), userId);
   }
 
