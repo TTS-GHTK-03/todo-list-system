@@ -245,7 +245,7 @@ public class SprintFacadeServiceImpl implements SprintFacadeService {
     int countTaskCompleted = taskService.countBySprintIdAndProjectIdAndStatus(sprintId, projectId, DONE.toString());
     int countTaskFailed =
         taskService.countBySprintIdAndProjectIdAndStatus(sprintId, projectId, IN_PROGRESS.toString()) +
-        taskService.countBySprintIdAndProjectIdAndStatus(projectId, projectId, TODO.toString()) +
+        taskService.countBySprintIdAndProjectIdAndStatus(sprintId, projectId, TODO.toString()) +
         taskService.countBySprintIdAndProjectIdAndStatus(sprintId, projectId, READY_FOR_TEST.toString());
     return CompleteSprintResponse.from(countTaskCompleted, countTaskFailed);
   }
