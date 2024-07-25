@@ -19,7 +19,6 @@ public class Task extends BaseEntity {
 
   private String title;
   private String description;
-  private String label;
   private Integer point;
   private String checklist;
   private String status;

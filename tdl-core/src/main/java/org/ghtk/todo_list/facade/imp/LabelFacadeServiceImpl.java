@@ -135,7 +135,7 @@ public class LabelFacadeServiceImpl implements LabelFacadeService {
 
   private void validateTypeIdAndLabelId(String typeId, String labelId){
     log.info("(validateTypeIdAndLabelId)typeId: {}, labelId: {}", typeId, labelId);
-    if(labelService.existsByTypeIdAndLabelId(typeId, labelId)){
+    if(!labelService.existsByTypeIdAndLabelId(typeId, labelId)){
       log.error("(validateTypeIdAndLabelId)labelId: {} not exists in typeId: {}", labelId, typeId);
       throw new LabelNotExistsException();
     }

@@ -6,6 +6,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.entity.LabelAttached;
 import org.ghtk.todo_list.exception.LabelAttachedAlreadyExistsException;
+import org.ghtk.todo_list.exception.LabelAttachedNotExistTask;
+import org.ghtk.todo_list.exception.LabelAttachedNotFoundException;
 import org.ghtk.todo_list.exception.LabelNotFoundException;
 import org.ghtk.todo_list.exception.ProjectNotFoundException;
 import org.ghtk.todo_list.exception.TaskNotFoundException;
@@ -74,7 +76,11 @@ public class LabelAttachedFacadeServiceImpl implements LabelAttachedFacadeServic
   @Override
   public void deleteLabelAttached(String projectId, String taskId, String id) {
     log.info("(deleteLabelAttached)projectId: {}, taskId: {}, id: {}", projectId, taskId, id);
+    validateProjectId(projectId);
+    validateTaskId(taskId);
+    validateLabelAttachedId(id);
     validateProjectIdAndTaskId(projectId, taskId);
+    validateTaskIdAndLabelAttachedId(taskId, id);
     labelAttachedService.deleteById(id);
   }
 
@@ -125,4 +131,19 @@ public class LabelAttachedFacadeServiceImpl implements LabelAttachedFacadeServic
     }
   }
 
+  private void validateLabelAttachedId(String labelAttachedId) {
+    log.info("(validateLabelAttachedId)labelAttachedId: {}", labelAttachedId);
+    if(!labelAttachedService.existsById(labelAttachedId)){
+      log.error("(validateLabelAttachedId)labelAttachedId: {} not found", labelAttachedId);
+      throw new LabelAttachedNotFoundException();
+    }
+  }
+
+  private void validateTaskIdAndLabelAttachedId(String taskId, String labelAttachedId){
+    log.info("(validateTaskIdAndLabelAttachedId)taskId: {}, labelAttachedId: {}", taskId, labelAttachedId);
+    if(!labelAttachedService.existsByTaskIdAndLabelAttachedId(taskId, labelAttachedId)){
+      log.error("(validateTaskIdAndLabelAttachedId) labelAttachedId: {} not exist in taskId: {}", labelAttachedId, taskId);
+      throw new LabelAttachedNotExistTask();
+    }
+  }
 }
