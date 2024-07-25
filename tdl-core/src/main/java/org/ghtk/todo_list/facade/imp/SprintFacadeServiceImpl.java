@@ -4,6 +4,7 @@ import static org.ghtk.todo_list.constant.TaskStatus.*;
 
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -242,12 +243,26 @@ public class SprintFacadeServiceImpl implements SprintFacadeService {
     validateSprintId(sprintId);
     validateProjectIdAndSprintId(projectId, sprintId);
 
-    int countTaskCompleted = taskService.countBySprintIdAndProjectIdAndStatus(sprintId, projectId, DONE.toString());
-    int countTaskFailed =
-        taskService.countBySprintIdAndProjectIdAndStatus(sprintId, projectId, IN_PROGRESS.toString()) +
-        taskService.countBySprintIdAndProjectIdAndStatus(sprintId, projectId, TODO.toString()) +
-        taskService.countBySprintIdAndProjectIdAndStatus(sprintId, projectId, READY_FOR_TEST.toString());
+    int countTaskCompleted = taskService.countBySprintIdAndProjectIdAndStatusDone(sprintId, projectId);
+    int countTaskFailed =taskService.countBySprintIdAndProjectIdAndStatusNotDone(sprintId, projectId);
     return CompleteSprintResponse.from(countTaskCompleted, countTaskFailed);
+  }
+
+  @Override
+  public void confirmCompleteSprint(String projectId, String sprintId) {
+    log.info("(confirmCompleteSprint)projectId: {}, sprintId {}", projectId, sprintId);
+    List<Task> tasks = taskService.findAllByProjectIdAndSprintIdAndStatusNotDone(projectId, sprintId);
+    List<Task> saveTakes = new ArrayList<>();
+    for (var task : tasks) {
+      task.setStatus(TODO.toString());
+      task.setSprintId(null);
+      task.setStartDate(null);
+      task.setDueDate(null);
+      saveTakes.add(task);
+    }
+    taskService.saveAll(saveTakes);
+    sprintService.updateSprintComplete(sprintId);
+
   }
 
   private boolean isValidDateRange(LocalDate startDate, LocalDate endDate) {
