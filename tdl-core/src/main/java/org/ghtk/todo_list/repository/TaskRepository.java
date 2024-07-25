@@ -86,4 +86,7 @@ public interface TaskRepository extends JpaRepository<Task, String>,
       WHERE t.status != :taskStatusDone ORDER BY t.status, t.createdAt
       """)
   List<Task> getAllTaskAssigneesForUser(String userId, String taskStatusDone);
+
+  @Query("SELECT COUNT(s) FROM Task s WHERE s.sprintId = :sprintId AND s.projectId = :projectId AND s.status = :status")
+  Integer countBySprintIdAndProjectIdAndStatus(String sprintId, String projectId, String status);
 }
