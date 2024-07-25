@@ -1,5 +1,7 @@
 package org.ghtk.todo_list.service.impl;
 
+import static org.ghtk.todo_list.constant.SprintStatus.COMPLETE;
+
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -82,5 +84,19 @@ public class SprintServiceImpl implements SprintService {
   public void deleteById(String id) {
     log.info("(deleteById)");
     sprintRepository.deleteById(id);
+  }
+
+  @Override
+  public void updateSprintComplete(String id) {
+    log.info("(updateSprintComplete)id: {}", id);
+    Sprint sprint = sprintRepository
+        .findById(id)
+        .orElseThrow(() -> {
+          log.error("(updateSprintComplete)projectId: {} not found", id);
+          throw new SprintNotFoundException();
+        });
+    sprint.setStatus(COMPLETE.toString());
+    sprint.setEndDate(LocalDate.now());
+    sprintRepository.save(sprint);
   }
 }

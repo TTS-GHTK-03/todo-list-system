@@ -230,8 +230,26 @@ public class TaskServiceImp implements TaskService {
   }
 
   @Override
-  public Integer countBySprintIdAndProjectIdAndStatus(String sprintId, String projectId, String status) {
-    log.info("(countBySprintIdAndProjectIdAndStatus)sprintId: {}, projectId: {}, status: {}", sprintId, projectId, status);
-    return taskRepository.countBySprintIdAndProjectIdAndStatus(sprintId, projectId, status);
+  public Integer countBySprintIdAndProjectIdAndStatusNotDone(String sprintId, String projectId) {
+    log.info("(countBySprintIdAndProjectIdAndStatusNotDone)sprintId: {}, projectId: {}", sprintId, projectId);
+    return taskRepository.countBySprintIdAndProjectIdAndStatusNotDone(sprintId, projectId);
+  }
+
+  @Override
+  public Integer countBySprintIdAndProjectIdAndStatusDone(String sprintId, String projectId) {
+    log.info("(countBySprintIdAndProjectIdAndStatusDone)sprintId: {}, projectId: {}", sprintId, projectId);
+    return taskRepository.countBySprintIdAndProjectIdAndStatusDone(sprintId, projectId);
+  }
+
+  @Override
+  public void saveAll(List<Task> tasks) {
+    log.info("(saveAll)");
+    taskRepository.saveAll(tasks);
+  }
+
+  @Override
+  public List<Task> findAllByProjectIdAndSprintIdAndStatusNotDone(String projectId, String sprintId) {
+    log.info("(findAllByProjectIdAndSprintIdAndStatusNotDone)projectId: {}, sprintId: {}", projectId, sprintId);
+    return taskRepository.findAllByProjectIdAndSprintIdAndStatusNotDone(projectId, sprintId);
   }
 }
