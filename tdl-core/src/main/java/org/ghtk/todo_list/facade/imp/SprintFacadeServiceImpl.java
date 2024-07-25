@@ -1,5 +1,7 @@
 package org.ghtk.todo_list.facade.imp;
 
+import static org.ghtk.todo_list.constant.TaskStatus.*;
+
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.List;
@@ -18,6 +20,7 @@ import org.ghtk.todo_list.exception.SprintStatusNotFoundException;
 import org.ghtk.todo_list.exception.SprintStatusTodoInvalidException;
 import org.ghtk.todo_list.facade.SprintFacadeService;
 import org.ghtk.todo_list.mapper.SprintMapper;
+import org.ghtk.todo_list.model.response.CompleteSprintResponse;
 import org.ghtk.todo_list.model.response.CreateSprintResponse;
 import org.ghtk.todo_list.model.response.ProgressStatisticsResponse;
 import org.ghtk.todo_list.model.response.SprintResponse;
@@ -230,6 +233,21 @@ public class SprintFacadeServiceImpl implements SprintFacadeService {
     }
     taskService.deleteAllBySprintId(id);
     sprintService.deleteById(id);
+  }
+
+  @Override
+  public CompleteSprintResponse completeSprint(String projectId, String sprintId) {
+    log.info("(completeSprint)");
+    validateProjectId(projectId);
+    validateSprintId(sprintId);
+    validateProjectIdAndSprintId(projectId, sprintId);
+
+    int countTaskCompleted = taskService.countBySprintIdAndProjectIdAndStatus(sprintId, projectId, DONE.toString());
+    int countTaskFailed =
+        taskService.countBySprintIdAndProjectIdAndStatus(sprintId, projectId, IN_PROGRESS.toString()) +
+        taskService.countBySprintIdAndProjectIdAndStatus(sprintId, projectId, TODO.toString()) +
+        taskService.countBySprintIdAndProjectIdAndStatus(sprintId, projectId, READY_FOR_TEST.toString());
+    return CompleteSprintResponse.from(countTaskCompleted, countTaskFailed);
   }
 
   private boolean isValidDateRange(LocalDate startDate, LocalDate endDate) {

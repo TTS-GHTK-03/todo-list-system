@@ -228,4 +228,10 @@ public class TaskServiceImp implements TaskService {
     return taskRepository.findAll(FilterTask.getTasksFilterByCriteria(searchValue, typeId, status,
         assignee, userId, projectId));
   }
+
+  @Override
+  public Integer countBySprintIdAndProjectIdAndStatus(String sprintId, String projectId, String status) {
+    log.info("(countBySprintIdAndProjectIdAndStatus)sprintId: {}, projectId: {}, status: {}", sprintId, projectId, status);
+    return taskRepository.countBySprintIdAndProjectIdAndStatus(sprintId, projectId, status);
+  }
 }

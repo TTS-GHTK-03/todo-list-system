@@ -49,4 +49,5 @@ public interface TaskService {
   List<Task> searchTaskBoard(String searchValue, String sprintId, String userId, String projectId);
   List<Task> searchTaskFilter(String searchValue, String typeId,
       String status, String assignee, String userId, String projectId);
+  Integer countBySprintIdAndProjectIdAndStatus(String sprintId, String projectId, String status);
 }

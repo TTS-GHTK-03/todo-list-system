@@ -100,4 +100,13 @@ public class SprintController {
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         "Delete sprint successfully!!");
   }
+
+  @GetMapping("/{sprint_id}/complete")
+  public BaseResponse completeSprint(@PathVariable("project_id") String projectId,
+      @PathVariable("sprint_id") String sprintId) {
+    log.info("(completeSprint) projectId {}, sprintId {}", projectId, sprintId);
+    getUserId();
+    return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
+        sprintFacadeService.completeSprint(projectId, sprintId));
+  }
 }

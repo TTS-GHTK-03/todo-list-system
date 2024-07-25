@@ -2,6 +2,7 @@ package org.ghtk.todo_list.facade;
 
 import java.time.LocalDate;
 import java.util.List;
+import org.ghtk.todo_list.model.response.CompleteSprintResponse;
 import org.ghtk.todo_list.model.response.CreateSprintResponse;
 import org.ghtk.todo_list.model.response.ProgressStatisticsResponse;
 import org.ghtk.todo_list.model.response.SprintResponse;
@@ -19,4 +20,5 @@ public interface SprintFacadeService {
 
    ProgressStatisticsResponse getProgressStatistics(String projectId, String sprintId);
    void deleteSprint(String projectId, String id);
+   CompleteSprintResponse completeSprint(String projectId, String sprintId);
 }
