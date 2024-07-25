@@ -8,6 +8,8 @@ import org.ghtk.todo_list.entity.Label;
 import org.ghtk.todo_list.entity.Type;
 import org.ghtk.todo_list.exception.InvalidTypeException;
 import org.ghtk.todo_list.exception.LabelAlreadyExistsException;
+import org.ghtk.todo_list.exception.LabelNotExistsException;
+import org.ghtk.todo_list.exception.LabelNotFoundException;
 import org.ghtk.todo_list.exception.ProjectIdMismatchException;
 import org.ghtk.todo_list.exception.ProjectNotFoundException;
 import org.ghtk.todo_list.exception.SprintNotExistProjectException;
@@ -60,6 +62,8 @@ public class LabelFacadeServiceImpl implements LabelFacadeService {
     log.info("(updateLabel)");
     validProjectId(projectId);
     validProjectInType(projectId, typeId);
+    validateLabelId(labelId);
+    validateTypeIdAndLabelId(typeId, labelId);
 
     Label label = labelService.findById(labelId);
 
@@ -97,6 +101,9 @@ public class LabelFacadeServiceImpl implements LabelFacadeService {
     log.info("(deleteLabel) label: {}", labelId);
     validProjectId(projectId);
     validProjectInType(projectId, typeId);
+    validateLabelId(labelId);
+    validateTypeIdAndLabelId(typeId, labelId);
+
     labelAttachedService.deleteByLabelId(labelId);
     labelService.deleteLabel(labelId);
     log.info("(deleteLabel) successfully");
@@ -115,6 +122,22 @@ public class LabelFacadeServiceImpl implements LabelFacadeService {
     if (!type.getProjectId().equals(projectId)) {
       log.error("(validProjectInType)typeId {} not part of projectId {}", typeId, projectId);
       throw new TypeNotExistProjectException();
+    }
+  }
+
+  private void validateLabelId(String labelId){
+    log.info("(validateLabelId)labelId: {}", labelId);
+    if(!labelService.existsById(labelId)){
+      log.error("(validateLabelId)labelId: {} not found", labelId);
+      throw new LabelNotFoundException();
+    }
+  }
+
+  private void validateTypeIdAndLabelId(String typeId, String labelId){
+    log.info("(validateTypeIdAndLabelId)typeId: {}, labelId: {}", typeId, labelId);
+    if(!labelService.existsByTypeIdAndLabelId(typeId, labelId)){
+      log.error("(validateTypeIdAndLabelId)labelId: {} not exists in typeId: {}", labelId, typeId);
+      throw new LabelNotExistsException();
     }
   }
 }

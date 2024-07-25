@@ -75,4 +75,10 @@ public class LabelServiceImpl implements LabelService {
     log.info("(existsByTypeId)typeId: {}", typeId);
     return labelRepository.existsByTypeId(typeId);
   }
+
+  @Override
+  public boolean existsByTypeIdAndLabelId(String typeId, String labelId) {
+    log.info("(existsByTypeIdAndLabelId)typeId: {}, labelId: {}", typeId, labelId);
+    return labelRepository.existsByTypeIdAndId(typeId, labelId);
+  }
 }

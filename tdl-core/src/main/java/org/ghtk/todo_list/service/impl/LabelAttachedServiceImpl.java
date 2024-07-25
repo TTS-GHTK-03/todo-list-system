@@ -58,4 +58,16 @@ public class LabelAttachedServiceImpl implements LabelAttachedService {
     log.info("(deleteAllByLabelId)labelId: {}", labelId);
     repository.deleteAllByLabelId(labelId);
   }
+
+  @Override
+  public boolean existsById(String labelAttachedId) {
+    log.info("(existsById)labelAttachedId: {}", labelAttachedId);
+    return repository.existsById(labelAttachedId);
+  }
+
+  @Override
+  public boolean existsByTaskIdAndLabelAttachedId(String taskId, String labelAttachedId) {
+    log.info("(existsByTaskIdAndLabelAttachedId)taskId: {}, labelAttachedId: {})",taskId,labelAttachedId);
+    return repository.existsByTaskIdAndId(taskId, labelAttachedId);
+  }
 }

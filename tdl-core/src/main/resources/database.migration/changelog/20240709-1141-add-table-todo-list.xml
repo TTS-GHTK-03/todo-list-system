@@ -377,4 +377,8 @@
       <column name="counter_task" type="integer"/>
     </addColumn>
   </changeSet>
+
+  <changeSet id="20240724-1549-delete-column-tsk" author="Phan Kieu">
+    <dropColumn tableName="task" columnName="label"/>
+  </changeSet>
 </databaseChangeLog>

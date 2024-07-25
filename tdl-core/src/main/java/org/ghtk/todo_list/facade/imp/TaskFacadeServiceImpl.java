@@ -197,7 +197,6 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
     clonedTask.setUserId(userId);
     clonedTask.setChecklist(task.getChecklist());
     clonedTask.setDescription(task.getDescription());
-    clonedTask.setLabel(task.getLabel());
     clonedTask.setProjectId(task.getProjectId());
     var taskClone = taskService.save(clonedTask);
     agileTaskByUser(user.getId(), taskClone.getId());
