@@ -66,6 +66,20 @@ public class TaskServiceImp implements TaskService {
   }
 
   @Override
+  public TaskResponse updatePoint(String taskId, int point, String userId) {
+    log.info("(updatePoint)taskId: {}, userId: {}", taskId, userId);
+    var task = taskRepository
+        .findById(taskId)
+        .orElseThrow(() -> {
+          log.error("(updateStatus)taskId: {}, userID: {}", taskId, userId);
+          throw new TaskNotFoundException();
+        });
+    task.setPoint(point);
+    taskRepository.save(task);
+    return TaskResponse.of(task.getId(), task.getTitle(), task.getPoint(), task.getStatus(), task.getKeyProjectTask(), userId);
+  }
+
+  @Override
   public String getUserIdById(String taskId) {
     log.info("(getUserIdById)taskId: {}", taskId);
     return taskRepository.getUserIdById(taskId);

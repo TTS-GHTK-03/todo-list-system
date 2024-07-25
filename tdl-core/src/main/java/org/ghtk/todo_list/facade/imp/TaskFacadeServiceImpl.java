@@ -106,6 +106,13 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
   }
 
   @Override
+  public TaskResponse updatePointTask(String userId, String projectId, String taskId, int point) {
+    log.info("(updateStatusTask)taskId: {},projectId: {}", taskId, projectId);
+    validateProjectId(projectId);
+    return taskService.updatePoint(taskId, point, userId);
+  }
+
+  @Override
   public TaskResponse updateSprintTask(String userId, String projectId, String sprintId,
       String taskId) {
     log.info("(updateSprintTask)sprintId: {}, taskId: {},projectId: {}", sprintId, taskId,
