@@ -101,7 +101,9 @@ public class LabelFacadeServiceImpl implements LabelFacadeService {
     log.info("(getLabelAttachedByProject) userId: {}, projectId: {}", userId, projectId);
     validProjectId(projectId);
 
-    return labelService.getAllLabelAttachedByProject(projectId);
+    List<Label> labelList = labelService.getAllLabelAttachedByProject(projectId);
+
+    return labelMapper.toLabelResponses(labelList);
   }
 
   @Override

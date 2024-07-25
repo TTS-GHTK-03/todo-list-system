@@ -49,7 +49,7 @@ public class LabelServiceImpl implements LabelService {
   }
 
   @Override
-  public List<LabelResponse> getAllLabelAttachedByProject(String projectId) {
+  public List<Label> getAllLabelAttachedByProject(String projectId) {
     log.info("(getAllLabelAttachedByProject)projectId: {}", projectId);
     return labelRepository.getAllLabelAttachedByProjectId(projectId);
   }

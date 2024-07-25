@@ -13,7 +13,7 @@ public interface LabelService {
   Label findById(String id);
 
   List<Label> getLabelsByType(String typeId);
-  List<LabelResponse> getAllLabelAttachedByProject(String projectId);
+  List<Label> getAllLabelAttachedByProject(String projectId);
   void deleteLabel(String id);
   void deleteByTypeId(String typeId);
   boolean existsById(String id);

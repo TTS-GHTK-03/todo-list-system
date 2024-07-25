@@ -15,12 +15,11 @@ public interface LabelRepository extends JpaRepository<Label, String> {
   List<Label> findByTypeId(String typeId);
 
   @Query("""
-      SELECT new org.ghtk.todo_list.model.response.LabelResponse(l.id, l.typeId, l.title, l.description) 
-      FROM Label l 
+      SELECT l FROM Label l
       JOIN LabelAttached la ON la.labelId = l.id
       JOIN Type t ON t.id = l.typeId AND t.projectId = :projectId
       """)
-  List<LabelResponse> getAllLabelAttachedByProjectId(String projectId);
+  List<Label> getAllLabelAttachedByProjectId(String projectId);
 
   void deleteAllByTypeId(String typeId);
 
