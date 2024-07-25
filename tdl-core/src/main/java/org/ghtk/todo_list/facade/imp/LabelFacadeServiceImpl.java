@@ -16,6 +16,7 @@ import org.ghtk.todo_list.exception.SprintNotExistProjectException;
 import org.ghtk.todo_list.exception.TypeNotExistProjectException;
 import org.ghtk.todo_list.facade.LabelFacadeService;
 import org.ghtk.todo_list.mapper.LabelMapper;
+import org.ghtk.todo_list.model.response.LabelAttachedResponse;
 import org.ghtk.todo_list.model.response.LabelResponse;
 import org.ghtk.todo_list.service.LabelAttachedService;
 import org.ghtk.todo_list.service.LabelService;
@@ -93,6 +94,16 @@ public class LabelFacadeServiceImpl implements LabelFacadeService {
 
     log.info("(getLabelsByTypeId)labels: {}", labels);
     return labelMapper.toLabelResponses(labels);
+  }
+
+  @Override
+  public List<LabelResponse> getAllLabelByProjectIdAndLabelAttached(String userId, String projectId) {
+    log.info("(getAllLabelByProjectIdAndLabelAttached) userId: {}, projectId: {}", userId, projectId);
+    validProjectId(projectId);
+
+    List<Label> labelList = labelService.getAllLabelByProjectIdAndLabelAttached(projectId);
+
+    return labelMapper.toLabelResponses(labelList);
   }
 
   @Override
