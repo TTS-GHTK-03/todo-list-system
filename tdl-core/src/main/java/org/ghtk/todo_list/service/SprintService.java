@@ -13,4 +13,5 @@ public interface SprintService {
   boolean existsByProjectIdAndTitle(String projectId, String title);
   void deleteAllByProjectId(String projectId);
   void deleteById(String id);
+  void updateSprintComplete(String id);
 }

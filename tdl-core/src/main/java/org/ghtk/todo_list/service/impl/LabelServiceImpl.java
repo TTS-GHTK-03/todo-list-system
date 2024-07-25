@@ -6,8 +6,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.entity.Label;
 import org.ghtk.todo_list.exception.LabelNotFoundException;
 import org.ghtk.todo_list.exception.TypeNotFoundException;
+import org.ghtk.todo_list.model.response.LabelResponse;
 import org.ghtk.todo_list.repository.LabelRepository;
 import org.ghtk.todo_list.service.LabelService;
+import org.ghtk.todo_list.service.ProjectService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class LabelServiceImpl implements LabelService {
 
   private final LabelRepository labelRepository;
+  private final ProjectService projectService;
 
   @Override
   public Label save(Label label) {
@@ -43,6 +46,12 @@ public class LabelServiceImpl implements LabelService {
   public List<Label> getLabelsByType(String typeId) {
     log.info("(getLabelsByType)typeId: {}", typeId);
     return labelRepository.findByTypeId(typeId);
+  }
+
+  @Override
+  public List<Label> getAllLabelByProjectIdAndLabelAttached(String projectId) {
+    log.info("(getAllLabelByProjectIdAndLabelAttached)projectId: {}", projectId);
+    return labelRepository.getAllLabelByProjectIdAndLabelAttached(projectId);
   }
 
   @Override

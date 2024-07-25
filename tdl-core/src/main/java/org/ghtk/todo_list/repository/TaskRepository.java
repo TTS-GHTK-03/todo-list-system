@@ -93,6 +93,12 @@ public interface TaskRepository extends JpaRepository<Task, String>,
       """)
   List<Task> getAllTaskAssigneesForUser(String userId, String taskStatusDone);
 
-  @Query("SELECT COUNT(s) FROM Task s WHERE s.sprintId = :sprintId AND s.projectId = :projectId AND s.status = :status")
-  Integer countBySprintIdAndProjectIdAndStatus(String sprintId, String projectId, String status);
+  @Query("SELECT COUNT(s) FROM Task s WHERE s.sprintId = :sprintId AND s.projectId = :projectId AND s.status <> 'DONE'")
+  Integer countBySprintIdAndProjectIdAndStatusNotDone(String sprintId, String projectId);
+
+  @Query("SELECT COUNT(s) FROM Task s WHERE s.sprintId = :sprintId AND s.projectId = :projectId AND s.status = 'DONE'")
+  Integer countBySprintIdAndProjectIdAndStatusDone(String sprintId, String projectId);
+
+  @Query("SELECT t FROM Task t WHERE t.projectId = :projectId AND t.sprintId = :sprintId AND t.status <> 'DONE'")
+  List<Task> findAllByProjectIdAndSprintIdAndStatusNotDone(String projectId, String sprintId);
 }

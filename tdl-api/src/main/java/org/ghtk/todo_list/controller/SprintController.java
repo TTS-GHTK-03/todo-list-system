@@ -109,4 +109,14 @@ public class SprintController {
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         sprintFacadeService.completeSprint(projectId, sprintId));
   }
+
+  @PutMapping("/{sprint_id}/confirm-complete")
+  public BaseResponse confirmCompleteSprint(@PathVariable("project_id") String projectId,
+      @PathVariable("sprint_id") String sprintId) {
+    log.info("(confirmCompleteSprint) projectId {}, sprintId {}", projectId, sprintId);
+    getUserId();
+    sprintFacadeService.confirmCompleteSprint(projectId, sprintId);
+    return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
+        "Complete sprint successfully!!");
+  }
 }
