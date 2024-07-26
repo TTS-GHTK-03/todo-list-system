@@ -2,6 +2,7 @@ package org.ghtk.todo_list.facade.imp;
 
 import static org.ghtk.todo_list.constant.ImageConstant.*;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -61,19 +62,22 @@ public class ProjectFacadeServiceImpl implements ProjectFacadeService {
   private final SprintProgressService sprintProgressService;
 
   @Override
-  public List<Project> getAllProject(String userId) {
+  public List<ProjectInformationResponse> getAllProject(String userId) {
     log.info("(getAllProject)userId: {}", userId);
-
-    validateUserId(userId);
-
-    return projectService.getAllProject(userId);
+    List<ProjectInformationResponse> projectInformationResponseList = new ArrayList<>();
+    List<Project> projectList = projectService.getAllProject(userId);
+    for(Project project : projectList) {
+      String roleProjectUser = projectUserService.getRoleProjectUser(userId, project.getId());
+      List<UserNameResponse> userNameResponseList = authUserService.getNameUser(project.getId());
+      ProjectInformationResponse projectInformationResponse = projectInformationResponseMapper.toProjectInformationResponse(project, roleProjectUser, userNameResponseList);
+      projectInformationResponseList.add(projectInformationResponse);
+    }
+    return projectInformationResponseList;
   }
 
   @Override
   public ProjectRoleResponse getProject(String userId, String projectId) {
     log.info("(getProject)user: {}, project: {}", userId, projectId);
-
-    validateUserId(userId);
 
     var project = projectService.getProject(userId, projectId);
     return ProjectRoleResponse.of(project.getId(), project.getTitle(), project.getKeyProject(),
@@ -83,8 +87,6 @@ public class ProjectFacadeServiceImpl implements ProjectFacadeService {
   @Override
   public ProjectInformationResponse getProjectInformation(String userId, String projectId) {
     log.info("(getProjectInformation)user: {}, project: {}", userId, projectId);
-
-    validateUserId(userId);
 
     Project project = projectService.getProjectInformation(projectId);
     String roleProjectUser = projectUserService.getRoleProjectUser(userId, projectId);
@@ -96,8 +98,6 @@ public class ProjectFacadeServiceImpl implements ProjectFacadeService {
   @Override
   public Project createProject(String userId, String title) {
     log.info("(createProject)user: {}", userId);
-
-    validateUserId(userId);
 
     Project projectSaved = projectService.createProject(userId, title);
     projectUserService.createProjectUser(userId, projectSaved.getId(),
@@ -124,7 +124,6 @@ public class ProjectFacadeServiceImpl implements ProjectFacadeService {
   public Project updateProject(String userId, String projectId, String title, String keyProject) {
     log.info("(updateProject)userId: {}, projectId: {}, title: {}, keyProject: {}", userId, projectId, title, keyProject);
 
-    validateUserId(userId);
     validateProjectId(projectId);
     validateTitle(title);
     validateKeyProject(keyProject);
@@ -169,14 +168,6 @@ public class ProjectFacadeServiceImpl implements ProjectFacadeService {
   public PagingRes<Project> searchProjects(String searchValue, Pageable pageable, String userId) {
     log.info("(searchProjects)searchValue: {}", searchValue);
     return projectService.searchProjects(searchValue, pageable, userId);
-  }
-
-  private void validateUserId(String userId){
-    log.info("(validateUserId)userId: {}", userId);
-    if(!authUserService.existById(userId)){
-      log.error("(validateUserId)userId: {} not found", userId);
-      throw new UserNotFoundException();
-    }
   }
 
   private void validateProjectId(String projectId){

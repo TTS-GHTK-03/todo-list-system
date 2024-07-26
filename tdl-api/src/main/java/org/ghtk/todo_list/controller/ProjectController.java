@@ -41,7 +41,7 @@ public class ProjectController {
 
   @GetMapping()
   @Operation(description = "Get all project for user")
-  public BaseResponse<List<Project>> getAllProject() {
+  public BaseResponse<List<ProjectInformationResponse>> getAllProject() {
     log.info("(getAllProject)");
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         projectService.getAllProject(getUserId()));
