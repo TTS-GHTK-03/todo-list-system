@@ -14,8 +14,8 @@ import org.springframework.data.jpa.domain.Specification;
 
 public class FilterTask {
 
-  public static Specification<Task> getTasksByCriteria(String searchValue, String typeId, String labelId,
-      String userId, String projectId) {
+  public static Specification<Task> getTasksByCriteria(String searchValue, String typeId,
+      String labelId, String status, String assignee, String userId, String projectId, String sprintId) {
     return (root, query, criteriaBuilder) -> {
       List<Predicate> predicates = new ArrayList<>();
 
@@ -38,70 +38,6 @@ public class FilterTask {
         predicates.add(criteriaBuilder.in(root.get("id")).value(labelSubquery));
       }
 
-      if (userId != null && !userId.isEmpty()) {
-        Subquery<String> subquery = query.subquery(String.class);
-        Root<ProjectUser> projectUserRoot = subquery.from(ProjectUser.class);
-        subquery.select(projectUserRoot.get("projectId"));
-        subquery.where(
-            criteriaBuilder.equal(projectUserRoot.get("userId"), userId),
-            criteriaBuilder.equal(projectUserRoot.get("projectId"), root.get("projectId"))
-        );
-
-        predicates.add(criteriaBuilder.exists(subquery));
-      }
-
-      if (projectId != null && !projectId.isEmpty()) {
-        predicates.add(criteriaBuilder.equal(root.get("projectId"), projectId));
-      }
-
-      query.distinct(true);
-
-      return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
-    };
-  }
-
-  public static Specification<Task> getTasksBoardByCriteria(String searchValue, String sprintId,
-      String userId, String projectId) {
-    return (root, query, criteriaBuilder) -> {
-      List<Predicate> predicates = new ArrayList<>();
-
-      if (searchValue != null && !searchValue.isEmpty()) {
-        Predicate titlePredicate = criteriaBuilder.like(criteriaBuilder.lower(root.get("title")), "%" + searchValue.toLowerCase() + "%");
-        Predicate keyProjectTaskPredicate = criteriaBuilder.like(criteriaBuilder.lower(root.get("keyProjectTask")), "%" + searchValue.toLowerCase() + "%");
-        predicates.add(criteriaBuilder.or(titlePredicate, keyProjectTaskPredicate));
-      }
-
-      if (sprintId != null && !sprintId.isEmpty()) {
-        predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("sprintId")), "%" + sprintId.toLowerCase() + "%"));
-      }
-
-      if (userId != null && !userId.isEmpty()) {
-        Subquery<String> subquery = query.subquery(String.class);
-        Root<ProjectUser> projectUserRoot = subquery.from(ProjectUser.class);
-        subquery.select(projectUserRoot.get("projectId"));
-        subquery.where(
-            criteriaBuilder.equal(projectUserRoot.get("userId"), userId),
-            criteriaBuilder.equal(projectUserRoot.get("projectId"), root.get("projectId"))
-        );
-
-        predicates.add(criteriaBuilder.exists(subquery));
-      }
-
-      if (projectId != null && !projectId.isEmpty()) {
-        predicates.add(criteriaBuilder.equal(root.get("projectId"), projectId));
-      }
-
-      query.distinct(true);
-
-      return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
-    };
-  }
-
-  public static Specification<Task> getTasksFilterByCriteria(String searchValue, String typeId,
-      String status, String assignee, String userId, String projectId) {
-    return (root, query, criteriaBuilder) -> {
-      List<Predicate> predicates = new ArrayList<>();
-
       if (searchValue != null && !searchValue.isEmpty()) {
         predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("title")), "%" + searchValue.toLowerCase() + "%"));
       }
@@ -116,6 +52,10 @@ public class FilterTask {
 
       if (projectId != null && !projectId.isEmpty()) {
         predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("projectId")), "%" + projectId.toLowerCase() + "%"));
+      }
+
+      if (sprintId != null && !sprintId.isEmpty()) {
+        predicates.add(criteriaBuilder.like(criteriaBuilder.lower(root.get("sprintId")), "%" + sprintId.toLowerCase() + "%"));
       }
 
       if (assignee != null && !assignee.isEmpty()) {
@@ -137,6 +77,10 @@ public class FilterTask {
         );
 
         predicates.add(criteriaBuilder.exists(subquery));
+      }
+
+      if (projectId != null && !projectId.isEmpty()) {
+        predicates.add(criteriaBuilder.equal(root.get("projectId"), projectId));
       }
 
       query.distinct(true);

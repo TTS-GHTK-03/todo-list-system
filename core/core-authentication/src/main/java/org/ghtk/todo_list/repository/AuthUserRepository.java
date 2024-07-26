@@ -4,6 +4,7 @@ import java.util.List;
 import org.ghtk.todo_list.dto.response.UserNameResponse;
 import org.ghtk.todo_list.entity.AuthUser;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -11,7 +12,8 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface AuthUserRepository extends JpaRepository<AuthUser, String> {
+public interface AuthUserRepository extends JpaRepository<AuthUser, String>,
+    JpaSpecificationExecutor<AuthUser> {
 
   boolean existsByEmail(String email);
 

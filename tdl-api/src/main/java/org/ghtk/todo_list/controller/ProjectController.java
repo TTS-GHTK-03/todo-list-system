@@ -11,6 +11,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.dto.response.BaseResponse;
+import org.ghtk.todo_list.entity.AuthUser;
 import org.ghtk.todo_list.entity.Project;
 import org.ghtk.todo_list.facade.ProjectFacadeService;
 import org.ghtk.todo_list.model.request.CreateProjectRequest;
@@ -107,5 +108,16 @@ public class ProjectController {
     log.info("(searchProjects)searchValue: {}, pageable: {}", searchValue, pageable);
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         projectService.searchProjects(searchValue, pageable.makePageable(), getUserId()));
+  }
+
+  @GetMapping("/{project_id}/search-user")
+  @Operation(description = "Search user in project")
+  public BaseResponse<List<AuthUser>> searchUserInProjects(
+      @RequestParam(required = false) String searchValue,
+      @RequestParam(required = false) List<String> role,
+      @PathVariable("project_id") String projectId) {
+    log.info("(searchUserInProjects)searchValue: {}", searchValue);
+    return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
+        projectService.searchUser(searchValue, role, projectId, getUserId()));
   }
 }

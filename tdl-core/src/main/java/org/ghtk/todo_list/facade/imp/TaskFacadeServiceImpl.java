@@ -395,50 +395,12 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
   }
 
   @Override
-  public List<TaskResponse> searchTask(String searchValue, String typeId, String labelId, String userId, String projectId) {
+  public List<TaskResponse> searchTask(String searchValue, String typeId, String labelId,
+      String status, String assignee, String userId, String projectId, String sprintId) {
     log.info("(searchTask)searchValue: {}, userId: {}, projectId: {}", searchValue, userId, projectId);
 
-    var taskSearch = taskService.searchTask(searchValue, typeId, labelId, userId, projectId);
-    List<TaskResponse> responses = new ArrayList<>();
-    for (var task : taskSearch) {
-      TaskResponse response = new TaskResponse();
-      response.setId(task.getId());
-      response.setTitle(task.getTitle());
-      response.setPoint(task.getPoint());
-      response.setStatus(task.getStatus());
-      response.setKeyProjectTask(task.getKeyProjectTask());
-      response.setUserId(taskAssigneesService.findUserIdByTaskId(task.getId()));
-      responses.add(response);
-    }
-    return responses;
-  }
-
-  @Override
-  public List<TaskResponse> searchTaskBoard(String searchValue, String sprintId, String userId,
-      String projectId) {
-    log.info("(searchTaskBoard)searchValue: {}, userId: {}, projectId: {}", searchValue, userId, projectId);
-
-    var taskSearch = taskService.searchTaskBoard(searchValue, sprintId, userId, projectId);
-    List<TaskResponse> responses = new ArrayList<>();
-    for (var task : taskSearch) {
-      TaskResponse response = new TaskResponse();
-      response.setId(task.getId());
-      response.setTitle(task.getTitle());
-      response.setPoint(task.getPoint());
-      response.setStatus(task.getStatus());
-      response.setKeyProjectTask(task.getKeyProjectTask());
-      response.setUserId(taskAssigneesService.findUserIdByTaskId(task.getId()));
-      responses.add(response);
-    }
-    return responses;
-  }
-
-  @Override
-  public List<TaskResponse> searchTaskFilter(String searchValue, String typeId, String status,
-      String assignee, String userId, String projectId) {
-    log.info("(searchTaskFilter)searchValue: {}, typeId: {}, status: {}, assignee: {}, "
-        + "userId: {}, projectId: {}", searchValue, typeId, status, assignee, userId, projectId);
-    var taskSearch = taskService.searchTaskFilter(searchValue, typeId, status.toUpperCase(), assignee, userId, projectId);
+    var taskSearch = taskService.searchTask(searchValue, typeId, labelId, status, assignee,
+        userId, projectId, sprintId);
     List<TaskResponse> responses = new ArrayList<>();
     for (var task : taskSearch) {
       TaskResponse response = new TaskResponse();
