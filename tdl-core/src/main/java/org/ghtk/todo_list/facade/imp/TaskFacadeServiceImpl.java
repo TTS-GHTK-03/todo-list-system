@@ -1,5 +1,7 @@
 package org.ghtk.todo_list.facade.imp;
 
+import static org.ghtk.todo_list.constant.ActivityLogConstant.AssigneeAction.ADD_ASSIGNEE;
+import static org.ghtk.todo_list.constant.ActivityLogConstant.TaskAction.*;
 import static org.ghtk.todo_list.constant.CacheConstant.UPDATE_STATUS_TASK;
 import static org.ghtk.todo_list.constant.CacheConstant.UPDATE_STATUS_TASK_KEY;
 import static org.ghtk.todo_list.constant.TaskStatus.TODO;
@@ -13,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.constant.CacheConstant;
 import org.ghtk.todo_list.constant.RoleProjectUser;
 import org.ghtk.todo_list.constant.TaskStatus;
+import org.ghtk.todo_list.entity.ActivityLog;
 import org.ghtk.todo_list.entity.Project;
 import org.ghtk.todo_list.entity.SprintProgress;
 import org.ghtk.todo_list.entity.Task;
@@ -118,6 +121,12 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
       sprintProgressService.updateCompleteTask(taskId);
     }
 
+    var notification = new ActivityLog();
+    notification.setAction(UPDATE_STATUS_TASK);
+    notification.setUserId(userId);
+    notification.setTaskId(taskId);
+    activityLogService.create(notification);
+
     return taskService.updateStatus(taskId, status.toUpperCase(),
         taskAssigneesService.findUserIdByTaskId(taskId));
   }
@@ -137,6 +146,12 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
         projectId);
     validateProjectId(projectId);
     validateTaskId(taskId);
+    var notification = new ActivityLog();
+    notification.setAction(UPDATE_SPRINT_TASK);
+    notification.setUserId(userId);
+    notification.setTaskId(taskId);
+    activityLogService.create(notification);
+
     var task = taskService.findById(taskId);
     if (task.getSprintId() == null && sprintId != null) {
       validateSprintId(sprintId);
@@ -207,8 +222,13 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
     taskAssignees.setUserId(userId);
     taskAssignees.setTaskId(taskId);
 
-    return taskAssigneesService.save(taskAssignees);
+    var notification = new ActivityLog();
+    notification.setAction(ADD_ASSIGNEE);
+    notification.setUserId(userId);
+    notification.setTaskId(taskId);
+    activityLogService.create(notification);
 
+    return taskAssigneesService.save(taskAssignees);
   }
 
   @Override
@@ -227,6 +247,13 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
     clonedTask.setProjectId(task.getProjectId());
     var taskClone = taskService.save(clonedTask);
     agileTaskByUser(user.getId(), taskClone.getId());
+
+    var notification = new ActivityLog();
+    notification.setAction(CLONE_TASK);
+    notification.setUserId(userId);
+    notification.setTaskId(taskClone.getId());
+    activityLogService.create(notification);
+
     return TaskResponse.of(
         taskClone.getId(),
         taskClone.getTitle(),
@@ -260,6 +287,12 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
       log.error("(updateStartDateDueDateTask)role: {} not allowed", roleProjectUser);
       throw new RoleProjectNotAllowException();
     }
+
+    var notification = new ActivityLog();
+    notification.setAction(UPDATE_DUE_DATE_TASK);
+    notification.setUserId(userId);
+    notification.setTaskId(taskId);
+    activityLogService.create(notification);
 
     return taskService.updateDueDate(projectId, sprintId, taskId, dueDate);
   }
@@ -301,6 +334,12 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
     var user = authUserService.findByUnassigned();
     agileTaskByUser(user.getId(), savedTask.getId());
 
+    var notification = new ActivityLog();
+    notification.setAction(CREATE_TASK);
+    notification.setUserId(userId);
+    notification.setTaskId(savedTask.getId());
+    activityLogService.create(notification);
+
     return TaskResponse.builder()
         .id(savedTask.getId())
         .title(savedTask.getTitle())
@@ -323,6 +362,12 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
     labelAttachedService.deleteAllByTaskId(taskId);
     activityLogService.deleteAllByTaskId(taskId);
     taskService.deleteTask(userId, projectId, taskId);
+
+    var notification = new ActivityLog();
+    notification.setAction(DELETE_TASK);
+    notification.setUserId(userId);
+    notification.setTaskId(taskId);
+    activityLogService.create(notification);
   }
 
   @Override
@@ -334,6 +379,13 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
     validateTaskId(taskId);
     validateProjectIdAndTaskId(projectId, taskId);
     taskService.updateTitle(taskId, title);
+
+    var notification = new ActivityLog();
+    notification.setAction(UPDATE_TASK);
+    notification.setUserId(userId);
+    notification.setTaskId(taskId);
+    activityLogService.create(notification);
+
     return TaskResponse.from(taskService.findById(taskId),
         taskAssigneesService.findUserIdByTaskId(taskId));
   }

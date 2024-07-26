@@ -151,6 +151,17 @@ public class AuthUserServiceImpl implements AuthUserService {
   }
 
   @Override
+  public AuthUser findByEmail(String email) {
+    log.info("(findByEmail)email: {}", email);
+    return repository
+        .findByEmail(email)
+        .orElseThrow(() -> {
+          log.error("(findByEmail)email: {} not found", email);
+          throw new UserNotFoundException();
+        });
+  }
+
+  @Override
   public UserProjection getByUserId(String userId) {
     log.info("(getByUserId)userId: {}", userId);
     return repository.findByUserId(userId)

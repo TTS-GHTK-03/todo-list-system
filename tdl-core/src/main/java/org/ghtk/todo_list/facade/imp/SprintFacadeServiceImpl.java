@@ -1,5 +1,6 @@
 package org.ghtk.todo_list.facade.imp;
 
+import static org.ghtk.todo_list.constant.ActivityLogConstant.SprintAction.*;
 import static org.ghtk.todo_list.constant.TaskStatus.*;
 
 import jakarta.transaction.Transactional;
@@ -9,6 +10,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.constant.SprintStatus;
+import org.ghtk.todo_list.entity.ActivityLog;
 import org.ghtk.todo_list.entity.Project;
 import org.ghtk.todo_list.entity.Sprint;
 import org.ghtk.todo_list.entity.SprintProgress;
@@ -54,7 +56,7 @@ public class SprintFacadeServiceImpl implements SprintFacadeService {
 
   @Transactional
   @Override
-  public CreateSprintResponse createSprintByProject(String projectId) {
+  public CreateSprintResponse createSprintByProject(String userId, String projectId) {
     log.info("(createSprintByProject)");
     Project project = projectService.getProjectById(projectId);
 
@@ -76,11 +78,18 @@ public class SprintFacadeServiceImpl implements SprintFacadeService {
     sprintProgress.setTotalTask(0);
     sprintProgress.setCompleteTask(0);
     sprintProgressService.save(sprintProgress);
+
+    var notification = new ActivityLog();
+    notification.setAction(CREATE_SPRINT);
+    notification.setUserId(userId);
+    notification.setSprintId(sprint.getId());
+    activityLogService.create(notification);
+
     return sprintMapper.toCreateSprintResponse(sprint);
   }
 
   @Override
-  public StartSprintResponse startSprint(String projectId, String sprintId, String title,
+  public StartSprintResponse startSprint(String userId, String projectId, String sprintId, String title,
       String startDate, String endDate) {
     log.info("(startSprint)projectId: {}, sprintId {}", projectId, sprintId);
 
@@ -113,6 +122,12 @@ public class SprintFacadeServiceImpl implements SprintFacadeService {
 
     sprint.setEndDate(LocalDate.parse(endDate));
     sprintService.save(sprint);
+
+    var notification = new ActivityLog();
+    notification.setAction(START_SPRINT);
+    notification.setUserId(userId);
+    notification.setSprintId(sprint.getId());
+    activityLogService.create(notification);
 
     return sprintMapper.toStartSprintResponse(sprint);
   }
@@ -220,7 +235,7 @@ public class SprintFacadeServiceImpl implements SprintFacadeService {
 
   @Override
   @Transactional
-  public void deleteSprint(String projectId, String id) {
+  public void deleteSprint(String userId, String projectId, String id) {
     log.info("(deleteSprint) projectId: {}, sprintId {}", projectId, id);
 
     validateProjectId(projectId);
@@ -237,6 +252,12 @@ public class SprintFacadeServiceImpl implements SprintFacadeService {
     }
     taskService.deleteAllBySprintId(id);
     sprintService.deleteById(id);
+
+    var notification = new ActivityLog();
+    notification.setAction(DELETE_SPRINT);
+    notification.setUserId(userId);
+    notification.setSprintId(id);
+    activityLogService.create(notification);
   }
 
   @Override
@@ -252,7 +273,7 @@ public class SprintFacadeServiceImpl implements SprintFacadeService {
   }
 
   @Override
-  public void confirmCompleteSprint(String projectId, String sprintId) {
+  public void confirmCompleteSprint(String userId, String projectId, String sprintId) {
     log.info("(confirmCompleteSprint)projectId: {}, sprintId {}", projectId, sprintId);
     validateProjectId(projectId);
     validateSprintId(sprintId);
@@ -268,6 +289,12 @@ public class SprintFacadeServiceImpl implements SprintFacadeService {
     }
     taskService.saveAll(saveTakes);
     sprintService.updateSprintComplete(sprintId);
+
+    var notification = new ActivityLog();
+    notification.setAction(COMPLETE_SPRINT);
+    notification.setUserId(userId);
+    notification.setSprintId(sprintId);
+    activityLogService.create(notification);
 
   }
 
