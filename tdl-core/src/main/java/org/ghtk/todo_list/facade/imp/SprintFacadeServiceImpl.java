@@ -200,6 +200,9 @@ public class SprintFacadeServiceImpl implements SprintFacadeService {
   @Override
   public ProgressStatisticsResponse getProgressStatistics(String projectId, String sprintId) {
     log.info("(getProgressStatistics) projectId: {}, sprintId {}", projectId, sprintId);
+    validateProjectId(projectId);
+    validateSprintId(sprintId);
+    validateProjectIdAndSprintId(projectId, sprintId);
     var sprintProgress = sprintProgressService.findBySprintId(sprintId);
     int totalTask = sprintProgress.getTotalTask();
     double completionRate;

@@ -14,6 +14,7 @@ public interface TaskFacadeService {
   TaskResponse getTaskByTaskId(String userId, String projectId, String taskId);
 
   TaskResponse updateStatusTask(String userId, String projectId, String taskId, String status);
+  TaskResponse updatePointTask(String userId, String projectId, String taskId, int point);
 
   TaskResponse updateSprintTask(String userId, String projectId, String sprintId, String taskId);
 

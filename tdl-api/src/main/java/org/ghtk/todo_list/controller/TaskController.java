@@ -10,6 +10,7 @@ import org.ghtk.todo_list.dto.response.BaseResponse;
 import org.ghtk.todo_list.facade.TaskFacadeService;
 import org.ghtk.todo_list.model.request.CreateTaskRequest;
 import org.ghtk.todo_list.model.request.UpdateDueDateTaskRequest;
+import org.ghtk.todo_list.model.request.UpdatePointTaskRequest;
 import org.ghtk.todo_list.model.request.UpdateTitleTaskRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -68,6 +69,14 @@ public class TaskController {
     log.info("(updateStatusTask)");
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         taskFacadeService.updateStatusTask(getUserId(), projectId, taskId, status));
+  }
+
+  @PatchMapping("/{project_id}/tasks/{task_id}/points")
+  public BaseResponse updatePointTask(@PathVariable("project_id") String projectId,
+      @PathVariable("task_id") String taskId, @Valid @RequestBody UpdatePointTaskRequest updatePointTaskRequest) {
+    log.info("(updatePointTask),projectId: {}, taskId: {}", projectId, taskId);
+    return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
+        taskFacadeService.updatePointTask(getUserId(), projectId, taskId, updatePointTaskRequest.getPoint()));
   }
 
   @PatchMapping("/{project_id}/sprints/{sprint_id}/tasks/{task_id}")

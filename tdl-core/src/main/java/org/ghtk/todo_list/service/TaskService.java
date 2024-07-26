@@ -13,6 +13,8 @@ public interface TaskService {
 
   TaskResponse updateStatus(String taskId, String taskStatus, String userId);
 
+  TaskResponse updatePoint(String taskId, int point, String userId);
+
   String getUserIdById(String taskId);
 
   TaskResponse updateSprintId(String projectId, String taskId, String sprintId, String userId);
