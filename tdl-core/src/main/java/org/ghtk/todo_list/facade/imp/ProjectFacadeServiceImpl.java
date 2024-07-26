@@ -39,6 +39,7 @@ import org.ghtk.todo_list.service.SprintService;
 import org.ghtk.todo_list.service.TaskAssigneesService;
 import org.ghtk.todo_list.service.TaskService;
 import org.ghtk.todo_list.service.TypeService;
+import org.ghtk.todo_list.service.UserService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -62,6 +63,7 @@ public class ProjectFacadeServiceImpl implements ProjectFacadeService {
   private final CommentService commentService;
   private final SprintService sprintService;
   private final SprintProgressService sprintProgressService;
+  private final UserService userService;
 
   @Override
   public List<ProjectInformationResponse> getAllProject(String userId) {
@@ -180,6 +182,13 @@ public class ProjectFacadeServiceImpl implements ProjectFacadeService {
   public PagingRes<Project> searchProjects(String searchValue, Pageable pageable, String userId) {
     log.info("(searchProjects)searchValue: {}", searchValue);
     return projectService.searchProjects(searchValue, pageable, userId);
+  }
+
+  @Override
+  public List<AuthUser> searchUser(String searchValue, List<String> roles, String projectId,
+      String userId) {
+    log.info("(searchUser)searchValue: {}", searchValue);
+    return userService.searchUser(searchValue, roles, projectId, userId);
   }
 
   private void validateProjectId(String projectId){

@@ -47,10 +47,8 @@ public interface TaskService {
   Task getTaskLastestByProjectId(String projectId);
 
   List<Task> getAllTaskAssigneesForUser(String userId);
-  List<Task> searchTask(String searchValue, String typeId, String labelId, String userId, String projectId);
-  List<Task> searchTaskBoard(String searchValue, String sprintId, String userId, String projectId);
-  List<Task> searchTaskFilter(String searchValue, String typeId,
-      String status, String assignee, String userId, String projectId);
+  List<Task> searchTask(String searchValue, String typeId, String labelId, String status,
+      String assignee, String userId, String projectId, String sprintId);
   Integer countBySprintIdAndProjectIdAndStatusNotDone(String sprintId, String projectId);
   Integer countBySprintIdAndProjectIdAndStatusDone(String sprintId, String projectId);
   void saveAll(List<Task> tasks);

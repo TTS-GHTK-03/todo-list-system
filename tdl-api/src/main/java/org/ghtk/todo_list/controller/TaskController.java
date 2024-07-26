@@ -200,7 +200,7 @@ public class TaskController {
         taskFacadeService.updateTitleTask(getUserId(), projectId, taskId, request.getTitle()));
   }
   @GetMapping("/{project_id}/tasks/search")
-  @Operation(description = "Search task by keyProjectTask, title, typeId, labelId")
+  @Operation(description = "Filter search task")
   public BaseResponse<List<TaskResponse>> searchTask(
       @Parameter(name = "project_id", description = "Identification project")
       @PathVariable("project_id") String projectId,
@@ -209,41 +209,15 @@ public class TaskController {
       @Parameter(name = "typeId", description = "TypeId")
       @RequestParam(required = false)  String typeId,
       @Parameter(name = "labelId", description = "LabelId")
-      @RequestParam(required = false)  String labelId) {
-    log.info("(searchTask)project: {}, search: {}", projectId, search);
-    return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
-        taskFacadeService.searchTask(search, typeId, labelId, getUserId(), projectId));
-  }
-
-  @GetMapping("/{project_id}/tasks/search-board")
-  @Operation(description = "Search task by keyProjectTask, title, sprintId")
-  public BaseResponse<List<TaskResponse>> searchTaskBoard(
-      @Parameter(name = "project_id", description = "Identification project")
-      @PathVariable("project_id") String projectId,
-      @Parameter(name = "search", description = "KeyProjectTask or title")
-      @RequestParam(required = false)  String search,
+      @RequestParam(required = false)  String labelId,
       @Parameter(name = "sprintId", description = "SprintId")
-      @RequestParam(required = false)  String sprintId) {
-    log.info("(searchTaskBoard)project: {}, search: {}, sprintId: {}", projectId, search, sprintId);
-    return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
-        taskFacadeService.searchTaskBoard(search, sprintId, getUserId(), projectId));
-  }
-
-  @GetMapping("/tasks/search-filter")
-  @Operation(description = "Search task by keyProjectTask, title, projectId, typeId, status, assignee")
-  public BaseResponse<List<TaskResponse>> searchTaskBoard(
-      @Parameter(name = "project_id", description = "Project id")
-      @RequestParam(required = false)  String projectId,
-      @Parameter(name = "search", description = "KeyProjectTask or title")
-      @RequestParam(required = false)  String search,
-      @Parameter(name = "typeId", description = "TypeId")
-      @RequestParam(required = false)  String typeId,
+      @RequestParam(required = false)  String sprintId,
       @Parameter(name = "status", description = "Status")
       @RequestParam(required = false)  String status,
       @Parameter(name = "assignee", description = "Assignee")
       @RequestParam(required = false)  String assignee) {
-    log.info("(searchTaskBoard)project: {}, search: {}, typeId: {}, status: {}, assignee: {}", projectId, search, typeId, status, assignee);
+    log.info("(searchTask)project: {}, search: {}", projectId, search);
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
-        taskFacadeService.searchTaskFilter(search, typeId, status, assignee, getUserId(), projectId));
+        taskFacadeService.searchTask(search, typeId, labelId, status, assignee, getUserId(), projectId, sprintId));
   }
 }
