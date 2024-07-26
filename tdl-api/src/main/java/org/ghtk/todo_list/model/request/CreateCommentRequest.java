@@ -9,7 +9,7 @@ import lombok.Getter;
 public class CreateCommentRequest {
 
   @NotBlank(message = "Text is required")
-  @Schema(description = "Comment", example = "My comment")
+  @Schema(description = "Comment text", example = "My comment")
   private String text;
 }
 

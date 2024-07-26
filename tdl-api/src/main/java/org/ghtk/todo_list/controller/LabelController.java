@@ -2,14 +2,19 @@ package org.ghtk.todo_list.controller;
 
 import static org.ghtk.todo_list.util.SecurityUtil.getUserId;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.time.LocalDate;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.dto.response.BaseResponse;
 import org.ghtk.todo_list.facade.LabelFacadeService;
 import org.ghtk.todo_list.model.request.CreateLabelRequest;
 import org.ghtk.todo_list.model.request.UpdateLabelRequest;
+import org.ghtk.todo_list.model.response.LabelResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,13 +29,18 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/projects/{project_id}")
 @RequiredArgsConstructor
+@Tag(name = "Label", description = "Label API")
 public class LabelController {
 
   private final LabelFacadeService labelFacadeService;
 
   @PostMapping("/types/{type_id}/labels")
-  public BaseResponse createLabel(@RequestBody @Valid CreateLabelRequest request,
-      @PathVariable("project_id") String projectId, @PathVariable("type_id") String typeId) {
+  @Operation(description = "Create label")
+  public BaseResponse<LabelResponse> createLabel(@RequestBody @Valid CreateLabelRequest request,
+      @Parameter(name = "project_id", description = "Identification of project")
+      @PathVariable("project_id") String projectId,
+      @Parameter(name = "type_id", description = "Identification of type")
+      @PathVariable("type_id") String typeId) {
     log.info("(createLabel)");
 
     getUserId();
@@ -40,8 +50,13 @@ public class LabelController {
   }
 
   @PutMapping("/types/{type_id}/labels/{id}")
-  public BaseResponse updateLabel(@RequestBody @Valid UpdateLabelRequest request,
-      @PathVariable("project_id") String projectId, @PathVariable("type_id") String typeId,
+  @Operation(description = "Update label")
+  public BaseResponse<LabelResponse> updateLabel(@RequestBody @Valid UpdateLabelRequest request,
+      @Parameter(name = "project_id", description = "Identification of project")
+      @PathVariable("project_id") String projectId,
+      @Parameter(name = "type_id", description = "Identification of type")
+      @PathVariable("type_id") String typeId,
+      @Parameter(name = "id", description = "Identification of label")
       @PathVariable("id") String labelId) {
     log.info("(updateLabel)");
 
@@ -52,7 +67,11 @@ public class LabelController {
   }
 
   @GetMapping("/types/{type_id}/labels")
-  public BaseResponse getLabelsByTypeId(@PathVariable("project_id") String projectId,
+  @Operation(description = "Get all labels by type id")
+  public BaseResponse<List<LabelResponse>> getLabelsByTypeId(
+      @Parameter(name = "project_id", description = "Identification of project")
+      @PathVariable("project_id") String projectId,
+      @Parameter(name = "type_id", description = "Identification of type")
       @PathVariable("type_id") String typeId) {
     log.info("(getLabelsByTypeId)");
     getUserId();
@@ -61,14 +80,24 @@ public class LabelController {
   }
 
   @GetMapping("/labels/attached")
-  public BaseResponse getAllLabelByProjectIdAndLabelAttached(@PathVariable("project_id") String projectId) {
+  @Operation(description = "Get all label by project id and label attached")
+  public BaseResponse<List<LabelResponse>> getAllLabelByProjectIdAndLabelAttached(
+      @Parameter(name = "project_id", description = "Identification of project")
+      @PathVariable("project_id") String projectId) {
     log.info("(getAllLabelByProjectIdAndLabelAttached)projectId: {}", projectId);
-    return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(), labelFacadeService.getAllLabelByProjectIdAndLabelAttached(getUserId(), projectId));
+    return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
+        labelFacadeService.getAllLabelByProjectIdAndLabelAttached(getUserId(), projectId));
   }
 
   @DeleteMapping("/types/{type_id}/labels/{id}")
-  public BaseResponse deleteLabel(@PathVariable("project_id") String projectId,
-      @PathVariable("type_id") String typeId, @PathVariable("id") String labelId) {
+  @Operation(description = "Delete label")
+  public BaseResponse<String> deleteLabel(
+      @Parameter(name = "project_id", description = "Identification of project")
+      @PathVariable("project_id") String projectId,
+      @Parameter(name = "type_id", description = "Identification of type")
+      @PathVariable("type_id") String typeId,
+      @Parameter(name = "id", description = "Identification of label")
+      @PathVariable("id") String labelId) {
     log.info("(deleteLabel)");
     getUserId();
     labelFacadeService.deleteLabel(projectId, typeId, labelId);

@@ -2,12 +2,15 @@ package org.ghtk.todo_list.controller;
 
 import static org.ghtk.todo_list.util.SecurityUtil.getUserId;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.dto.request.ChangePasswordRequest;
 import org.ghtk.todo_list.dto.request.UpdateInformationRequest;
+import org.ghtk.todo_list.dto.response.AuthUserResponse;
 import org.ghtk.todo_list.dto.response.BaseResponse;
 import org.ghtk.todo_list.facade.AuthFacadeService;
 import org.ghtk.todo_list.service.AuthUserService;
@@ -27,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RequiredArgsConstructor
 @Validated
+@Tag(name = "User", description = "User API")
 public class UserController {
 
   private final AuthFacadeService authFacadeService;
@@ -34,8 +38,8 @@ public class UserController {
 
   @PutMapping("/change-password")
   @ResponseStatus(HttpStatus.OK)
-  public BaseResponse changePassword(@RequestBody @Valid ChangePasswordRequest request) {
-
+  @Operation(description = "Change password")
+  public BaseResponse<String> changePassword(@RequestBody @Valid ChangePasswordRequest request) {
     log.info("(changePassword)request: {}", request.toString());
     authFacadeService.changePassword(request, SecurityUtil.getUserId());
     return BaseResponse.of(HttpStatus.OK.value(), LocalDateTime.now().toString(),
@@ -44,7 +48,8 @@ public class UserController {
 
   @PatchMapping
   @ResponseStatus(HttpStatus.OK)
-  public BaseResponse updateInformation(@RequestBody @Valid UpdateInformationRequest request) {
+  @Operation(description = "Update information")
+  public BaseResponse<AuthUserResponse> updateInformation(@RequestBody @Valid UpdateInformationRequest request) {
     log.info("(updateInformation)request: {}", request.toString());
     return BaseResponse.of(HttpStatus.OK.value(), LocalDateTime.now().toString(),
         authUserService.updateUserDetail(getUserId(), request));
@@ -52,7 +57,8 @@ public class UserController {
 
   @GetMapping()
   @ResponseStatus(HttpStatus.OK)
-  public BaseResponse getDetail() {
+  @Operation(description = "Get detail")
+  public BaseResponse<AuthUserResponse> getDetail() {
     log.info("(getDetail)");
     return BaseResponse.of(HttpStatus.OK.value(), LocalDateTime.now().toString(),
         authUserService.getDetail(getUserId()));
