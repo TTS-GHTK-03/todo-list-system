@@ -58,4 +58,10 @@ public class ActivityLogServiceImpl implements ActivityLogService {
     log.info("(deleteById)activityLogId: {}", activityLogId);
     activityLogRepository.deleteById(activityLogId);
   }
+
+  @Override
+  public void create(ActivityLog activityLog) {
+    log.info("(create)activityLog: {}", activityLog);
+    activityLogRepository.save(activityLog);
+  }
 }

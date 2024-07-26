@@ -84,9 +84,9 @@ public class TdlCoreConfiguration {
   public ProjectUserFacadeService projectUserFacadeService(ProjectUserService projectUserService,
       ProjectService projectService,
       AuthUserService authUserService, RedisCacheService redisCacheService,
-      EmailHelper emailHelper) {
+      EmailHelper emailHelper, ActivityLogService activityLogService) {
     return new ProjectUserFacadeServiceImpl(projectUserService, projectService, authUserService,
-        redisCacheService, emailHelper);
+        redisCacheService, emailHelper, activityLogService);
   }
 
   @Bean

@@ -45,9 +45,8 @@ public class SprintController {
       @Parameter(name = "project id", description = "Identification project")
       @PathVariable("project_id") String projectId) {
     log.info("(createSprintByProject) project {}", projectId);
-    getUserId();
     return BaseResponse.of(HttpStatus.CREATED.value(), LocalDate.now().toString(),
-        sprintFacadeService.createSprintByProject(projectId));
+        sprintFacadeService.createSprintByProject(getUserId(), projectId));
   }
 
   @PutMapping("/{sprint_id}/start")
@@ -59,9 +58,8 @@ public class SprintController {
       @Parameter(name = "sprint id", description = "Identification sprint")
       @PathVariable("sprint_id") String sprintId) {
     log.info("(startSprint) projectId {}, sprintId {}", projectId, sprintId);
-    getUserId();
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
-        sprintFacadeService.startSprint(projectId, sprintId, request.getTitle(),
+        sprintFacadeService.startSprint(getUserId(), projectId, sprintId, request.getTitle(),
             request.getStartDate(), request.getEndDate()));
   }
 
@@ -134,8 +132,7 @@ public class SprintController {
       @Parameter(name = "sprint id", description = "Identification sprint")
       @PathVariable("id") String id) {
     log.info("(deleteSprint) projectId: {}, id: {}", projectId, id);
-    getUserId();
-    sprintFacadeService.deleteSprint(projectId, id);
+    sprintFacadeService.deleteSprint(getUserId(), projectId, id);
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         "Delete sprint successfully!!");
   }
@@ -161,8 +158,7 @@ public class SprintController {
       @Parameter(name = "sprint id", description = "Identification sprint")
       @PathVariable("sprint_id") String sprintId) {
     log.info("(confirmCompleteSprint) projectId {}, sprintId {}", projectId, sprintId);
-    getUserId();
-    sprintFacadeService.confirmCompleteSprint(projectId, sprintId);
+    sprintFacadeService.confirmCompleteSprint(getUserId(), projectId, sprintId);
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         "Complete sprint successfully!!");
   }

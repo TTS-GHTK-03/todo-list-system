@@ -1,5 +1,6 @@
 package org.ghtk.todo_list.facade.imp;
 
+import static org.ghtk.todo_list.constant.ActivityLogConstant.ProjectUserAction.*;
 import static org.ghtk.todo_list.constant.CacheConstant.INVITE_KEY;
 
 import java.util.Base64;
@@ -11,6 +12,7 @@ import org.ghtk.todo_list.constant.RoleProjectUser;
 import org.ghtk.todo_list.constant.URL;
 import org.ghtk.todo_list.core_email.helper.EmailHelper;
 import org.ghtk.todo_list.dto.response.AuthUserResponse;
+import org.ghtk.todo_list.entity.ActivityLog;
 import org.ghtk.todo_list.entity.AuthUser;
 import org.ghtk.todo_list.entity.Project;
 import org.ghtk.todo_list.entity.ProjectUser;
@@ -20,6 +22,7 @@ import org.ghtk.todo_list.exception.RoleProjectUserNotFound;
 import org.ghtk.todo_list.exception.UserNotFoundException;
 import org.ghtk.todo_list.facade.ProjectUserFacadeService;
 import org.ghtk.todo_list.model.request.RedisInviteUserRequest;
+import org.ghtk.todo_list.service.ActivityLogService;
 import org.ghtk.todo_list.service.AuthUserService;
 import org.ghtk.todo_list.service.ProjectService;
 import org.ghtk.todo_list.service.ProjectUserService;
@@ -34,6 +37,7 @@ public class ProjectUserFacadeServiceImpl implements ProjectUserFacadeService {
   private final AuthUserService authUserService;
   private final RedisCacheService redisCacheService;
   private final EmailHelper emailHelper;
+  private final ActivityLogService activityLogService;
 
   @Override
   public void inviteUser(String userId, String projectId, String email, String role) {
@@ -60,6 +64,11 @@ public class ProjectUserFacadeServiceImpl implements ProjectUserFacadeService {
     redisInviteUserRequest.setRole(role);
 
     redisCacheService.save(INVITE_KEY, email, redisInviteUserRequest);
+
+    var notification = new ActivityLog();
+    notification.setAction(INVITE_USER);
+    notification.setUserId(userId);
+    activityLogService.create(notification);
   }
 
   @Override
@@ -96,6 +105,10 @@ public class ProjectUserFacadeServiceImpl implements ProjectUserFacadeService {
       String acceptEmailKey = generateAcceptEmailKey(email, projectId, role);
     }
 
+    var notification = new ActivityLog();
+    notification.setAction(ACCEPT_INVITE);
+    notification.setUserId(authUserService.findByEmail(email).getId());
+    activityLogService.create(notification);
     return null;
   }
 
@@ -128,6 +141,10 @@ public class ProjectUserFacadeServiceImpl implements ProjectUserFacadeService {
     param.put("subtitle", "If you want to join with our, contact me!");
     emailHelper.send(subject, userMember.getEmail(), "email-kick-user-in-project-template", param);
 
+    var notification = new ActivityLog();
+    notification.setAction(KICK_USER);
+    notification.setUserId(userId);
+    activityLogService.create(notification);
   }
 
   private void validateProjectId(String projectId) {

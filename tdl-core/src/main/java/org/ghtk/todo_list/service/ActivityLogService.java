@@ -13,4 +13,5 @@ public interface ActivityLogService {
   boolean existsByActivityLogId(String activityLogId);
   boolean existsByActivityLogIdAndUserId(String activityLogId, String userId);
   void deleteById(String activityLogId);
+  void create(ActivityLog activityLog);
 }

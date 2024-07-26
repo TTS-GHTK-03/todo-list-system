@@ -50,4 +50,6 @@ public interface AuthUserRepository extends JpaRepository<AuthUser, String> {
       WHERE au.email != ''
       """)
   List<AuthUser> getAllUserByProject(String projectId);
+
+  Optional<AuthUser> findByEmail(String email);
 }
