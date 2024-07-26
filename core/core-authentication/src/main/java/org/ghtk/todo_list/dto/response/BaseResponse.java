@@ -8,13 +8,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor(staticName = "of")
 @Data
 @NoArgsConstructor
-public class BaseResponse {
+public class BaseResponse<T> {
 
   private int status;
   private String timestamp;
-  private Object data;
+  private T data;
 
-  public static BaseResponse of(int status, Object data) {
+  public BaseResponse of(int status, T data) {
     return BaseResponse.of(status, String.valueOf(LocalDateTime.now()), data);
   }
 

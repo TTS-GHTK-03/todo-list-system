@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
+
 public class ActivityLogController {
 
   private final ActivityLogFacadeService activityLogFacadeService;
