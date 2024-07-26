@@ -216,7 +216,13 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
           userId);
       throw new TaskNotExistUserException();
     }
-    TaskAssignees taskAssignees = new TaskAssignees();
+    TaskAssignees taskAssignees = taskAssigneesService.findByTaskId(taskId);
+    log.info("(agileTaskByUser) TaskAssignees: {}", taskAssignees);
+    if(taskAssignees == null) {
+      log.warn("(agileTaskByUser) is null");
+      taskAssignees = new TaskAssignees();
+    }
+
     taskAssignees.setUserId(userId);
     taskAssignees.setTaskId(taskId);
 

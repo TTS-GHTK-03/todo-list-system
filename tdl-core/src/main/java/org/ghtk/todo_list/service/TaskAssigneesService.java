@@ -9,4 +9,6 @@ public interface TaskAssigneesService {
   TaskAssignees save(TaskAssignees taskAssignees);
   boolean existsByUserIdAndTaskId(String userId, String taskId);
   void deleteAllByTaskId(String taskId);
+  void updateTaskAssigneesByUserIdAndProjectId(String userId, String memberId, String projectId);
+  TaskAssignees findByTaskId(String taskId);
 }
