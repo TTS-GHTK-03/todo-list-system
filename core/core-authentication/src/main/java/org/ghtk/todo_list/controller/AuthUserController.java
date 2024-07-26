@@ -1,5 +1,7 @@
 package org.ghtk.todo_list.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +14,9 @@ import org.ghtk.todo_list.dto.request.VerifyResetPasswordRequest;
 import org.ghtk.todo_list.dto.request.RegisterRequest;
 import org.ghtk.todo_list.dto.request.*;
 import org.ghtk.todo_list.dto.response.BaseResponse;
+import org.ghtk.todo_list.dto.response.LoginResponse;
+import org.ghtk.todo_list.dto.response.VerifyRegisterResponse;
+import org.ghtk.todo_list.dto.response.VerifyResetPasswordResponse;
 import org.ghtk.todo_list.facade.AuthFacadeService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,13 +29,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
+@Tag(name = "Authentication", description = "Authentication API")
 public class AuthUserController {
 
   private final AuthFacadeService authFacadeService;
 
   @PostMapping("/register")
   @ResponseStatus(HttpStatus.OK)
-  public BaseResponse register(@RequestBody @Valid RegisterRequest request) {
+  @Operation(description = "Register")
+  public BaseResponse<String> register(@RequestBody @Valid RegisterRequest request) {
     log.info("(register)request: {}", request);
     authFacadeService.register(request);
     return BaseResponse.of(HttpStatus.CREATED.value(), LocalDateTime.now().toString(),
@@ -39,7 +46,8 @@ public class AuthUserController {
 
   @PostMapping("/register/otp/validate")
   @ResponseStatus(HttpStatus.OK)
-  public BaseResponse verifyRegister(@RequestBody @Valid VerifyRegisterRequest request) {
+  @Operation(description = "Verify register")
+  public BaseResponse<VerifyRegisterResponse> verifyRegister(@RequestBody @Valid VerifyRegisterRequest request) {
     log.info("(verifyRegister)email: {}, otp: {}", request.getEmail(), request.getOtp());
     return BaseResponse.of(HttpStatus.OK.value(), LocalDateTime.now().toString(),
         authFacadeService.verifyRegister(request));
@@ -47,7 +55,8 @@ public class AuthUserController {
 
   @PostMapping("/register/email/validate")
   @ResponseStatus(HttpStatus.OK)
-  public BaseResponse verifyEmail(@RequestBody @Valid VerifyEmailRequest request) {
+  @Operation(description = "Verify email")
+  public BaseResponse<String> verifyEmail(@RequestBody @Valid VerifyEmailRequest request) {
     log.info("(verifyEmail)email: {}", request.getEmail());
     return BaseResponse.of(HttpStatus.CREATED.value(), LocalDateTime.now().toString(),
         authFacadeService.verifyEmail(request));
@@ -55,7 +64,8 @@ public class AuthUserController {
 
   @PostMapping("/forgot")
   @ResponseStatus(HttpStatus.OK)
-  public BaseResponse forgotPassword(@RequestBody @Valid ForgotPasswordRequest request) {
+  @Operation(description = "Forgot password")
+  public BaseResponse<String> forgotPassword(@RequestBody @Valid ForgotPasswordRequest request) {
     log.info("(forgotPassword)request: {}", request);
     authFacadeService.forgotPassword(request);
     return BaseResponse.of(HttpStatus.OK.value(), LocalDateTime.now().toString(),
@@ -65,16 +75,17 @@ public class AuthUserController {
 
   @PostMapping("/reset-password/otp/validate")
   @ResponseStatus(HttpStatus.OK)
-  public BaseResponse verifyResetPassword(@RequestBody @Valid VerifyResetPasswordRequest request) {
+  @Operation(description = "Verify reset password")
+  public BaseResponse<VerifyResetPasswordResponse> verifyResetPassword(@RequestBody @Valid VerifyResetPasswordRequest request) {
     log.info("(verifyResetPassword)request: {}", request);
-
     return BaseResponse.of(HttpStatus.OK.value(), LocalDateTime.now().toString(),
         authFacadeService.verifyResetPassword(request));
   }
 
   @PostMapping("/login")
   @ResponseStatus(HttpStatus.OK)
-  public BaseResponse login(@Valid @RequestBody LoginRequest request) {
+  @Operation(description = "Login")
+  public BaseResponse<LoginResponse> login(@Valid @RequestBody LoginRequest request) {
     log.info("(login)request: {}", request);
     return BaseResponse.of(HttpStatus.OK.value(), LocalDateTime.now().toString(),
         authFacadeService.login(request));
@@ -82,20 +93,20 @@ public class AuthUserController {
 
   @PostMapping("/reset-password")
   @ResponseStatus(HttpStatus.OK)
-  public BaseResponse resetPassword(@RequestBody @Valid ResetPasswordRequest request) {
+  @Operation(description = "Reset password")
+  public BaseResponse<String> resetPassword(@RequestBody @Valid ResetPasswordRequest request) {
     log.info("(resetPassword)request: {}", request);
     authFacadeService.resetPassword(request);
-
     return BaseResponse.of(HttpStatus.OK.value(), LocalDateTime.now().toString(),
         "Reset Password successfully!!");
   }
 
   @PostMapping("/resend/otp")
   @ResponseStatus(HttpStatus.OK)
-  public BaseResponse resendOtp(@RequestBody @Valid ResendOtpRequest request) {
+  @Operation(description = "Resend otp")
+  public BaseResponse<String> resendOtp(@RequestBody @Valid ResendOtpRequest request) {
     log.info("(resendOtp)request: {}", request);
     authFacadeService.resendOtp(request);
-
     return BaseResponse.of(HttpStatus.OK.value(), LocalDateTime.now().toString(),
         "resend Otp successfully!!");
   }

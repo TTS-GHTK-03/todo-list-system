@@ -2,58 +2,85 @@ package org.ghtk.todo_list.controller;
 
 import static org.ghtk.todo_list.util.SecurityUtil.getUserId;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.time.LocalDate;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.dto.response.BaseResponse;
+import org.ghtk.todo_list.entity.Project;
 import org.ghtk.todo_list.facade.ProjectFacadeService;
 import org.ghtk.todo_list.model.request.CreateProjectRequest;
 import org.ghtk.todo_list.model.request.UpdateProjectRequest;
+import org.ghtk.todo_list.model.response.ProjectInformationResponse;
+import org.ghtk.todo_list.model.response.ProjectRoleResponse;
 import org.ghtk.todo_list.paging.PagingReq;
-import org.ghtk.todo_list.service.ProjectService;
+import org.ghtk.todo_list.paging.PagingRes;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
-
-import java.time.LocalDate;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
 @RequestMapping("/api/v1/projects")
 @RequiredArgsConstructor
+@Tag(name = "Project", description = "Project API")
 public class ProjectController {
 
   private final ProjectFacadeService projectService;
 
   @GetMapping()
-  public BaseResponse getAllProject() {
+  @Operation(description = "Get all project for user")
+  public BaseResponse<List<Project>> getAllProject() {
     log.info("(getAllProject)");
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         projectService.getAllProject(getUserId()));
   }
 
   @GetMapping("/{project_id}")
-  public BaseResponse getProject(@PathVariable(name = "project_id") String projectId) {
+  @Operation(description = "Get project by id")
+  public BaseResponse<ProjectRoleResponse> getProject(
+      @Parameter(name = "project_id", description = "Identification of project")
+      @PathVariable(name = "project_id") String projectId) {
     log.info("(getProject)projectId: {}", projectId);
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         projectService.getProject(getUserId(), projectId));
   }
 
   @GetMapping("/{project_id}/information")
-  public BaseResponse getProjectInformation(@PathVariable(name = "project_id") String projectId) {
+  @Operation(description = "Get project information by id")
+  public BaseResponse<ProjectInformationResponse> getProjectInformation(
+      @Parameter(name = "project_id", description = "Identification of project")
+      @PathVariable(name = "project_id") String projectId) {
     log.info("(getProjectInformation)projectId: {}", projectId);
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         projectService.getProjectInformation(getUserId(), projectId));
   }
 
   @PostMapping()
-  public BaseResponse createProject(@RequestBody @Valid CreateProjectRequest createProjectRequest) {
+  @Operation(description = "Create project")
+  public BaseResponse<Project> createProject(
+      @RequestBody @Valid CreateProjectRequest createProjectRequest) {
     log.info("(createProject)project: {}", createProjectRequest);
     return BaseResponse.of(HttpStatus.CREATED.value(), LocalDate.now().toString(),
         projectService.createProject(getUserId(), createProjectRequest.getTitle()));
   }
 
   @PutMapping("/{project_id}")
-  public BaseResponse updateProject(@PathVariable("project_id") String projectId,
+  @Operation(description = "Update project")
+  public BaseResponse<Project> updateProject(
+      @Parameter(name = "project_id", description = "Identification of project")
+      @PathVariable("project_id") String projectId,
       @RequestBody @Valid UpdateProjectRequest updateProjectRequest) {
     log.info("(updateProject)project: {}", updateProjectRequest);
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
@@ -62,7 +89,10 @@ public class ProjectController {
   }
 
   @DeleteMapping("/{project_id}")
-  public BaseResponse deleteProject(@PathVariable("project_id") String projectId) {
+  @Operation(description = "Delete project")
+  public BaseResponse<String> deleteProject(
+      @Parameter(name = "project_id", description = "Identification of project")
+      @PathVariable("project_id") String projectId) {
     log.info("(deleteProject)projectId: {}", projectId);
     projectService.deleteProject(getUserId(), projectId);
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
@@ -70,7 +100,8 @@ public class ProjectController {
   }
 
   @GetMapping("/search")
-  public BaseResponse searchProjects(
+  @Operation(description = "Search project")
+  public BaseResponse<PagingRes<Project>> searchProjects(
       @RequestParam(required = false) String searchValue,
       @Valid PagingReq pageable) {
     log.info("(searchProjects)searchValue: {}, pageable: {}", searchValue, pageable);

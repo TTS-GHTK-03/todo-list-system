@@ -2,14 +2,23 @@ package org.ghtk.todo_list.controller;
 
 import static org.ghtk.todo_list.util.SecurityUtil.getUserId;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.time.LocalDate;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.dto.response.BaseResponse;
 import org.ghtk.todo_list.facade.SprintFacadeService;
 import org.ghtk.todo_list.model.request.SprintRequest;
 import org.ghtk.todo_list.model.request.StartSprintRequest;
+import org.ghtk.todo_list.model.response.CompleteSprintResponse;
+import org.ghtk.todo_list.model.response.CreateSprintResponse;
+import org.ghtk.todo_list.model.response.ProgressStatisticsResponse;
+import org.ghtk.todo_list.model.response.SprintResponse;
+import org.ghtk.todo_list.model.response.StartSprintResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,12 +34,16 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/projects/{project_id}/sprints")
 @RequiredArgsConstructor
+@Tag(name = "sprint")
 public class SprintController {
 
   private final SprintFacadeService sprintFacadeService;
 
   @PostMapping()
-  public BaseResponse createSprintByProject(@PathVariable("project_id") String projectId) {
+  @Operation(description = "Create sprint by project")
+  public BaseResponse<CreateSprintResponse> createSprintByProject(
+      @Parameter(name = "project id", description = "Identification project")
+      @PathVariable("project_id") String projectId) {
     log.info("(createSprintByProject) project {}", projectId);
     getUserId();
     return BaseResponse.of(HttpStatus.CREATED.value(), LocalDate.now().toString(),
@@ -38,8 +51,13 @@ public class SprintController {
   }
 
   @PutMapping("/{sprint_id}/start")
-  public BaseResponse startSprint(@RequestBody @Valid StartSprintRequest request,
-      @PathVariable("project_id") String projectId, @PathVariable("sprint_id") String sprintId) {
+  @Operation(description = "Start sprint")
+  public BaseResponse<StartSprintResponse> startSprint(
+      @RequestBody @Valid StartSprintRequest request,
+      @Parameter(name = "project id", description = "Identification project")
+      @PathVariable("project_id") String projectId,
+      @Parameter(name = "sprint id", description = "Identification sprint")
+      @PathVariable("sprint_id") String sprintId) {
     log.info("(startSprint) projectId {}, sprintId {}", projectId, sprintId);
     getUserId();
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
@@ -48,8 +66,13 @@ public class SprintController {
   }
 
   @PutMapping("/{sprint_id}")
-  public BaseResponse updateSprint(@RequestBody @Valid SprintRequest request,
-      @PathVariable("project_id") String projectId, @PathVariable("sprint_id") String sprintId) {
+  @Operation(description = "Update sprint")
+  public BaseResponse<SprintResponse> updateSprint(
+      @RequestBody @Valid SprintRequest request,
+      @Parameter(name = "project id", description = "Identification project")
+      @PathVariable("project_id") String projectId,
+      @Parameter(name = "sprint id", description = "Identification sprint")
+      @PathVariable("sprint_id") String sprintId) {
     log.info("(updateSprint) projectId {}, sprintId {}", projectId, sprintId);
     getUserId();
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
@@ -58,7 +81,11 @@ public class SprintController {
   }
 
   @GetMapping()
-  public BaseResponse getSprints(@PathVariable("project_id") String projectId,
+  @Operation(description = "Get sprints or search sprints by status")
+  public BaseResponse<List<SprintResponse>> getSprints(
+      @Parameter(name = "project id", description = "Identification project")
+      @PathVariable("project_id") String projectId,
+      @Parameter(name = "status", description = "Status sprint", example = "IN_PROGRESS")
       @RequestParam(value = "status", required = false) String status) {
     log.info("(getSprints) projectId: {}", projectId);
     getUserId();
@@ -74,7 +101,11 @@ public class SprintController {
   }
 
   @GetMapping("/{id}")
-  public BaseResponse getSprint(@PathVariable("project_id") String projectId,
+  @Operation(description = "Get sprint by id")
+  public BaseResponse<SprintResponse> getSprint(
+      @Parameter(name = "project id", description = "Identification project")
+      @PathVariable("project_id") String projectId,
+      @Parameter(name = "sprint id", description = "Identification sprint")
       @PathVariable("id") String id) {
     log.info("(getSprint) projectId: {}, id: {}", projectId, id);
     getUserId();
@@ -83,7 +114,11 @@ public class SprintController {
   }
 
   @GetMapping("/{id}/progress")
-  public BaseResponse getProgressStatistics(@PathVariable("project_id") String projectId,
+  @Operation(description = "Get progress statistics")
+  public BaseResponse<ProgressStatisticsResponse> getProgressStatistics(
+      @Parameter(name = "project id", description = "Identification project")
+      @PathVariable("project_id") String projectId,
+      @Parameter(name = "sprint id", description = "Identification sprint")
       @PathVariable("id") String id) {
     log.info("(getProgressStatistics) projectId: {}, id: {}", projectId, id);
     getUserId();
@@ -92,7 +127,11 @@ public class SprintController {
   }
 
   @DeleteMapping("/{id}")
-  public BaseResponse deleteSprint(@PathVariable("project_id") String projectId,
+  @Operation(description = "Delete sprint by id")
+  public BaseResponse<String> deleteSprint(
+      @Parameter(name = "project id", description = "Identification project")
+      @PathVariable("project_id") String projectId,
+      @Parameter(name = "sprint id", description = "Identification sprint")
       @PathVariable("id") String id) {
     log.info("(deleteSprint) projectId: {}, id: {}", projectId, id);
     getUserId();
@@ -102,7 +141,11 @@ public class SprintController {
   }
 
   @GetMapping("/{sprint_id}/complete")
-  public BaseResponse completeSprint(@PathVariable("project_id") String projectId,
+  @Operation(description = "Complete sprint")
+  public BaseResponse<CompleteSprintResponse> completeSprint(
+      @Parameter(name = "project id", description = "Identification project")
+      @PathVariable("project_id") String projectId,
+      @Parameter(name = "sprint id", description = "Identification sprint")
       @PathVariable("sprint_id") String sprintId) {
     log.info("(completeSprint) projectId {}, sprintId {}", projectId, sprintId);
     getUserId();
@@ -111,7 +154,11 @@ public class SprintController {
   }
 
   @PutMapping("/{sprint_id}/confirm-complete")
-  public BaseResponse confirmCompleteSprint(@PathVariable("project_id") String projectId,
+  @Operation(description = "Confirm complete sprint")
+  public BaseResponse<String> confirmCompleteSprint(
+      @Parameter(name = "project id", description = "Identification project")
+      @PathVariable("project_id") String projectId,
+      @Parameter(name = "sprint id", description = "Identification sprint")
       @PathVariable("sprint_id") String sprintId) {
     log.info("(confirmCompleteSprint) projectId {}, sprintId {}", projectId, sprintId);
     getUserId();

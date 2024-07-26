@@ -2,8 +2,12 @@ package org.ghtk.todo_list.controller;
 
 import static org.ghtk.todo_list.util.SecurityUtil.getUserId;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.time.LocalDate;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.dto.response.BaseResponse;
@@ -12,6 +16,8 @@ import org.ghtk.todo_list.model.request.CreateTaskRequest;
 import org.ghtk.todo_list.model.request.UpdateDueDateTaskRequest;
 import org.ghtk.todo_list.model.request.UpdatePointTaskRequest;
 import org.ghtk.todo_list.model.request.UpdateTitleTaskRequest;
+import org.ghtk.todo_list.model.response.TaskResponse;
+import org.ghtk.todo_list.model.response.UpdateDueDateTaskResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -29,12 +35,18 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
+@Tag(name = "Task")
 public class TaskController {
 
   private final TaskFacadeService taskFacadeService;
 
   @GetMapping("/{project_id}/tasks")
-  public BaseResponse getTasksByProjectId(@PathVariable("project_id") String projectId, @RequestParam(value = "status", required = false) String status) {
+  @Operation(summary = "Get all task by project id")
+  public BaseResponse<List<TaskResponse>> getTasksByProjectId(
+      @Parameter(name = "project_id", description = "Identification project")
+      @PathVariable("project_id") String projectId,
+      @Parameter(name = "status", description = "Status task", example = "TODO")
+      @RequestParam(value = "status", required = false) String status) {
     log.info("(getTasksByProjectId)");
     if (status == null) {
       log.info("(getTasksByProjectId)getAllTasks");
@@ -48,15 +60,22 @@ public class TaskController {
   }
 
   @PostMapping ("/{project_id}/tasks")
-  public BaseResponse createTask(@PathVariable("project_id") String projectId, @Valid @RequestBody
-      CreateTaskRequest createTaskRequest) {
+  @Operation(description = "Create task")
+  public BaseResponse<TaskResponse> createTask(
+      @Parameter(name = "project_id", description = "Identification project")
+      @PathVariable("project_id") String projectId,
+      @Valid @RequestBody CreateTaskRequest createTaskRequest) {
     log.info("(createTask)projectId: {}", projectId);
     return BaseResponse.of(HttpStatus.CREATED.value(), LocalDate.now().toString(),
           taskFacadeService.createTask(getUserId(),projectId,createTaskRequest.getTitle()));
     }
 
   @GetMapping("/{project_id}/tasks/{task_id}")
-  public BaseResponse getTaskByTaskId(@PathVariable("project_id") String projectId,
+  @Operation(description = "Get task by task id")
+  public BaseResponse<TaskResponse> getTaskByTaskId(
+      @Parameter(name = "project_id", description = "Identification project")
+      @PathVariable("project_id") String projectId,
+      @Parameter(name = "task_id", description = "Identification task")
       @PathVariable("task_id") String taskId) {
     log.info("(getTask)");
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
@@ -64,31 +83,52 @@ public class TaskController {
   }
 
   @PatchMapping("/{project_id}/tasks/{task_id}")
-  public BaseResponse updateStatusTask(@PathVariable("project_id") String projectId,
-      @PathVariable("task_id") String taskId, @Valid @RequestParam(value = "statusTask") String status) {
+  @Operation(description = "Update status task")
+  public BaseResponse<TaskResponse> updateStatusTask(
+      @Parameter(name = "project_id", description = "Identification project")
+      @PathVariable("project_id") String projectId,
+      @Parameter(name = "task_id", description = "Identification task")
+      @PathVariable("task_id") String taskId,
+      @Parameter(name = "statusTask", description = "Status task", example = "TODO")
+      @Valid @RequestParam(value = "statusTask") String status) {
     log.info("(updateStatusTask)");
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         taskFacadeService.updateStatusTask(getUserId(), projectId, taskId, status));
   }
 
   @PatchMapping("/{project_id}/tasks/{task_id}/points")
-  public BaseResponse updatePointTask(@PathVariable("project_id") String projectId,
-      @PathVariable("task_id") String taskId, @Valid @RequestBody UpdatePointTaskRequest updatePointTaskRequest) {
+  @Operation(description = "Update point task")
+  public BaseResponse<TaskResponse> updatePointTask(
+      @Parameter(name = "project_id", description = "Identification project")
+      @PathVariable("project_id") String projectId,
+      @Parameter(name = "task_id", description = "Identification task")
+      @PathVariable("task_id") String taskId,
+      @Valid @RequestBody UpdatePointTaskRequest updatePointTaskRequest) {
     log.info("(updatePointTask),projectId: {}, taskId: {}", projectId, taskId);
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         taskFacadeService.updatePointTask(getUserId(), projectId, taskId, updatePointTaskRequest.getPoint()));
   }
 
   @PatchMapping("/{project_id}/sprints/{sprint_id}/tasks/{task_id}")
-  public BaseResponse updateSprintTask(@PathVariable("project_id") String projectId,
-      @PathVariable("task_id") String taskId, @PathVariable("sprint_id") String sprintId) {
+  @Operation(description = "Update sprint of task")
+  public BaseResponse<TaskResponse> updateSprintTask(
+      @Parameter(name = "project_id", description = "Identification project")
+      @PathVariable("project_id") String projectId,
+      @Parameter(name = "task_id", description = "Identification taskId")
+      @PathVariable("task_id") String taskId,
+      @Parameter(name = "sprint_id", description = "Identification sprint")
+      @PathVariable("sprint_id") String sprintId) {
     log.info("(updateSprintTask)");
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         taskFacadeService.updateSprintTask(getUserId(), projectId, sprintId, taskId));
   }
 
   @PostMapping("/{project_id}/tasks/{task_id}/clone")
-  public BaseResponse cloneTask(@PathVariable("project_id") String projectId,
+  @Operation(description = "Clone task")
+  public BaseResponse<TaskResponse> cloneTask(
+      @Parameter(name = "project_id", description = "Identification project")
+      @PathVariable("project_id") String projectId,
+      @Parameter(name = "task_id", description = "Identification task")
       @PathVariable("task_id") String taskId) {
     log.info("(cloneTask)");
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
@@ -96,8 +136,14 @@ public class TaskController {
   }
 
   @PutMapping("/{project_id}/sprints/{sprint_id}/tasks/{task_id}/update-date")
-  public BaseResponse updateStartDateDueDateTask(@PathVariable("project_id") String projectId,
-      @PathVariable("sprint_id") String sprintId, @PathVariable("task_id") String taskId,
+  @Operation(description = "Update start date and due date of task")
+  public BaseResponse<UpdateDueDateTaskResponse> updateStartDateDueDateTask(
+      @Parameter(name = "project_id", description = "Identification project")
+      @PathVariable("project_id") String projectId,
+      @Parameter(name = "sprint_id", description = "Identification sprint")
+      @PathVariable("sprint_id") String sprintId,
+      @Parameter(name = "task_id", description = "Identification task")
+      @PathVariable("task_id") String taskId,
       @RequestBody @Valid UpdateDueDateTaskRequest updateDueDateTaskRequest) {
     log.info("(updateStartDateDueDateTask)project: {}, sprint: {}, task: {}", projectId, sprintId,
         taskId);
@@ -108,7 +154,11 @@ public class TaskController {
   }
 
   @GetMapping("/{project_id}/sprints/{sprint_id}/tasks")
-  public BaseResponse getAllBySprintId(@PathVariable("project_id") String projectId,
+  @Operation(description = "Get all task by sprint")
+  public BaseResponse<List<TaskResponse>> getAllBySprintId(
+      @Parameter(name = "project_id", description = "Identification project")
+      @PathVariable("project_id") String projectId,
+      @Parameter(name = "sprint_id", description = "Identification sprint")
       @PathVariable("sprint_id") String sprintId) {
     log.info("(getAllTaskBySprintId)");
     getUserId();
@@ -117,7 +167,11 @@ public class TaskController {
   }
 
   @DeleteMapping ("/{project_id}/tasks/{task_id}")
-  public BaseResponse deleteTask(@PathVariable("project_id") String projectId,
+  @Operation(description = "Delete task")
+  public BaseResponse<String> deleteTask(
+      @Parameter(name = "project_id", description = "Identification project")
+      @PathVariable("project_id") String projectId,
+      @Parameter(name = "task_id", description = "Identification task")
       @PathVariable("task_id") String taskId) {
     log.info("(deleteTask)projectId: {}, taskId: {}", projectId, taskId);
     taskFacadeService.deleteTask(getUserId(), projectId, taskId);
@@ -126,16 +180,27 @@ public class TaskController {
   }
 
   @PutMapping("/{project_id}/tasks/{task_id}")
-  public BaseResponse updateTitleTask(@PathVariable("project_id") String projectId,
-      @PathVariable("task_id") String taskId, @Valid @RequestBody UpdateTitleTaskRequest request) {
+  @Operation(description = "Update title task")
+  public BaseResponse<TaskResponse> updateTitleTask(
+      @Parameter(name = "project_id", description = "Identification project")
+      @PathVariable("project_id") String projectId,
+      @Parameter(name = "task_id", description = "Identification task")
+      @PathVariable("task_id") String taskId,
+      @Valid @RequestBody UpdateTitleTaskRequest request) {
     log.info("(updateTitleTask)project: {}, task: {}, title: {}", projectId, taskId, request.getTitle());
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         taskFacadeService.updateTitleTask(getUserId(), projectId, taskId, request.getTitle()));
   }
   @GetMapping("/{project_id}/tasks/search")
-  public BaseResponse searchTask(@PathVariable("project_id") String projectId,
+  @Operation(description = "Search task by keyProjectTask, title, typeId, labelId")
+  public BaseResponse<List<TaskResponse>> searchTask(
+      @Parameter(name = "project_id", description = "Identification project")
+      @PathVariable("project_id") String projectId,
+      @Parameter(name = "search", description = "KeyProjectTask or title")
       @RequestParam(required = false)  String search,
+      @Parameter(name = "typeId", description = "TypeId")
       @RequestParam(required = false)  String typeId,
+      @Parameter(name = "labelId", description = "LabelId")
       @RequestParam(required = false)  String labelId) {
     log.info("(searchTask)project: {}, search: {}", projectId, search);
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
@@ -143,8 +208,13 @@ public class TaskController {
   }
 
   @GetMapping("/{project_id}/tasks/search-board")
-  public BaseResponse searchTaskBoard(@PathVariable("project_id") String projectId,
+  @Operation(description = "Search task by keyProjectTask, title, sprintId")
+  public BaseResponse<List<TaskResponse>> searchTaskBoard(
+      @Parameter(name = "project_id", description = "Identification project")
+      @PathVariable("project_id") String projectId,
+      @Parameter(name = "search", description = "KeyProjectTask or title")
       @RequestParam(required = false)  String search,
+      @Parameter(name = "sprintId", description = "SprintId")
       @RequestParam(required = false)  String sprintId) {
     log.info("(searchTaskBoard)project: {}, search: {}, sprintId: {}", projectId, search, sprintId);
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
@@ -152,11 +222,17 @@ public class TaskController {
   }
 
   @GetMapping("/tasks/search-filter")
-  public BaseResponse searchTaskBoard(
+  @Operation(description = "Search task by keyProjectTask, title, projectId, typeId, status, assignee")
+  public BaseResponse<List<TaskResponse>> searchTaskBoard(
+      @Parameter(name = "project_id", description = "Project id")
       @RequestParam(required = false)  String projectId,
+      @Parameter(name = "search", description = "KeyProjectTask or title")
       @RequestParam(required = false)  String search,
+      @Parameter(name = "typeId", description = "TypeId")
       @RequestParam(required = false)  String typeId,
+      @Parameter(name = "status", description = "Status")
       @RequestParam(required = false)  String status,
+      @Parameter(name = "assignee", description = "Assignee")
       @RequestParam(required = false)  String assignee) {
     log.info("(searchTaskBoard)project: {}, search: {}, typeId: {}, status: {}, assignee: {}", projectId, search, typeId, status, assignee);
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
