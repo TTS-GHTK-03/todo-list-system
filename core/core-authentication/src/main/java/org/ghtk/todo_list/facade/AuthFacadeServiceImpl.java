@@ -110,8 +110,13 @@ public class AuthFacadeServiceImpl implements AuthFacadeService {
       log.error("(forgotPassword)email: {}", request.getEmail());
       throw new EmailNotFoundException(request.getEmail());
     }
-    var otp = otpService.generateOtp();
     var redisKey = request.getEmail() + RESET_PASSWORD_OTP_KEY;
+    var otpCache = redisCacheService.get(redisKey);
+    if (otpCache.isPresent()) {
+      log.error("(forgotPassword)otpCache is still valid for email: {}", request.getEmail());
+      throw new OtpStillValidException(request.getEmail());
+    }
+    var otp = otpService.generateOtp();
     redisCacheService.save(redisKey, otp, OTP_TTL_MINUTES, TimeUnit.MINUTES);
 
     String subject = "Your OTP for rest password";
@@ -207,8 +212,14 @@ public class AuthFacadeServiceImpl implements AuthFacadeService {
     log.info("(verifyEmail)email: {}", request.getEmail());
     if (!authUserService.existsByEmail(request.getEmail())) {
       log.info("(verifyEmail)email don't registered: {}", request.getEmail());
-      var otp = otpService.generateOtp();
+
       var redisKey = request.getEmail() + OTP_VERIFICATION_ACCOUNT_KEY;
+      var otpCache = redisCacheService.get(redisKey);
+      if (otpCache.isPresent()) {
+        log.error("(verifyEmail)otpCache is still valid for email: {}", request.getEmail());
+        throw new OtpStillValidException(request.getEmail());
+      }
+      var otp = otpService.generateOtp();
       redisCacheService.save(redisKey, otp, OTP_TTL_MINUTES, TimeUnit.MINUTES);
 
       String subject = "Your OTP for account verification";
@@ -352,6 +363,12 @@ public class AuthFacadeServiceImpl implements AuthFacadeService {
   private void resend(String email, String otpKey) {
     log.info("(resend)email {}, otpKey {}", email, otpKey);
     var redisKey = email + otpKey;
+
+    var otpCache = redisCacheService.get(redisKey);
+    if (otpCache.isPresent()) {
+      log.error("(verifyEmail)otpCache is still valid for email: {}", email);
+      throw new OtpStillValidException(email);
+    }
 
     var otp = otpService.generateOtp();
     redisCacheService.save(redisKey, otp, OTP_TTL_MINUTES, TimeUnit.MINUTES);
