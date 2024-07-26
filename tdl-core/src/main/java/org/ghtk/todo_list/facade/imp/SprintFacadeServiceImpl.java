@@ -254,6 +254,9 @@ public class SprintFacadeServiceImpl implements SprintFacadeService {
   @Override
   public void confirmCompleteSprint(String projectId, String sprintId) {
     log.info("(confirmCompleteSprint)projectId: {}, sprintId {}", projectId, sprintId);
+    validateProjectId(projectId);
+    validateSprintId(sprintId);
+    validateProjectIdAndSprintId(projectId, sprintId);
     List<Task> tasks = taskService.findAllByProjectIdAndSprintIdAndStatusNotDone(projectId, sprintId);
     List<Task> saveTakes = new ArrayList<>();
     for (var task : tasks) {

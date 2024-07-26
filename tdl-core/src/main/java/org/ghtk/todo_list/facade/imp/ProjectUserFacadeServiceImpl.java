@@ -24,6 +24,9 @@ import org.ghtk.todo_list.service.AuthUserService;
 import org.ghtk.todo_list.service.ProjectService;
 import org.ghtk.todo_list.service.ProjectUserService;
 import org.ghtk.todo_list.service.RedisCacheService;
+import org.ghtk.todo_list.service.TaskAssigneesService;
+import org.ghtk.todo_list.service.TaskService;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -33,6 +36,7 @@ public class ProjectUserFacadeServiceImpl implements ProjectUserFacadeService {
   private final ProjectService projectService;
   private final AuthUserService authUserService;
   private final RedisCacheService redisCacheService;
+  private final TaskAssigneesService taskAssigneesService;
   private final EmailHelper emailHelper;
 
   @Override
@@ -108,6 +112,7 @@ public class ProjectUserFacadeServiceImpl implements ProjectUserFacadeService {
   }
 
   @Override
+  @Transactional
   public void deleteUser(String userId, String projectId, String memberId) {
     log.info("(deleteUser)projectId: {}, memberId: {}", projectId, memberId);
     AuthUser userMember = authUserService.findById(memberId);
@@ -128,6 +133,7 @@ public class ProjectUserFacadeServiceImpl implements ProjectUserFacadeService {
     param.put("subtitle", "If you want to join with our, contact me!");
     emailHelper.send(subject, userMember.getEmail(), "email-kick-user-in-project-template", param);
 
+    taskAssigneesService.updateTaskAssigneesByUserIdAndProjectId(userId, memberId, projectId);
   }
 
   private void validateProjectId(String projectId) {

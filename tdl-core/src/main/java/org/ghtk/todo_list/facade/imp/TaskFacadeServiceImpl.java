@@ -201,7 +201,9 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
           userId);
       throw new TaskNotExistUserException();
     }
-    TaskAssignees taskAssignees = new TaskAssignees();
+    TaskAssignees taskAssignees = taskAssigneesService.findByTaskId(taskId);
+    if(taskAssignees == null) taskAssignees = new TaskAssignees();
+
     taskAssignees.setUserId(userId);
     taskAssignees.setTaskId(taskId);
 

@@ -83,10 +83,10 @@ public class TdlCoreConfiguration {
   @Bean
   public ProjectUserFacadeService projectUserFacadeService(ProjectUserService projectUserService,
       ProjectService projectService,
-      AuthUserService authUserService, RedisCacheService redisCacheService,
+      AuthUserService authUserService, RedisCacheService redisCacheService, TaskAssigneesService taskAssigneesService,
       EmailHelper emailHelper) {
     return new ProjectUserFacadeServiceImpl(projectUserService, projectService, authUserService,
-        redisCacheService, emailHelper);
+        redisCacheService, taskAssigneesService, emailHelper);
   }
 
   @Bean

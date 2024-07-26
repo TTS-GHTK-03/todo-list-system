@@ -47,4 +47,17 @@ public class TaskAssigneesServiceImpl implements TaskAssigneesService {
   public void deleteAllByTaskId(String taskId) {
     taskAssigneesRepository.deleteAllByTaskId(taskId);
   }
+
+  @Override
+  public void updateTaskAssigneesByUserIdAndProjectId(String userId, String memberId,
+      String projectId) {
+    log.info("(updateTaskAssigneesByUserIdAndProjectId)userId: {}, memberId: {}, projectId: {}", userId, memberId, projectId);
+    taskAssigneesRepository.updateTaskAssigneesByUserIdAndProjectId(userId, memberId, projectId);
+  }
+
+  @Override
+  public TaskAssignees findByTaskId(String taskId) {
+    log.info("(findByTaskId)taskId: {}", taskId);
+    return taskAssigneesRepository.findByTaskId(taskId);
+  }
 }
