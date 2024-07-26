@@ -1,8 +1,12 @@
 package org.ghtk.todo_list.facade.imp;
 
+import static org.ghtk.todo_list.constant.ActivityLogConstant.CommentAction.*;
+import static org.ghtk.todo_list.constant.ActivityLogConstant.TaskAction.CREATE_TASK;
+
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.ghtk.todo_list.entity.ActivityLog;
 import org.ghtk.todo_list.entity.Comment;
 import org.ghtk.todo_list.exception.CommentNotFoundException;
 import org.ghtk.todo_list.exception.ProjectNotFoundException;
@@ -11,6 +15,7 @@ import org.ghtk.todo_list.exception.UserInvalidException;
 import org.ghtk.todo_list.exception.UserNotFoundException;
 import org.ghtk.todo_list.facade.CommentFacadeService;
 import org.ghtk.todo_list.model.response.CommentResponse;
+import org.ghtk.todo_list.service.ActivityLogService;
 import org.ghtk.todo_list.service.CommentService;
 import org.ghtk.todo_list.service.ProjectService;
 import org.ghtk.todo_list.service.TaskService;
@@ -24,6 +29,7 @@ public class CommentFacadeServiceImp implements CommentFacadeService {
   private final TaskService taskService;
   private final CommentService commentService;
   private final ProjectService projectService;
+  private final ActivityLogService activityLogService;
 
   @Override
   public CommentResponse createComment(String userId, String projectId, String taskid,
@@ -31,6 +37,13 @@ public class CommentFacadeServiceImp implements CommentFacadeService {
     log.info("(createComment)userId: {},taskId: {}", userId, taskid);
     validateProjectId(projectId);
     validateTaskId(taskid);
+
+    var notification = new ActivityLog();
+    notification.setAction(CREATE_COMMENT);
+    notification.setUserId(userId);
+    notification.setTaskId(taskid);
+    activityLogService.create(notification);
+
     return commentService.createComment(userId, taskid, text);
   }
 
@@ -106,6 +119,13 @@ public class CommentFacadeServiceImp implements CommentFacadeService {
     validateProjectId(projectId);
     validateParentId(commentId);
     validateTaskId(taskId);
+
+    var notification = new ActivityLog();
+    notification.setAction(REPLY_COMMENT);
+    notification.setUserId(userId);
+    notification.setTaskId(taskId);
+    activityLogService.create(notification);
+
     return commentService.replyComment(userId, taskId, commentId, text);
   }
 

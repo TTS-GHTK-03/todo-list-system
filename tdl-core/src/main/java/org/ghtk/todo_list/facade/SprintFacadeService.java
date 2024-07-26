@@ -9,9 +9,9 @@ import org.ghtk.todo_list.model.response.SprintResponse;
 import org.ghtk.todo_list.model.response.StartSprintResponse;
 
 public interface SprintFacadeService {
-   CreateSprintResponse createSprintByProject(String projectId);
+   CreateSprintResponse createSprintByProject(String userId, String projectId);
 
-   StartSprintResponse startSprint(String projectId, String sprintId, String title, String startDate, String endDate);
+   StartSprintResponse startSprint(String userId, String projectId, String sprintId, String title, String startDate, String endDate);
    SprintResponse updateSprint(String projectId, String sprintId, String title, String startDate, String endDate);
 
    List<SprintResponse> getSprints(String projectId);
@@ -19,7 +19,7 @@ public interface SprintFacadeService {
    SprintResponse getSprint(String projectId, String id);
 
    ProgressStatisticsResponse getProgressStatistics(String projectId, String sprintId);
-   void deleteSprint(String projectId, String id);
+   void deleteSprint(String userId, String projectId, String id);
    CompleteSprintResponse completeSprint(String projectId, String sprintId);
-   void confirmCompleteSprint(String projectId, String sprintId);
+   void confirmCompleteSprint(String userId, String projectId, String sprintId);
 }

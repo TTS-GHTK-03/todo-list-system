@@ -1,5 +1,6 @@
 package org.ghtk.todo_list.facade.imp;
 
+import static org.ghtk.todo_list.constant.ActivityLogConstant.ProjectAction.*;
 import static org.ghtk.todo_list.constant.ImageConstant.*;
 
 import java.util.ArrayList;
@@ -9,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.constant.RoleProjectUser;
 import org.ghtk.todo_list.dto.response.UserNameResponse;
+import org.ghtk.todo_list.entity.ActivityLog;
 import org.ghtk.todo_list.entity.AuthUser;
 import org.ghtk.todo_list.entity.Project;
 import org.ghtk.todo_list.entity.Type;
@@ -128,6 +130,11 @@ public class ProjectFacadeServiceImpl implements ProjectFacadeService {
     validateTitle(title);
     validateKeyProject(keyProject);
 
+    var notification = new ActivityLog();
+    notification.setAction(UPDATE_PROJECT);
+    notification.setUserId(userId);
+    activityLogService.create(notification);
+
     Project project = projectMapper.toProject(title, keyProject.toUpperCase());
     project.setId(projectId);
     return projectService.updateProject(project);
@@ -162,6 +169,11 @@ public class ProjectFacadeServiceImpl implements ProjectFacadeService {
     sprintService.deleteAllByProjectId(projectId);
     projectUserService.deleteAllByProjectId(projectId);
     projectService.deleteProject(projectId);
+
+    var notification = new ActivityLog();
+    notification.setAction(DELETE_PROJECT);
+    notification.setUserId(userId);
+    activityLogService.create(notification);
   }
 
   @Override

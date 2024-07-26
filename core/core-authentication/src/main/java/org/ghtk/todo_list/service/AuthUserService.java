@@ -24,4 +24,5 @@ public interface AuthUserService {
   AuthUser create(String lastName);
   AuthUser findByUnassigned();
   List<AuthUserResponse> getAllUserByProject(String projectId);
+  AuthUser findByEmail(String email);
 }
