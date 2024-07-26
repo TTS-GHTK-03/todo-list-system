@@ -68,6 +68,23 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
   private final ActivityLogService activityLogService;
 
   @Override
+  public List<TaskResponse> getAllTaskByProjectParticipant(String userId) {
+    log.info("(getAllTaskByProjectParticipant)userId: {}", userId);
+
+    List<Project> projects = projectService.getAllProject(userId);
+    List<TaskResponse> taskResponseList = new ArrayList<>();
+
+    for (Project project : projects) {
+      taskResponseList.addAll(taskService.getAllTasksByProjectId(project.getId()));
+    }
+
+    for(TaskResponse taskResponse : taskResponseList) {
+      taskResponse.setUserId(taskAssigneesService.findUserIdByTaskId(taskResponse.getId()));
+    }
+    return taskResponseList;
+  }
+
+  @Override
   public List<TaskResponse> getAllTaskByProjectId(String userId, String projectId) {
     log.info("(getAllTaskByProjectId)projectId: {}", projectId);
     validateProjectId(projectId);

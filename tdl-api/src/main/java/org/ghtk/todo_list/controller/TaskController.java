@@ -40,6 +40,14 @@ public class TaskController {
 
   private final TaskFacadeService taskFacadeService;
 
+  @GetMapping("/tasks")
+  @Operation(description = "Get all task by project participant")
+  public BaseResponse<List<TaskResponse>> getAllTaskByProjectParticipant() {
+    log.info("(getAllTaskByProjectParticipant)");
+    return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
+        taskFacadeService.getAllTaskByProjectParticipant(getUserId()));
+  }
+
   @GetMapping("/{project_id}/tasks")
   @Operation(summary = "Get all task by project id")
   public BaseResponse<List<TaskResponse>> getTasksByProjectId(

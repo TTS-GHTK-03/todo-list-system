@@ -9,6 +9,7 @@ import org.ghtk.todo_list.model.response.UpdateDueDateTaskResponse;
 
 public interface TaskFacadeService {
 
+  List<TaskResponse> getAllTaskByProjectParticipant(String userId);
   List<TaskResponse> getAllTaskByProjectId(String userId, String projectId);
 
   TaskResponse getTaskByTaskId(String userId, String projectId, String taskId);
