@@ -10,7 +10,7 @@ import org.springframework.data.domain.Pageable;
 
 public interface ProjectFacadeService {
 
-  List<Project> getAllProject(String userId);
+  List<ProjectInformationResponse> getAllProject(String userId);
 
   ProjectRoleResponse getProject(String userId, String projectId);
 
