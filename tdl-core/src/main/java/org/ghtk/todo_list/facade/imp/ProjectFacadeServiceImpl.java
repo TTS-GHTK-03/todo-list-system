@@ -2,12 +2,14 @@ package org.ghtk.todo_list.facade.imp;
 
 import static org.ghtk.todo_list.constant.ActivityLogConstant.ProjectAction.*;
 import static org.ghtk.todo_list.constant.ImageConstant.*;
+import static org.ghtk.todo_list.util.SecurityUtil.getUserId;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.ghtk.todo_list.base_authrization.BaseAuthorization;
 import org.ghtk.todo_list.constant.RoleProjectUser;
 import org.ghtk.todo_list.dto.response.UserNameResponse;
 import org.ghtk.todo_list.entity.ActivityLog;
@@ -17,7 +19,6 @@ import org.ghtk.todo_list.entity.Type;
 import org.ghtk.todo_list.exception.ProjectKeyAlreadyExistedException;
 import org.ghtk.todo_list.exception.ProjectNotFoundException;
 import org.ghtk.todo_list.exception.ProjectTitleAlreadyExistedException;
-import org.ghtk.todo_list.exception.UserNotFoundException;
 import org.ghtk.todo_list.facade.ProjectFacadeService;
 import org.ghtk.todo_list.mapper.ProjectInformationResponseMapper;
 import org.ghtk.todo_list.mapper.ProjectMapper;
@@ -40,7 +41,6 @@ import org.ghtk.todo_list.service.TaskAssigneesService;
 import org.ghtk.todo_list.service.TaskService;
 import org.ghtk.todo_list.service.TypeService;
 import org.ghtk.todo_list.service.UserService;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 @Slf4j
@@ -64,6 +64,7 @@ public class ProjectFacadeServiceImpl implements ProjectFacadeService {
   private final SprintService sprintService;
   private final SprintProgressService sprintProgressService;
   private final UserService userService;
+  private final BaseAuthorization baseAuthorization;
 
   @Override
   public List<ProjectInformationResponse> getAllProject(String userId) {
@@ -71,6 +72,7 @@ public class ProjectFacadeServiceImpl implements ProjectFacadeService {
     List<ProjectInformationResponse> projectInformationResponseList = new ArrayList<>();
     List<Project> projectList = projectService.getAllProject(userId);
     for(Project project : projectList) {
+      baseAuthorization.allRole(getUserId(), project.getId());
       String roleProjectUser = projectUserService.getRoleProjectUser(userId, project.getId());
       List<UserNameResponse> userNameResponseList = authUserService.getNameUser(project.getId());
       ProjectInformationResponse projectInformationResponse = projectInformationResponseMapper.toProjectInformationResponse(project, roleProjectUser, userNameResponseList);

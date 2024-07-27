@@ -9,6 +9,7 @@ import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.ghtk.todo_list.base_authrization.BaseAuthorization;
 import org.ghtk.todo_list.dto.response.BaseResponse;
 import org.ghtk.todo_list.facade.LabelAttachedFacadeService;
 import org.ghtk.todo_list.model.response.LabelAttachedResponse;
@@ -28,6 +29,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class LabelAttachedController {
 
   private final LabelAttachedFacadeService service;
+  private final BaseAuthorization baseAuthorization;
 
   @PostMapping("/types/{type_id}/tasks/{task_id}/labels/{label_id}/attach")
   @Operation(description = "Create label attached")
@@ -41,6 +43,7 @@ public class LabelAttachedController {
       @Parameter(name = "label_id", description = "Identification of label")
       @PathVariable("label_id") String labelId) {
     log.info("(create) Label attached");
+    baseAuthorization.roleAdminAndEdit(getUserId(), projectId);
     getUserId();
     return BaseResponse.of(HttpStatus.CREATED.value(), LocalDate.now().toString(),
         service.create(projectId, typeId, taskId, labelId));
@@ -54,6 +57,7 @@ public class LabelAttachedController {
       @Parameter(name = "task_id", description = "Identification of task")
       @PathVariable("task_id") String taskId) {
     log.info("(getLabelAttachedByTask)");
+    baseAuthorization.allRole(getUserId(), projectId);
     getUserId();
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         service.getLabelAttachedByTask(projectId, taskId));
@@ -69,6 +73,7 @@ public class LabelAttachedController {
       @Parameter(name = "id", description = "Identification of label attached")
       @PathVariable("id") String id) {
     log.info("(deleteLabelAttached)");
+    baseAuthorization.roleAdmin(getUserId(), projectId);
     getUserId();
     service.deleteLabelAttached(projectId, taskId, id);
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
@@ -83,6 +88,7 @@ public class LabelAttachedController {
       @Parameter(name = "task_id", description = "Identification of task")
       @PathVariable("task_id") String taskId) {
     log.info("(deleteLabelAttachedByTask)");
+    baseAuthorization.roleAdminAndEdit(getUserId(), projectId);
     getUserId();
     service.deleteLabelAttachedByTask(projectId, taskId);
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),

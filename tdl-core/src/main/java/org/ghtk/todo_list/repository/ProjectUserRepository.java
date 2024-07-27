@@ -30,6 +30,9 @@ public interface ProjectUserRepository extends JpaRepository<ProjectUser, String
       """)
   List<String> findProjectIdByUserId(String role);
 
+  @Query("""
+    SELECT pu.role FROM ProjectUser pu WHERE pu.userId = :userId AND pu.projectId = :projectId
+    """)
   String findRoleByUserIdAndProjectId(String userId, String projectId);
 
   void deleteAllByProjectId(String projectId);

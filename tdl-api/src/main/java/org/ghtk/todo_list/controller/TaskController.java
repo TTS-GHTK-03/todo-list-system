@@ -10,6 +10,7 @@ import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.ghtk.todo_list.base_authrization.BaseAuthorization;
 import org.ghtk.todo_list.dto.response.BaseResponse;
 import org.ghtk.todo_list.facade.TaskFacadeService;
 import org.ghtk.todo_list.model.request.CreateTaskRequest;
@@ -18,7 +19,6 @@ import org.ghtk.todo_list.model.request.UpdatePointTaskRequest;
 import org.ghtk.todo_list.model.request.UpdateTitleTaskRequest;
 import org.ghtk.todo_list.model.response.TaskResponse;
 import org.ghtk.todo_list.model.response.UpdateDueDateTaskResponse;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -39,6 +39,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class TaskController {
 
   private final TaskFacadeService taskFacadeService;
+  private final BaseAuthorization baseAuthorization;
 
   @GetMapping("/tasks")
   @Operation(description = "Get all task by project participant")
@@ -56,6 +57,7 @@ public class TaskController {
       @Parameter(name = "status", description = "Status task", example = "TODO")
       @RequestParam(value = "status", required = false) String status) {
     log.info("(getTasksByProjectId)");
+    baseAuthorization.allRole(getUserId(), projectId);
     if (status == null) {
       log.info("(getTasksByProjectId)getAllTasks");
       return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
@@ -74,6 +76,7 @@ public class TaskController {
       @PathVariable("project_id") String projectId,
       @Valid @RequestBody CreateTaskRequest createTaskRequest) {
     log.info("(createTask)projectId: {}", projectId);
+    baseAuthorization.roleAdminAndEdit(getUserId(), projectId);
     return BaseResponse.of(HttpStatus.CREATED.value(), LocalDate.now().toString(),
           taskFacadeService.createTask(getUserId(),projectId,createTaskRequest.getTitle()));
     }
@@ -86,6 +89,7 @@ public class TaskController {
       @Parameter(name = "task_id", description = "Identification task")
       @PathVariable("task_id") String taskId) {
     log.info("(getTask)");
+    baseAuthorization.allRole(getUserId(), projectId);
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         taskFacadeService.getTaskByTaskId(getUserId(), projectId, taskId));
   }
@@ -100,6 +104,7 @@ public class TaskController {
       @Parameter(name = "statusTask", description = "Status task", example = "TODO")
       @Valid @RequestParam(value = "statusTask") String status) {
     log.info("(updateStatusTask)");
+    baseAuthorization.roleAdminAndEdit(getUserId(), projectId);
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         taskFacadeService.updateStatusTask(getUserId(), projectId, taskId, status));
   }
@@ -113,6 +118,7 @@ public class TaskController {
       @PathVariable("task_id") String taskId,
       @Valid @RequestBody UpdatePointTaskRequest updatePointTaskRequest) {
     log.info("(updatePointTask),projectId: {}, taskId: {}", projectId, taskId);
+    baseAuthorization.roleAdminAndEdit(getUserId(), projectId);
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         taskFacadeService.updatePointTask(getUserId(), projectId, taskId, updatePointTaskRequest.getPoint()));
   }
@@ -127,6 +133,7 @@ public class TaskController {
       @Parameter(name = "sprint_id", description = "Identification sprint")
       @PathVariable("sprint_id") String sprintId) {
     log.info("(updateSprintTask)");
+    baseAuthorization.roleAdminAndEdit(getUserId(), projectId);
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         taskFacadeService.updateSprintTask(getUserId(), projectId, sprintId, taskId));
   }
@@ -139,6 +146,7 @@ public class TaskController {
       @Parameter(name = "task_id", description = "Identification task")
       @PathVariable("task_id") String taskId) {
     log.info("(cloneTask)");
+    baseAuthorization.roleAdminAndEdit(getUserId(), projectId);
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         taskFacadeService.cloneTask(getUserId(), projectId, taskId));
   }
@@ -155,6 +163,7 @@ public class TaskController {
       @RequestBody @Valid UpdateDueDateTaskRequest updateDueDateTaskRequest) {
     log.info("(updateStartDateDueDateTask)project: {}, sprint: {}, task: {}", projectId, sprintId,
         taskId);
+    baseAuthorization.roleAdminAndEdit(getUserId(), projectId);
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         taskFacadeService.updateStartDateDueDateTask(getUserId(), projectId, sprintId, taskId,
             updateDueDateTaskRequest.getStatusTaskKey(),
@@ -169,6 +178,7 @@ public class TaskController {
       @Parameter(name = "sprint_id", description = "Identification sprint")
       @PathVariable("sprint_id") String sprintId) {
     log.info("(getAllTaskBySprintId)");
+    baseAuthorization.allRole(getUserId(), projectId);
     getUserId();
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         taskFacadeService.getAllBySprintId(projectId, sprintId));
@@ -182,6 +192,7 @@ public class TaskController {
       @Parameter(name = "task_id", description = "Identification task")
       @PathVariable("task_id") String taskId) {
     log.info("(deleteTask)projectId: {}, taskId: {}", projectId, taskId);
+    baseAuthorization.roleAdminAndEdit(getUserId(), projectId);
     taskFacadeService.deleteTask(getUserId(), projectId, taskId);
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         "Successfull delete task!");
@@ -196,6 +207,7 @@ public class TaskController {
       @PathVariable("task_id") String taskId,
       @Valid @RequestBody UpdateTitleTaskRequest request) {
     log.info("(updateTitleTask)project: {}, task: {}, title: {}", projectId, taskId, request.getTitle());
+    baseAuthorization.roleAdminAndEdit(getUserId(), projectId);
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         taskFacadeService.updateTitleTask(getUserId(), projectId, taskId, request.getTitle()));
   }
