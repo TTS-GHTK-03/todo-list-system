@@ -34,8 +34,8 @@ public class WebSecurityConfiguration {
     return http.cors(Customizer.withDefaults())
         .csrf(AbstractHttpConfigurer::disable)
         .authorizeHttpRequests(authorize -> authorize
-            .requestMatchers("/api/v1/projects/accept").permitAll()
-            .requestMatchers("/api/v1/projects/share").permitAll()
+            .requestMatchers("/api/v1/email/**").permitAll()
+            .requestMatchers("/api/v1/projects/**").authenticated()
             .requestMatchers("/api/v1/users/**").authenticated()
             .requestMatchers("/api/v1/sprints/**").authenticated()
             .requestMatchers("/api/v1/auth/**").permitAll()

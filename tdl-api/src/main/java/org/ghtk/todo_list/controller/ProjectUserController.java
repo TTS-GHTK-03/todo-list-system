@@ -48,7 +48,7 @@ public class ProjectUserController {
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(), "Invitation sent successfully!");
   }
 
-  @GetMapping("/projects/accept")
+  @GetMapping("/email/accept")
   @Operation(description = "Accept invitation")
   public BaseResponse<?> accept(
       @Parameter(name = "emailEncode", description = "Email encode")
@@ -72,7 +72,7 @@ public class ProjectUserController {
         "Share project successfully!");
   }
 
-  @GetMapping("/projects/view_share")
+  @GetMapping("/email/view_share")
   @Operation(description = "View share project")
   public BaseResponse<?> viewShareProject(
       @Parameter(name = "shareToken", description = "Share token")
