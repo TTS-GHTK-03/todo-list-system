@@ -245,6 +245,4 @@ public class ProjectUserFacadeServiceImpl implements ProjectUserFacadeService {
     }
     return name.substring(0, 1).toUpperCase() + name.substring(1).toLowerCase();
   }
-
-//  private
 }
