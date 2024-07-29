@@ -15,6 +15,7 @@ import org.ghtk.todo_list.dto.response.AuthUserResponse;
 import org.ghtk.todo_list.dto.response.BaseResponse;
 import org.ghtk.todo_list.facade.ProjectUserFacadeService;
 import org.ghtk.todo_list.model.request.InviteUserRequest;
+import org.ghtk.todo_list.model.request.ShareUserRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -47,14 +48,39 @@ public class ProjectUserController {
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(), "Invitation sent successfully!");
   }
 
-  @GetMapping("/projects/accept")
+  @GetMapping("/accept")
   @Operation(description = "Accept invitation")
   public BaseResponse<?> accept(
       @Parameter(name = "emailEncode", description = "Email encode")
       @Valid @RequestParam(value = "emailEncode") String emailEncode){
     log.info("(accept)");
     projectUserFacadeService.accept(emailEncode);
-    return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(), "Accepted invitation!");
+    return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
+        "Accepted invitation!");
+  }
+
+  @PostMapping("/projects/{project_id}/share")
+  @Operation(description = "Share project")
+  public BaseResponse<String> shareProject(
+      @Parameter(name = "project_id", description = "Identification project")
+      @PathVariable(name = "project_id") String projectId,
+      @RequestBody @Valid ShareUserRequest shareUserRequest) {
+    log.info("(shareProject)projectId: {}", projectId);
+    projectUserFacadeService.shareProject(getUserId(), projectId, shareUserRequest.getEmail(),
+        shareUserRequest.getRole(), shareUserRequest.getExpireTime());
+    return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
+        "Share project successfully!");
+  }
+
+  @GetMapping("/view_share")
+  @Operation(description = "View share project")
+  public BaseResponse<?> viewShareProject(
+      @Parameter(name = "shareToken", description = "Share token")
+      @Valid @RequestParam(name = "shareToken") String shareToken) {
+    log.info("(viewShareProject)shareToken: {}", shareToken);
+    projectUserFacadeService.viewShareProject(shareToken);
+    return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
+        "View share project successfully!");
   }
 
   @GetMapping("/users/projects/{project_id}")

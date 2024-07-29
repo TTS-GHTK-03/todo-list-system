@@ -2,7 +2,10 @@ package org.ghtk.todo_list.facade.imp;
 
 import static org.ghtk.todo_list.constant.ActivityLogConstant.ProjectUserAction.*;
 import static org.ghtk.todo_list.constant.CacheConstant.INVITE_KEY;
+import static org.ghtk.todo_list.constant.CacheConstant.SHARE_KEY;
 
+import io.jsonwebtoken.Claims;
+import java.sql.Time;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
@@ -19,16 +22,15 @@ import org.ghtk.todo_list.entity.ProjectUser;
 import org.ghtk.todo_list.exception.EmailNotInviteException;
 import org.ghtk.todo_list.exception.ProjectNotFoundException;
 import org.ghtk.todo_list.exception.RoleProjectUserNotFound;
-import org.ghtk.todo_list.exception.UserNotFoundException;
 import org.ghtk.todo_list.facade.ProjectUserFacadeService;
 import org.ghtk.todo_list.model.request.RedisInviteUserRequest;
 import org.ghtk.todo_list.service.ActivityLogService;
+import org.ghtk.todo_list.service.AuthTokenService;
 import org.ghtk.todo_list.service.AuthUserService;
 import org.ghtk.todo_list.service.ProjectService;
 import org.ghtk.todo_list.service.ProjectUserService;
 import org.ghtk.todo_list.service.RedisCacheService;
 import org.ghtk.todo_list.service.TaskAssigneesService;
-import org.ghtk.todo_list.service.TaskService;
 import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
@@ -38,6 +40,7 @@ public class ProjectUserFacadeServiceImpl implements ProjectUserFacadeService {
   private final ProjectUserService projectUserService;
   private final ProjectService projectService;
   private final AuthUserService authUserService;
+  private final AuthTokenService authTokenService;
   private final RedisCacheService redisCacheService;
   private final TaskAssigneesService taskAssigneesService;
   private final EmailHelper emailHelper;
@@ -54,7 +57,7 @@ public class ProjectUserFacadeServiceImpl implements ProjectUserFacadeService {
       throw new RoleProjectUserNotFound();
     }
 
-    var subject = "Admin invited you to join them in Todo List";
+    var subject = "Admin has shared with you his project";
     var param = new HashMap<String, Object>();
     String emailEncode = encodeEmail(email);
 
@@ -114,6 +117,58 @@ public class ProjectUserFacadeServiceImpl implements ProjectUserFacadeService {
     notification.setUserId(authUserService.findByEmail(email).getId());
     activityLogService.create(notification);
     return null;
+  }
+
+  @Override
+  public void shareProject(String userId, String projectId, String email, String role, Time expireTime) {
+    log.info("(shareProject)user: {}, project: {}, email: {}, role: {}, expireDate: {}", userId, projectId, email, role, expireTime);
+
+    validateProjectId(projectId);
+
+    if(!RoleProjectUser.isValid(role)){
+      log.error("(shareProject)role: {} not found", role);
+      throw new RoleProjectUserNotFound();
+    }
+
+    var subject = "Admin shared you to their project in Todo List";
+    var param = new HashMap<String, Object>();
+
+    int hours = expireTime.getHours();
+    int minutes = expireTime.getMinutes();
+    int second = expireTime.getSeconds();
+
+    String shareToken = authTokenService.generateShareToken(email, role, projectId, (long)(hours * 3600 + minutes * 60 + second) * 1000);
+
+    param.put("role", role);
+    param.put("email", email);
+    param.put("domain", URL.DOMAIN);
+    param.put("shareToken", shareToken);
+    emailHelper.send(subject, email, "email-share-project-template", param);
+
+    var notification = new ActivityLog();
+    notification.setAction(SHARE_KEY);
+    notification.setUserId(userId);
+    activityLogService.create(notification);
+  }
+
+  @Override
+  public void viewShareProject(String shareToken) {
+    log.info("(viewShareProject)shareToken: {}", shareToken);
+
+    Claims claims = authTokenService.getClaimsFromShareToken(shareToken);
+
+    String email = claims.get("email", String.class);
+    String role = claims.get("role", String.class);
+    String projectId = claims.get("projectId", String.class);
+
+    if (authUserService.existsByEmail(email)) {
+      var userId = authUserService.getUserId(email);
+      if(!projectUserService.existsByUserIdAndProjectId(userId, projectId)){
+        var projectUser = projectUserService.createProjectUser(userId, projectId, role);
+      }
+    }
+
+    //call login page and return token share
   }
 
   @Override
