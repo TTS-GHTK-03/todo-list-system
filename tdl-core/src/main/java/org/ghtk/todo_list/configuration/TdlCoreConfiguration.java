@@ -1,5 +1,6 @@
 package org.ghtk.todo_list.configuration;
 
+import org.ghtk.todo_list.base_authrization.BaseAuthorization;
 import org.ghtk.todo_list.facade.ActivityLogFacadeService;
 import org.ghtk.todo_list.core_email.helper.EmailHelper;
 import org.ghtk.todo_list.facade.ProjectFacadeService;

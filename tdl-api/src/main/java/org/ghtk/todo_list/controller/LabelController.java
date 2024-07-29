@@ -10,6 +10,7 @@ import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.ghtk.todo_list.base_authrization.BaseAuthorization;
 import org.ghtk.todo_list.dto.response.BaseResponse;
 import org.ghtk.todo_list.facade.LabelFacadeService;
 import org.ghtk.todo_list.model.request.CreateLabelRequest;
@@ -33,6 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class LabelController {
 
   private final LabelFacadeService labelFacadeService;
+  private final BaseAuthorization baseAuthorization;
 
   @PostMapping("/types/{type_id}/labels")
   @Operation(description = "Create label")
@@ -42,7 +44,7 @@ public class LabelController {
       @Parameter(name = "type_id", description = "Identification of type")
       @PathVariable("type_id") String typeId) {
     log.info("(createLabel)");
-
+    baseAuthorization.roleAdmin(getUserId(), projectId);
     getUserId();
     return BaseResponse.of(HttpStatus.CREATED.value(), LocalDate.now().toString(),
         labelFacadeService.createLabel(projectId, typeId, request.getTitle(),
@@ -59,7 +61,7 @@ public class LabelController {
       @Parameter(name = "id", description = "Identification of label")
       @PathVariable("id") String labelId) {
     log.info("(updateLabel)");
-
+    baseAuthorization.roleAdmin(getUserId(), projectId);
     getUserId();
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         labelFacadeService.updateLabel(projectId, typeId, labelId, request.getTitle(),
@@ -74,6 +76,7 @@ public class LabelController {
       @Parameter(name = "type_id", description = "Identification of type")
       @PathVariable("type_id") String typeId) {
     log.info("(getLabelsByTypeId)");
+    baseAuthorization.roleAdminAndEdit(getUserId(), projectId);
     getUserId();
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         labelFacadeService.getLabelsByTypeId(projectId, typeId));
@@ -85,6 +88,7 @@ public class LabelController {
       @Parameter(name = "project_id", description = "Identification of project")
       @PathVariable("project_id") String projectId) {
     log.info("(getAllLabelByProjectIdAndLabelAttached)projectId: {}", projectId);
+    baseAuthorization.allRole(getUserId(), projectId);
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         labelFacadeService.getAllLabelByProjectIdAndLabelAttached(getUserId(), projectId));
   }
@@ -99,6 +103,7 @@ public class LabelController {
       @Parameter(name = "id", description = "Identification of label")
       @PathVariable("id") String labelId) {
     log.info("(deleteLabel)");
+    baseAuthorization.roleAdmin(getUserId(), projectId);
     getUserId();
     labelFacadeService.deleteLabel(projectId, typeId, labelId);
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),

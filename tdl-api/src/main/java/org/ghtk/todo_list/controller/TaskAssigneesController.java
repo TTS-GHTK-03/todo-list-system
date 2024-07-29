@@ -9,6 +9,7 @@ import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.ghtk.todo_list.base_authrization.BaseAuthorization;
 import org.ghtk.todo_list.dto.response.BaseResponse;
 import org.ghtk.todo_list.entity.TaskAssignees;
 import org.ghtk.todo_list.facade.TaskFacadeService;
@@ -28,15 +29,19 @@ import org.springframework.web.bind.annotation.RestController;
 public class TaskAssigneesController {
 
   private final TaskFacadeService taskFacadeService;
+  private final BaseAuthorization baseAuthorization;
 
-  @PostMapping("/users/{user_id}/tasks/{task_id}")
+  @PostMapping("/users/{user_id}/projects/{project_id}/tasks/{task_id}")
   @Operation(description = "Agile task for user")
   public BaseResponse<TaskAssignees> agileTaskByUser(
       @Parameter(name = "user_id", description = "Identification of invited user")
       @PathVariable("user_id") String userId,
       @Parameter(name = "task_id", description = "Identification of task")
-      @PathVariable("task_id") String taskId) {
+      @PathVariable("task_id") String taskId,
+      @Parameter(name = "project id", description = "Identification of project")
+      @PathVariable("project_id") String projectId) {
     log.info("(agileTaskByUser)");
+    baseAuthorization.roleAdminAndEdit(getUserId(), projectId);
     getUserId();
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         taskFacadeService.agileTaskByUser(userId, taskId));

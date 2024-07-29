@@ -2,6 +2,7 @@ package org.ghtk.todo_list.facade.imp;
 
 import static org.ghtk.todo_list.constant.ActivityLogConstant.ProjectAction.*;
 import static org.ghtk.todo_list.constant.ImageConstant.*;
+import static org.ghtk.todo_list.util.SecurityUtil.getUserId;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,7 +18,6 @@ import org.ghtk.todo_list.entity.Type;
 import org.ghtk.todo_list.exception.ProjectKeyAlreadyExistedException;
 import org.ghtk.todo_list.exception.ProjectNotFoundException;
 import org.ghtk.todo_list.exception.ProjectTitleAlreadyExistedException;
-import org.ghtk.todo_list.exception.UserNotFoundException;
 import org.ghtk.todo_list.facade.ProjectFacadeService;
 import org.ghtk.todo_list.mapper.ProjectInformationResponseMapper;
 import org.ghtk.todo_list.mapper.ProjectMapper;
@@ -40,7 +40,6 @@ import org.ghtk.todo_list.service.TaskAssigneesService;
 import org.ghtk.todo_list.service.TaskService;
 import org.ghtk.todo_list.service.TypeService;
 import org.ghtk.todo_list.service.UserService;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 @Slf4j

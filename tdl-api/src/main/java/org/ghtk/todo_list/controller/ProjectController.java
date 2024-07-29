@@ -10,6 +10,7 @@ import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.ghtk.todo_list.base_authrization.BaseAuthorization;
 import org.ghtk.todo_list.dto.response.BaseResponse;
 import org.ghtk.todo_list.entity.AuthUser;
 import org.ghtk.todo_list.entity.Project;
@@ -39,6 +40,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ProjectController {
 
   private final ProjectFacadeService projectService;
+  private final BaseAuthorization baseAuthorization;
 
   @GetMapping()
   @Operation(description = "Get all project for user")
@@ -54,6 +56,7 @@ public class ProjectController {
       @Parameter(name = "project_id", description = "Identification of project")
       @PathVariable(name = "project_id") String projectId) {
     log.info("(getProject)projectId: {}", projectId);
+    baseAuthorization.allRole(getUserId(), projectId);
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         projectService.getProject(getUserId(), projectId));
   }
@@ -64,6 +67,7 @@ public class ProjectController {
       @Parameter(name = "project_id", description = "Identification of project")
       @PathVariable(name = "project_id") String projectId) {
     log.info("(getProjectInformation)projectId: {}", projectId);
+    baseAuthorization.roleAdmin(getUserId(), projectId);
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         projectService.getProjectInformation(getUserId(), projectId));
   }
@@ -84,6 +88,7 @@ public class ProjectController {
       @PathVariable("project_id") String projectId,
       @RequestBody @Valid UpdateProjectRequest updateProjectRequest) {
     log.info("(updateProject)project: {}", updateProjectRequest);
+    baseAuthorization.roleAdmin(getUserId(), projectId);
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         projectService.updateProject(getUserId(), projectId, updateProjectRequest.getTitle(),
             updateProjectRequest.getKeyProject()));
@@ -95,6 +100,7 @@ public class ProjectController {
       @Parameter(name = "project_id", description = "Identification of project")
       @PathVariable("project_id") String projectId) {
     log.info("(deleteProject)projectId: {}", projectId);
+    baseAuthorization.roleAdmin(getUserId(), projectId);
     projectService.deleteProject(getUserId(), projectId);
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         "Deleted project successfully!!!");

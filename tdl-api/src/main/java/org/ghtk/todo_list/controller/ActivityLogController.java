@@ -10,6 +10,7 @@ import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.ghtk.todo_list.base_authrization.BaseAuthorization;
 import org.ghtk.todo_list.dto.response.BaseResponse;
 import org.ghtk.todo_list.entity.ActivityLog;
 import org.ghtk.todo_list.facade.ActivityLogFacadeService;
@@ -30,6 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ActivityLogController {
 
   private final ActivityLogFacadeService activityLogFacadeService;
+  private final BaseAuthorization baseAuthorization;
 
   @GetMapping("/projects/{project_id}/logs")
   @Operation(description = "Get all notifications")
@@ -63,6 +65,7 @@ public class ActivityLogController {
       @Parameter(name = "task_id", description = "Identification of task")
       @PathVariable(name = "task_id") String taskId) {
     log.info("(getAllActivityLogsByTaskId)projectId: {}, taskId: {}", projectId, taskId);
+    baseAuthorization.allRole(getUserId(), projectId);
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         activityLogFacadeService.getAllActivityLogsByTaskId(getUserId(), projectId, taskId));
   }

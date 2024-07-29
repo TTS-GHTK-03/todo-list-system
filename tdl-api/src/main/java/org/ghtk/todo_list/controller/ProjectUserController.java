@@ -10,10 +10,10 @@ import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.ghtk.todo_list.base_authrization.BaseAuthorization;
 import org.ghtk.todo_list.dto.response.AuthUserResponse;
 import org.ghtk.todo_list.dto.response.BaseResponse;
 import org.ghtk.todo_list.facade.ProjectUserFacadeService;
-import org.ghtk.todo_list.model.request.AcceptUserRequest;
 import org.ghtk.todo_list.model.request.InviteUserRequest;
 import org.ghtk.todo_list.model.request.ShareUserRequest;
 import org.springframework.http.HttpStatus;
@@ -34,25 +34,25 @@ import org.springframework.web.bind.annotation.RestController;
 public class ProjectUserController {
 
   private final ProjectUserFacadeService projectUserFacadeService;
+  private final BaseAuthorization baseAuthorization;
 
   @PostMapping("/projects/{project_id}/invite")
   @Operation(description = "Invite user")
   public BaseResponse<String> inviteUser(
       @Parameter(name = "project_id", description = "Identification project")
       @PathVariable(name = "project_id") String projectId,
-      @RequestBody @Valid InviteUserRequest inviteUserRequest) {
+      @RequestBody @Valid InviteUserRequest inviteUserRequest){
     log.info("(inviteUser)projectId: {}", projectId);
-    projectUserFacadeService.inviteUser(getUserId(), projectId, inviteUserRequest.getEmail(),
-        inviteUserRequest.getRole());
-    return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
-        "Invitation sent successfully!");
+    baseAuthorization.roleAdmin(getUserId(), projectId);
+    projectUserFacadeService.inviteUser(getUserId(), projectId, inviteUserRequest.getEmail(), inviteUserRequest.getRole());
+    return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(), "Invitation sent successfully!");
   }
 
   @GetMapping("/projects/accept")
   @Operation(description = "Accept invitation")
   public BaseResponse<?> accept(
       @Parameter(name = "emailEncode", description = "Email encode")
-      @Valid @RequestParam(value = "emailEncode") String emailEncode) {
+      @Valid @RequestParam(value = "emailEncode") String emailEncode){
     log.info("(accept)");
     projectUserFacadeService.accept(emailEncode);
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
@@ -87,10 +87,10 @@ public class ProjectUserController {
   @Operation(description = "Get all user in project")
   public BaseResponse<List<AuthUserResponse>> getAllUserByProject(
       @Parameter(name = "project_id", description = "Identification project")
-      @PathVariable("project_id") String projectId) {
+      @PathVariable("project_id") String projectId){
     log.info("(getAllUserByProject)projectId: {}", projectId);
-    return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
-        projectUserFacadeService.getAllUserByProject(getUserId(), projectId));
+    baseAuthorization.roleAdmin(getUserId(), projectId);
+    return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(), projectUserFacadeService.getAllUserByProject(getUserId(), projectId));
   }
 
   @DeleteMapping("/users/{user_id}/projects/{project_id}")
@@ -99,10 +99,10 @@ public class ProjectUserController {
       @Parameter(name = "project_id", description = "Identification project")
       @PathVariable("project_id") String projectId,
       @Parameter(name = "user_id", description = "Identification user")
-      @PathVariable("user_id") String memberId) {
+      @PathVariable("user_id") String memberId){
     log.info("(deleteUser)");
+    baseAuthorization.roleAdmin(getUserId(), projectId);
     projectUserFacadeService.deleteUser(getUserId(), projectId, memberId);
-    return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
-        "Kick user in project successfully!!");
+    return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(), "Kick user in project successfully!!");
   }
 }
