@@ -9,7 +9,6 @@ import java.util.Arrays;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.ghtk.todo_list.base_authrization.BaseAuthorization;
 import org.ghtk.todo_list.constant.RoleProjectUser;
 import org.ghtk.todo_list.dto.response.UserNameResponse;
 import org.ghtk.todo_list.entity.ActivityLog;
@@ -64,7 +63,6 @@ public class ProjectFacadeServiceImpl implements ProjectFacadeService {
   private final SprintService sprintService;
   private final SprintProgressService sprintProgressService;
   private final UserService userService;
-  private final BaseAuthorization baseAuthorization;
 
   @Override
   public List<ProjectInformationResponse> getAllProject(String userId) {
@@ -72,7 +70,6 @@ public class ProjectFacadeServiceImpl implements ProjectFacadeService {
     List<ProjectInformationResponse> projectInformationResponseList = new ArrayList<>();
     List<Project> projectList = projectService.getAllProject(userId);
     for(Project project : projectList) {
-      baseAuthorization.allRole(getUserId(), project.getId());
       String roleProjectUser = projectUserService.getRoleProjectUser(userId, project.getId());
       List<UserNameResponse> userNameResponseList = authUserService.getNameUser(project.getId());
       ProjectInformationResponse projectInformationResponse = projectInformationResponseMapper.toProjectInformationResponse(project, roleProjectUser, userNameResponseList);
