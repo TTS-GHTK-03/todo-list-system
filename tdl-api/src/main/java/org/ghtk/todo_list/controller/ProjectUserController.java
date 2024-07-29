@@ -10,10 +10,10 @@ import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.ghtk.todo_list.base_authrization.BaseAuthorization;
 import org.ghtk.todo_list.dto.response.AuthUserResponse;
 import org.ghtk.todo_list.dto.response.BaseResponse;
 import org.ghtk.todo_list.facade.ProjectUserFacadeService;
-import org.ghtk.todo_list.model.request.AcceptUserRequest;
 import org.ghtk.todo_list.model.request.InviteUserRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -33,6 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ProjectUserController {
 
   private final ProjectUserFacadeService projectUserFacadeService;
+  private final BaseAuthorization baseAuthorization;
 
   @PostMapping("/projects/{project_id}/invite")
   @Operation(description = "Invite user")
@@ -41,6 +42,7 @@ public class ProjectUserController {
       @PathVariable(name = "project_id") String projectId,
       @RequestBody @Valid InviteUserRequest inviteUserRequest){
     log.info("(inviteUser)projectId: {}", projectId);
+    baseAuthorization.roleAdmin(getUserId(), projectId);
     projectUserFacadeService.inviteUser(getUserId(), projectId, inviteUserRequest.getEmail(), inviteUserRequest.getRole());
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(), "Invitation sent successfully!");
   }
@@ -61,6 +63,7 @@ public class ProjectUserController {
       @Parameter(name = "project_id", description = "Identification project")
       @PathVariable("project_id") String projectId){
     log.info("(getAllUserByProject)projectId: {}", projectId);
+    baseAuthorization.roleAdmin(getUserId(), projectId);
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(), projectUserFacadeService.getAllUserByProject(getUserId(), projectId));
   }
 
@@ -72,6 +75,7 @@ public class ProjectUserController {
       @Parameter(name = "user_id", description = "Identification user")
       @PathVariable("user_id") String memberId){
     log.info("(deleteUser)");
+    baseAuthorization.roleAdmin(getUserId(), projectId);
     projectUserFacadeService.deleteUser(getUserId(), projectId, memberId);
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(), "Kick user in project successfully!!");
   }

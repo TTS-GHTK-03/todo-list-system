@@ -1,5 +1,6 @@
 package org.ghtk.todo_list.configuration;
 
+import org.ghtk.todo_list.base_authrization.BaseAuthorization;
 import org.ghtk.todo_list.facade.ActivityLogFacadeService;
 import org.ghtk.todo_list.core_email.helper.EmailHelper;
 import org.ghtk.todo_list.facade.ProjectFacadeService;
@@ -75,11 +76,12 @@ public class TdlCoreConfiguration {
       TaskAssigneesService taskAssigneesService,
       CommentService commentService, SprintService sprintService,
       SprintProgressService sprintProgressService,
-      UserService userService) {
+      UserService userService,
+      BaseAuthorization baseAuthorization) {
     return new ProjectFacadeServiceImpl(projectService, projectUserService, boardService,
         authUserService, projectInformationResponseMapper, projectMapper, typeService, typeMapper,
         labelService, labelAttachedService, taskService, activityLogService, taskAssigneesService,
-        commentService, sprintService, sprintProgressService, userService);
+        commentService, sprintService, sprintProgressService, userService, baseAuthorization);
   }
 
   @Bean

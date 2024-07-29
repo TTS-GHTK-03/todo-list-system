@@ -10,6 +10,7 @@ import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.ghtk.todo_list.base_authrization.BaseAuthorization;
 import org.ghtk.todo_list.dto.response.BaseResponse;
 import org.ghtk.todo_list.entity.Type;
 import org.ghtk.todo_list.facade.TypeFacadeService;
@@ -33,6 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class TypeController {
 
   private final TypeFacadeService typeFacadeService;
+  private final BaseAuthorization baseAuthorization;
 
   @PostMapping()
   @Operation(description = "Create type")
@@ -41,6 +43,7 @@ public class TypeController {
       @PathVariable("project_id") String projectId,
       @RequestBody @Valid TypeRequest typeRequest) {
     log.info("(createType)projectId: {}, typeRequest: {}", projectId, typeRequest);
+    baseAuthorization.roleAdmin(getUserId(), projectId);
     return BaseResponse.of(HttpStatus.CREATED.value(), LocalDate.now().toString(),
         typeFacadeService.createType(getUserId(), projectId, typeRequest.getTitle(), typeRequest.getImage(),
             typeRequest.getDescription()));
@@ -55,6 +58,7 @@ public class TypeController {
       @PathVariable("type_id") String typeId,
       @RequestBody @Valid TypeRequest typeRequest) {
     log.info("(updateType)projectId: {}, typeId: {}, typeRequest: {}", projectId, typeId, typeRequest);
+    baseAuthorization.roleAdmin(getUserId(), projectId);
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         typeFacadeService.updateType(getUserId(), projectId, typeId, typeRequest.getTitle(), typeRequest.getImage(),
             typeRequest.getDescription()));
@@ -68,6 +72,7 @@ public class TypeController {
       @Parameter(name = "type_id", description = "Identification type")
       @PathVariable("type_id") String typeId){
     log.info("(deleteType)projectId: {}, typeId: {}", projectId, typeId);
+    baseAuthorization.roleAdmin(getUserId(), projectId);
     typeFacadeService.deleteType(getUserId(), projectId, typeId);
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(), "Delete type successfully!");
   }
@@ -78,6 +83,7 @@ public class TypeController {
       @Parameter(name = "project_id", description = "Identification project")
       @PathVariable("project_id") String projectId){
     log.info("(getAllTypes)projectId: {}", projectId);
+    baseAuthorization.allRole(getUserId(), projectId);
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(), typeFacadeService.getAllTypes(getUserId(), projectId));
   }
 
@@ -89,6 +95,7 @@ public class TypeController {
       @Parameter(name = "type_id", description = "Identification type")
       @PathVariable("type_id") String typeId){
     log.info("(getType)projectId: {}, typeId: {}", projectId, typeId);
+    baseAuthorization.roleAdmin(getUserId(), projectId);
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(), typeFacadeService.getType(getUserId(), projectId, typeId));
   }
 }

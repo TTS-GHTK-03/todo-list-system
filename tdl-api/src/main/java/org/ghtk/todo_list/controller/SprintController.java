@@ -10,6 +10,7 @@ import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.ghtk.todo_list.base_authrization.BaseAuthorization;
 import org.ghtk.todo_list.dto.response.BaseResponse;
 import org.ghtk.todo_list.facade.SprintFacadeService;
 import org.ghtk.todo_list.model.request.SprintRequest;
@@ -38,6 +39,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class SprintController {
 
   private final SprintFacadeService sprintFacadeService;
+  private final BaseAuthorization baseAuthorization;
 
   @PostMapping()
   @Operation(description = "Create sprint by project")
@@ -45,6 +47,7 @@ public class SprintController {
       @Parameter(name = "project id", description = "Identification project")
       @PathVariable("project_id") String projectId) {
     log.info("(createSprintByProject) project {}", projectId);
+    baseAuthorization.roleAdminAndEdit(getUserId(), projectId);
     return BaseResponse.of(HttpStatus.CREATED.value(), LocalDate.now().toString(),
         sprintFacadeService.createSprintByProject(getUserId(), projectId));
   }
@@ -58,6 +61,7 @@ public class SprintController {
       @Parameter(name = "sprint id", description = "Identification sprint")
       @PathVariable("sprint_id") String sprintId) {
     log.info("(startSprint) projectId {}, sprintId {}", projectId, sprintId);
+    baseAuthorization.roleAdminAndEdit(getUserId(), projectId);
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         sprintFacadeService.startSprint(getUserId(), projectId, sprintId, request.getTitle(),
             request.getStartDate(), request.getEndDate()));
@@ -72,6 +76,7 @@ public class SprintController {
       @Parameter(name = "sprint id", description = "Identification sprint")
       @PathVariable("sprint_id") String sprintId) {
     log.info("(updateSprint) projectId {}, sprintId {}", projectId, sprintId);
+    baseAuthorization.roleAdminAndEdit(getUserId(), projectId);
     getUserId();
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         sprintFacadeService.updateSprint(projectId, sprintId, request.getTitle(),
@@ -86,6 +91,7 @@ public class SprintController {
       @Parameter(name = "status", description = "Status sprint", example = "IN_PROGRESS")
       @RequestParam(value = "status", required = false) String status) {
     log.info("(getSprints) projectId: {}", projectId);
+    baseAuthorization.allRole(getUserId(), projectId);
     getUserId();
     if (status == null) {
       log.info("(getSprints) sprints");
@@ -106,6 +112,7 @@ public class SprintController {
       @Parameter(name = "sprint id", description = "Identification sprint")
       @PathVariable("id") String id) {
     log.info("(getSprint) projectId: {}, id: {}", projectId, id);
+    baseAuthorization.allRole(getUserId(), projectId);
     getUserId();
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         sprintFacadeService.getSprint(projectId, id));
@@ -119,6 +126,7 @@ public class SprintController {
       @Parameter(name = "sprint id", description = "Identification sprint")
       @PathVariable("id") String id) {
     log.info("(getProgressStatistics) projectId: {}, id: {}", projectId, id);
+    baseAuthorization.roleAdminAndEdit(getUserId(), projectId);
     getUserId();
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         sprintFacadeService.getProgressStatistics(projectId, id));
@@ -132,6 +140,7 @@ public class SprintController {
       @Parameter(name = "sprint id", description = "Identification sprint")
       @PathVariable("id") String id) {
     log.info("(deleteSprint) projectId: {}, id: {}", projectId, id);
+    baseAuthorization.roleAdminAndEdit(getUserId(), projectId);
     sprintFacadeService.deleteSprint(getUserId(), projectId, id);
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         "Delete sprint successfully!!");
@@ -145,6 +154,7 @@ public class SprintController {
       @Parameter(name = "sprint id", description = "Identification sprint")
       @PathVariable("sprint_id") String sprintId) {
     log.info("(completeSprint) projectId {}, sprintId {}", projectId, sprintId);
+    baseAuthorization.roleAdminAndEdit(getUserId(), projectId);
     getUserId();
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         sprintFacadeService.completeSprint(projectId, sprintId));
@@ -158,6 +168,7 @@ public class SprintController {
       @Parameter(name = "sprint id", description = "Identification sprint")
       @PathVariable("sprint_id") String sprintId) {
     log.info("(confirmCompleteSprint) projectId {}, sprintId {}", projectId, sprintId);
+    baseAuthorization.roleAdminAndEdit(getUserId(), projectId);
     sprintFacadeService.confirmCompleteSprint(getUserId(), projectId, sprintId);
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         "Complete sprint successfully!!");

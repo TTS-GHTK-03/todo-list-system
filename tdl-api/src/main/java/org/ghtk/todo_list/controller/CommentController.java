@@ -10,6 +10,7 @@ import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.ghtk.todo_list.base_authrization.BaseAuthorization;
 import org.ghtk.todo_list.dto.response.BaseResponse;
 import org.ghtk.todo_list.facade.CommentFacadeService;
 import org.ghtk.todo_list.model.request.CreateCommentRequest;
@@ -33,6 +34,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class CommentController {
 
   private final CommentFacadeService commentFacadeService;
+  private final BaseAuthorization baseAuthorization;
 
   @PostMapping("/{project_id}/tasks/{task_id}/comments")
   @Operation(description = "Create comment")
@@ -43,6 +45,7 @@ public class CommentController {
       @Parameter(name = "project_id", description = "Identification of project")
       @PathVariable("project_id") String projectId) {
     log.info("(CreateComment)taskId: {}", taskId);
+    baseAuthorization.allRole(getUserId(), projectId);
     return BaseResponse.of(HttpStatus.CREATED.value(), LocalDate.now().toString(),
         commentFacadeService.createComment(getUserId(), projectId, taskId,
             commentRequest.getText()));
@@ -59,6 +62,7 @@ public class CommentController {
       @Parameter(name = "project_id", description = "Identification of project")
       @PathVariable("project_id") String projectId) {
     log.info("(UpdateComment)taskId: {}, commentId: {}", taskId, commentId);
+    baseAuthorization.allRole(getUserId(), projectId);
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         commentFacadeService.updateComment(getUserId(), projectId, taskId, commentId,
             updateCommentRequest.getText()));
@@ -75,53 +79,66 @@ public class CommentController {
       @Parameter(name = "project_id", description = "Identification of project")
       @PathVariable("project_id") String projectId) {
     log.info("(replyComment)taskId: {}, commentId: {}", taskId, commentId);
+    baseAuthorization.allRole(getUserId(), projectId);
     return BaseResponse.of(HttpStatus.CREATED.value(), LocalDate.now().toString(),
         commentFacadeService.replyComment(getUserId(), projectId, taskId, commentId,
             request.getText()));
   }
 
-  @GetMapping("/{task_id}/comments")
+  @GetMapping("/{project_id}/tasks/{task_id}/comments")
   @Operation(description = "Get all comments by task id")
   public BaseResponse<List<CommentResponse>> getAllCommentsByTaskId(
       @Parameter(name = "task_id", description = "Identification of task")
-      @PathVariable("task_id") String taskId) {
+      @PathVariable("task_id") String taskId,
+      @Parameter(name = "project_id", description = "Identification of project")
+      @PathVariable("project_id") String projectId) {
     log.info("(getAllCommentsByTaskId)taskId: {}", taskId);
+    baseAuthorization.allRole(getUserId(), projectId);
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         commentFacadeService.getAllCommentsByTaskId(taskId));
   }
 
-  @GetMapping("/{task_id}/comments/{comment_id}")
+  @GetMapping("/{project_id}/tasks/{task_id}/comments/{comment_id}")
   @Operation(description = "Get comment by comment id")
   public BaseResponse<CommentResponse> getCommentByCommentId(
       @Parameter(name = "task_id", description = "Identification of task")
       @PathVariable("task_id") String taskId,
       @Parameter(name = "comment_id", description = "Identification of comment")
-      @PathVariable("comment_id") String commentId) {
+      @PathVariable("comment_id") String commentId,
+      @Parameter(name = "project_id", description = "Identification of project")
+      @PathVariable("project_id") String projectId) {
     log.info("(getCommentByCommentId)taskId: {}, commentId: {}", taskId, commentId);
+    baseAuthorization.allRole(getUserId(), projectId);
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         commentFacadeService.findById(taskId, commentId));
   }
 
-  @GetMapping("/{task_id}/comments/parent/{parent_id}")
+  @GetMapping("/{project_id}/tasks/{task_id}/comments/parent/{parent_id}")
   @Operation(description = "Get all comments by parent id")
   public BaseResponse<List<CommentResponse>> getAllCommentsByParentId(
       @Parameter(name = "task_id", description = "Identification of task")
       @PathVariable("task_id") String taskId,
       @Parameter(name = "parent_id", description = "Identification of parent")
-      @PathVariable("parent_id") String parentId) {
+      @PathVariable("parent_id") String parentId,
+      @Parameter(name = "project_id", description = "Identification of project")
+      @PathVariable("project_id") String projectId) {
     log.info("(getAllCommentsByParentId)taskId: {}, parentId: {}", taskId, parentId);
+    baseAuthorization.allRole(getUserId(), projectId);
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         commentFacadeService.getAllCommentsByParentId(taskId, parentId));
   }
 
-  @DeleteMapping("/{task_id}/comments/{comment_id}")
+  @DeleteMapping("/{project_id}/tasks/{task_id}/comments/{comment_id}")
   @Operation(description = "Delete comment")
   public BaseResponse<String> deleteComment(
       @Parameter(name = "task_id", description = "Identification of task")
       @PathVariable("task_id") String taskId,
       @Parameter(name = "comment_id", description = "Identification of comment")
-      @PathVariable("comment_id") String commentId) {
+      @PathVariable("comment_id") String commentId,
+      @Parameter(name = "project_id", description = "Identification of project")
+      @PathVariable("project_id") String projectId) {
     log.info("(deleteComment)taskId: {}, commentId: {}", taskId, commentId);
+    baseAuthorization.allRole(getUserId(), projectId);
     commentFacadeService.deleteComment(getUserId(), taskId, commentId);
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         "Delete comment successfully!!");
