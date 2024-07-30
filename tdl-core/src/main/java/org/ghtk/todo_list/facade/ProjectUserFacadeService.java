@@ -12,5 +12,7 @@ public interface ProjectUserFacadeService {
   String viewShareProject(String userId, String shareToken);
 
   List<UserResponse> getAllUserByProject(String userId, String projectId);
+
+  String updateRoleProjectUser(String projectId, String memberId, String role);
   void deleteUser(String userId, String projectId, String memberId);
 }

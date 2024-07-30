@@ -16,11 +16,13 @@ import org.ghtk.todo_list.facade.ProjectUserFacadeService;
 import org.ghtk.todo_list.model.request.InviteUserRequest;
 import org.ghtk.todo_list.model.request.ShareUserRequest;
 import org.ghtk.todo_list.dto.response.UserResponse;
+import org.ghtk.todo_list.model.request.UpdateRoleProjectUserRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -70,6 +72,7 @@ public class ProjectUserController {
       @PathVariable(name = "project_id") String projectId,
       @RequestBody @Valid ShareUserRequest shareUserRequest) {
     log.info("(shareProject)projectId: {}", projectId);
+    //bổ sung vào base authorization
     projectUserFacadeService.shareProject(getUserId(), projectId, shareUserRequest.getEmail(),
         shareUserRequest.getRole(), shareUserRequest.getExpireTime());
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
@@ -96,6 +99,19 @@ public class ProjectUserController {
     baseAuthorization.roleAdmin(getUserId(), projectId);
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         projectUserFacadeService.getAllUserByProject(getUserId(), projectId));
+  }
+
+  @PutMapping("/projects/{project_id}/role")
+  @Operation(description = "Update role user in project")
+  public BaseResponse<String> updateRoleProjectUser(
+      @Parameter(name = "project_id", description = "Identification project")
+      @PathVariable("project_id") String projectId,
+      @RequestBody @Valid UpdateRoleProjectUserRequest updateRoleProjectUserRequest) {
+    log.info("(updateRoleProjectUser)projectId: {}", projectId);
+    baseAuthorization.roleAdmin(getUserId(), projectId);
+    return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
+        projectUserFacadeService.updateRoleProjectUser(projectId,
+            updateRoleProjectUserRequest.getMemberId(), updateRoleProjectUserRequest.getRole()));
   }
 
   @DeleteMapping("/users/{user_id}/projects/{project_id}")

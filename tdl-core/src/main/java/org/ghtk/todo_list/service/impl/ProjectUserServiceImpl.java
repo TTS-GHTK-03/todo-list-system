@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @RequiredArgsConstructor
+
 public class ProjectUserServiceImpl implements ProjectUserService {
 
   private final ProjectUserRepository projectUserRepository;
@@ -40,6 +41,18 @@ public class ProjectUserServiceImpl implements ProjectUserService {
       throw new ProjectUserNotFoundException();
     }
     return projectUserRepository.getRoleProjectUser(userId, projectId);
+  }
+
+  @Override
+  @Transactional
+  public String updateRoleProjectUser(String projectId, String memberId, String role) {
+    log.info("(updateRoleProjectUser)project: {}, member: {}, role: {}", projectId, memberId, role);
+    if(projectUserRepository.existByUserIdAndProjectId(memberId, projectId) == null){
+      log.error("(updateRoleProjectUser)project: {}", projectId);
+      throw new ProjectUserNotFoundException();
+    }
+    projectUserRepository.updateRoleByUserIdAndProjectId(projectId, memberId, role);
+    return projectUserRepository.getRoleProjectUser(memberId, projectId);
   }
 
   @Override
