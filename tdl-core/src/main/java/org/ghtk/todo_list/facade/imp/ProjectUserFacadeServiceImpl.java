@@ -3,7 +3,6 @@ package org.ghtk.todo_list.facade.imp;
 import static org.ghtk.todo_list.constant.ActivityLogConstant.ProjectUserAction.*;
 import static org.ghtk.todo_list.constant.CacheConstant.INVITE_KEY;
 import static org.ghtk.todo_list.constant.CacheConstant.MAIL_TTL_MINUTES;
-import static org.ghtk.todo_list.constant.CacheConstant.OTP_FAILED_UNLOCK_TIME_KEY;
 import static org.ghtk.todo_list.constant.CacheConstant.SHARE_KEY;
 
 import io.jsonwebtoken.Claims;
@@ -17,7 +16,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.constant.RoleProjectUser;
 import org.ghtk.todo_list.constant.URL;
 import org.ghtk.todo_list.core_email.helper.EmailHelper;
-import org.ghtk.todo_list.dto.response.AuthUserResponse;
 import org.ghtk.todo_list.entity.ActivityLog;
 import org.ghtk.todo_list.entity.AuthUser;
 import org.ghtk.todo_list.entity.Project;
@@ -31,6 +29,7 @@ import org.ghtk.todo_list.exception.ProjectUserExistedException;
 import org.ghtk.todo_list.exception.RoleProjectUserNotFound;
 import org.ghtk.todo_list.facade.ProjectUserFacadeService;
 import org.ghtk.todo_list.model.request.RedisInviteUserRequest;
+import org.ghtk.todo_list.dto.response.UserResponse;
 import org.ghtk.todo_list.service.ActivityLogService;
 import org.ghtk.todo_list.service.AuthTokenService;
 import org.ghtk.todo_list.service.AuthUserService;
@@ -64,7 +63,8 @@ public class ProjectUserFacadeServiceImpl implements ProjectUserFacadeService {
       throw new RoleProjectUserNotFound();
     }
 
-    if(projectUserService.existsByUserIdAndProjectId(userId, projectId)){
+    String invitedUserId = authUserService.getUserId(email);
+    if(projectUserService.existsByUserIdAndProjectId(invitedUserId, projectId)){
       log.error("(inviteUser)user: {} already in project: {}", userId, projectId);
       throw new ProjectUserExistedException();
     }
@@ -142,7 +142,8 @@ public class ProjectUserFacadeServiceImpl implements ProjectUserFacadeService {
   public void shareProject(String userId, String projectId, String email, String role, Time expireTime) {
     log.info("(shareProject)user: {}, project: {}, email: {}, role: {}, expireDate: {}", userId, projectId, email, role, expireTime);
 
-    if(projectUserService.existsByUserIdAndProjectId(userId, projectId)){
+    String sharedUserId = authUserService.getUserId(email);
+    if(projectUserService.existsByUserIdAndProjectId(sharedUserId, projectId)){
       log.error("(shareProject)user: {} already in project: {}", userId, projectId);
       throw new ProjectUserExistedException();
     }
@@ -154,7 +155,7 @@ public class ProjectUserFacadeServiceImpl implements ProjectUserFacadeService {
       throw new RoleProjectUserNotFound();
     }
 
-    var redisShareUser = redisCacheService.get(INVITE_KEY + projectId, email);
+    var redisShareUser = redisCacheService.get(SHARE_KEY + projectId + email);
     if (redisShareUser.isPresent()) {
       log.error("(shareProject)email: {} already shared", email);
       throw new EmailShareStillValidException(email);
@@ -175,7 +176,7 @@ public class ProjectUserFacadeServiceImpl implements ProjectUserFacadeService {
     param.put("shareToken", shareToken);
     emailHelper.send(subject, email, "email-share-project-template", param);
 
-    redisCacheService.save(SHARE_KEY + projectId, email, MAIL_TTL_MINUTES, TimeUnit.MINUTES);
+    redisCacheService.save(SHARE_KEY + projectId + email, email, MAIL_TTL_MINUTES, TimeUnit.MINUTES);
 
     var notification = new ActivityLog();
     notification.setAction(SHARE_KEY);
@@ -207,11 +208,15 @@ public class ProjectUserFacadeServiceImpl implements ProjectUserFacadeService {
   }
 
   @Override
-  public List<AuthUserResponse> getAllUserByProject(String userId, String projectId) {
+  public List<UserResponse> getAllUserByProject(String userId, String projectId) {
     log.info("(getAllUserByProject)user: {}, project: {}", userId, projectId);
     validateProjectId(projectId);
 
-    return authUserService.getAllUserByProject(projectId);
+    List<UserResponse> userResponseList = authUserService.getAllUserByProject(projectId);
+    for(UserResponse userResponse : userResponseList){
+      userResponse.setRole(projectUserService.getRoleProjectUser(userResponse.getId(), projectId));
+    }
+    return userResponseList;
   }
 
   @Override
