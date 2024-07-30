@@ -2,6 +2,8 @@ package org.ghtk.todo_list.facade.imp;
 
 import static org.ghtk.todo_list.constant.ActivityLogConstant.ProjectUserAction.*;
 import static org.ghtk.todo_list.constant.CacheConstant.INVITE_KEY;
+import static org.ghtk.todo_list.constant.CacheConstant.MAIL_TTL_MINUTES;
+import static org.ghtk.todo_list.constant.CacheConstant.OTP_FAILED_UNLOCK_TIME_KEY;
 import static org.ghtk.todo_list.constant.CacheConstant.SHARE_KEY;
 
 import io.jsonwebtoken.Claims;
@@ -9,6 +11,7 @@ import java.sql.Time;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.constant.RoleProjectUser;
@@ -19,8 +22,12 @@ import org.ghtk.todo_list.entity.ActivityLog;
 import org.ghtk.todo_list.entity.AuthUser;
 import org.ghtk.todo_list.entity.Project;
 import org.ghtk.todo_list.entity.ProjectUser;
+import org.ghtk.todo_list.exception.EmailInvalidWithToken;
+import org.ghtk.todo_list.exception.EmailInviteStillValidException;
 import org.ghtk.todo_list.exception.EmailNotInviteException;
+import org.ghtk.todo_list.exception.EmailShareStillValidException;
 import org.ghtk.todo_list.exception.ProjectNotFoundException;
+import org.ghtk.todo_list.exception.ProjectUserExistedException;
 import org.ghtk.todo_list.exception.RoleProjectUserNotFound;
 import org.ghtk.todo_list.facade.ProjectUserFacadeService;
 import org.ghtk.todo_list.model.request.RedisInviteUserRequest;
@@ -57,11 +64,23 @@ public class ProjectUserFacadeServiceImpl implements ProjectUserFacadeService {
       throw new RoleProjectUserNotFound();
     }
 
-    var subject = "Admin has shared with you his project";
+    if(projectUserService.existsByUserIdAndProjectId(userId, projectId)){
+      log.error("(inviteUser)user: {} already in project: {}", userId, projectId);
+      throw new ProjectUserExistedException();
+    }
+
+    var redisInviteUser = redisCacheService.get(INVITE_KEY + projectId, email);
+    if (redisInviteUser.isPresent()) {
+      log.error("(inviteUser)email: {} already invited", email);
+      throw new EmailInviteStillValidException(email);
+    }
+
+    var subject = "Admin has invited you to join their project";
     var param = new HashMap<String, Object>();
     String emailEncode = encodeEmail(email);
 
     param.put("email", email);
+    param.put("projectId", projectId);
     param.put("domain", URL.DOMAIN);
     param.put("emailEncode", emailEncode);
     emailHelper.send(subject, email, "email-invite-to-project-template", param);
@@ -70,7 +89,7 @@ public class ProjectUserFacadeServiceImpl implements ProjectUserFacadeService {
     redisInviteUserRequest.setProjectId(projectId);
     redisInviteUserRequest.setRole(role);
 
-    redisCacheService.save(INVITE_KEY, email, redisInviteUserRequest);
+    redisCacheService.save(INVITE_KEY + projectId, email, redisInviteUserRequest);
 
     var notification = new ActivityLog();
     notification.setAction(INVITE_USER);
@@ -79,43 +98,43 @@ public class ProjectUserFacadeServiceImpl implements ProjectUserFacadeService {
   }
 
   @Override
-  public String accept(String emailEncode) {
-    log.info("(accept)email: {}", emailEncode);
+  public String accept(String userId, String emailEncode, String projectId) {
+    log.info("(accept)user: {}, email: {}, project: {}", userId, emailEncode, projectId);
 
     String email = decryptionEmailEncode(emailEncode);
-    var redisRequest = redisCacheService.get(INVITE_KEY, email);
+
+    if(!email.equals(authUserService.findById(userId).getEmail())){
+      log.error("(accept)email: {} invalid with token", email);
+      throw new EmailInvalidWithToken(email);
+    }
+
+    var redisRequest = redisCacheService.get(INVITE_KEY + projectId, email);
 
     if (redisRequest.isEmpty()) {
       log.error("(accept)email: {} isn't invited", email);
       throw new EmailNotInviteException();
     }
 
-    RedisInviteUserRequest redisInviteUserRequest = (RedisInviteUserRequest) redisRequest.get();
-    String projectId = redisInviteUserRequest.getProjectId();
-    String role = redisInviteUserRequest.getRole();
-
     validateProjectId(projectId);
+
+    RedisInviteUserRequest redisInviteUserRequest = (RedisInviteUserRequest) redisRequest.get();
+    String role = redisInviteUserRequest.getRole();
 
     if (!RoleProjectUser.isValid(role)) {
       log.error("(accept)role: {} not found", role);
       throw new RoleProjectUserNotFound();
     }
 
-    if (!authUserService.existsByEmail(email)) {
-      log.info("(accept)email: {} not found", email);
-      //call login page
-    } else {
-      log.info("(accept)email: {} is existed", email);
-      String userId = authUserService.getUserId(email);
-      ProjectUser projectUser = projectUserService.createProjectUser(userId, projectId, role);
-      //call project page
-      String acceptEmailKey = generateAcceptEmailKey(email, projectId, role);
-    }
+    ProjectUser projectUser = projectUserService.createProjectUser(userId, projectId, role);
+    String acceptEmailKey = generateAcceptEmailKey(email, projectId, role);
+    redisCacheService.delete(INVITE_KEY + projectId, email);
 
     var notification = new ActivityLog();
     notification.setAction(ACCEPT_INVITE);
     notification.setUserId(authUserService.findByEmail(email).getId());
     activityLogService.create(notification);
+
+    //call project page
     return null;
   }
 
@@ -123,11 +142,22 @@ public class ProjectUserFacadeServiceImpl implements ProjectUserFacadeService {
   public void shareProject(String userId, String projectId, String email, String role, Time expireTime) {
     log.info("(shareProject)user: {}, project: {}, email: {}, role: {}, expireDate: {}", userId, projectId, email, role, expireTime);
 
+    if(projectUserService.existsByUserIdAndProjectId(userId, projectId)){
+      log.error("(shareProject)user: {} already in project: {}", userId, projectId);
+      throw new ProjectUserExistedException();
+    }
+
     validateProjectId(projectId);
 
     if(!RoleProjectUser.isValid(role)){
       log.error("(shareProject)role: {} not found", role);
       throw new RoleProjectUserNotFound();
+    }
+
+    var redisShareUser = redisCacheService.get(INVITE_KEY + projectId, email);
+    if (redisShareUser.isPresent()) {
+      log.error("(shareProject)email: {} already shared", email);
+      throw new EmailShareStillValidException(email);
     }
 
     var subject = "Admin shared you to their project in Todo List";
@@ -139,11 +169,13 @@ public class ProjectUserFacadeServiceImpl implements ProjectUserFacadeService {
 
     String shareToken = authTokenService.generateShareToken(email, role, projectId, (long)(hours * 3600 + minutes * 60 + second) * 1000);
 
-    param.put("role", role);
+    param.put("projectId", projectId);
     param.put("email", email);
     param.put("domain", URL.DOMAIN);
     param.put("shareToken", shareToken);
     emailHelper.send(subject, email, "email-share-project-template", param);
+
+    redisCacheService.save(SHARE_KEY + projectId, email, MAIL_TTL_MINUTES, TimeUnit.MINUTES);
 
     var notification = new ActivityLog();
     notification.setAction(SHARE_KEY);
@@ -152,7 +184,7 @@ public class ProjectUserFacadeServiceImpl implements ProjectUserFacadeService {
   }
 
   @Override
-  public void viewShareProject(String shareToken) {
+  public String viewShareProject(String userId, String shareToken) {
     log.info("(viewShareProject)shareToken: {}", shareToken);
 
     Claims claims = authTokenService.getClaimsFromShareToken(shareToken);
@@ -161,14 +193,17 @@ public class ProjectUserFacadeServiceImpl implements ProjectUserFacadeService {
     String role = claims.get("role", String.class);
     String projectId = claims.get("projectId", String.class);
 
-    if (authUserService.existsByEmail(email)) {
-      var userId = authUserService.getUserId(email);
-      if(!projectUserService.existsByUserIdAndProjectId(userId, projectId)){
-        var projectUser = projectUserService.createProjectUser(userId, projectId, role);
-      }
+    if(!email.equals(authUserService.findById(userId).getEmail())){
+      log.error("(viewShareProject)email: {} invalid with token", email);
+      throw new EmailInvalidWithToken(email);
     }
 
+    validateProjectId(projectId);
+
+    var projectUser = projectUserService.createProjectUser(userId, projectId, role);
+
     //call login page and return token share
+    return null;
   }
 
   @Override

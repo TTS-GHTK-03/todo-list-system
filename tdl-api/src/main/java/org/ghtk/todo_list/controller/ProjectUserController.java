@@ -52,9 +52,11 @@ public class ProjectUserController {
   @Operation(description = "Accept invitation")
   public BaseResponse<?> accept(
       @Parameter(name = "emailEncode", description = "Email encode")
-      @Valid @RequestParam(value = "emailEncode") String emailEncode){
+      @Valid @RequestParam(value = "emailEncode") String emailEncode,
+      @Parameter(name = "projectId", description = "Identification project")
+      @Valid @RequestParam(value = "projectId") String projectId){
     log.info("(accept)");
-    projectUserFacadeService.accept(emailEncode);
+    projectUserFacadeService.accept(getUserId(), emailEncode, projectId);
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         "Accepted invitation!");
   }
@@ -78,7 +80,7 @@ public class ProjectUserController {
       @Parameter(name = "shareToken", description = "Share token")
       @Valid @RequestParam(name = "shareToken") String shareToken) {
     log.info("(viewShareProject)shareToken: {}", shareToken);
-    projectUserFacadeService.viewShareProject(shareToken);
+    projectUserFacadeService.viewShareProject(getUserId(), shareToken);
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         "View share project successfully!");
   }
