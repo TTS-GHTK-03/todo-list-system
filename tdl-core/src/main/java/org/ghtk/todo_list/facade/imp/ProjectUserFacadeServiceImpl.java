@@ -27,6 +27,7 @@ import org.ghtk.todo_list.exception.EmailShareStillValidException;
 import org.ghtk.todo_list.exception.ProjectNotFoundException;
 import org.ghtk.todo_list.exception.ProjectUserExistedException;
 import org.ghtk.todo_list.exception.RoleProjectUserNotFound;
+import org.ghtk.todo_list.exception.UserNotFoundException;
 import org.ghtk.todo_list.facade.ProjectUserFacadeService;
 import org.ghtk.todo_list.model.request.RedisInviteUserRequest;
 import org.ghtk.todo_list.dto.response.UserResponse;
@@ -155,6 +156,8 @@ public class ProjectUserFacadeServiceImpl implements ProjectUserFacadeService {
       throw new RoleProjectUserNotFound();
     }
 
+    //Bo sung check quyen nguoi moi
+
     var redisShareUser = redisCacheService.get(SHARE_KEY + projectId + email);
     if (redisShareUser.isPresent()) {
       log.error("(shareProject)email: {} already shared", email);
@@ -217,6 +220,25 @@ public class ProjectUserFacadeServiceImpl implements ProjectUserFacadeService {
       userResponse.setRole(projectUserService.getRoleProjectUser(userResponse.getId(), projectId));
     }
     return userResponseList;
+  }
+
+  @Override
+  @Transactional
+  public String updateRoleProjectUser(String projectId, String memberId, String role) {
+    log.info("(updateRoleProjectUser)projectId: {}, memberId: {}, role: {}", projectId, memberId, role);
+    validateProjectId(projectId);
+
+    if(!RoleProjectUser.isValid(role)){
+      log.error("(updateRoleProjectUser)role: {} not found", role);
+      throw new RoleProjectUserNotFound();
+    }
+
+    if(!authUserService.existById(memberId)){
+      log.error("(updateRoleProjectUser)memberId: {} not found", memberId);
+      throw new UserNotFoundException();
+    }
+
+    return projectUserService.updateRoleProjectUser(projectId, memberId, role);
   }
 
   @Override

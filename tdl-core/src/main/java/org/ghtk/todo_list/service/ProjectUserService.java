@@ -11,6 +11,8 @@ public interface ProjectUserService {
 
   String getRoleProjectUser(String userId, String projectId);
 
+  String updateRoleProjectUser(String projectId, String memberId, String role);
+
   void deleteAllByProjectId(String projectId);
 
   void deleteByUserIdAndProjectId(String memberId, String projectId);

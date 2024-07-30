@@ -17,6 +17,13 @@ public interface ProjectUserRepository extends JpaRepository<ProjectUser, String
       """)
   String getRoleProjectUser(@Param("userId") String userId, @Param("projectId") String projectId);
 
+  @Modifying
+  @Transactional
+  @Query("""
+      UPDATE ProjectUser pu SET pu.role = :role WHERE pu.userId = :memberId AND pu.projectId = :projectId
+      """)
+  void updateRoleByUserIdAndProjectId(String projectId, String memberId, String role);
+
   @Query("""
       SELECT pu FROM ProjectUser pu WHERE pu.userId = :userId AND pu.projectId = :projectId
       """)
