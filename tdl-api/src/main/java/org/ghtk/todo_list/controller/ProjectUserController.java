@@ -43,11 +43,13 @@ public class ProjectUserController {
   public BaseResponse<String> inviteUser(
       @Parameter(name = "project_id", description = "Identification project")
       @PathVariable(name = "project_id") String projectId,
+      @Parameter(name = "reSend", description = "Resend invitation")
+      @RequestParam(value = "reSend", required = false) Boolean reSend,
       @RequestBody @Valid InviteUserRequest inviteUserRequest) {
     log.info("(inviteUser)projectId: {}", projectId);
     baseAuthorization.roleAdmin(getUserId(), projectId);
     projectUserFacadeService.inviteUser(getUserId(), projectId, inviteUserRequest.getEmail(),
-        inviteUserRequest.getRole());
+        inviteUserRequest.getRole(), reSend);
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         "Invitation sent successfully!");
   }
