@@ -54,7 +54,7 @@ public class ProjectUserFacadeServiceImpl implements ProjectUserFacadeService {
   private final ActivityLogService activityLogService;
 
   @Override
-  public void inviteUser(String userId, String projectId, String email, String role) {
+  public void inviteUser(String userId, String projectId, String email, String role, Boolean reSend) {
     log.info("(inviteUser)user: {}, project: {}", userId, projectId);
 
     validateProjectId(projectId);
@@ -70,10 +70,13 @@ public class ProjectUserFacadeServiceImpl implements ProjectUserFacadeService {
       throw new ProjectUserExistedException();
     }
 
-    var redisInviteUser = redisCacheService.get(INVITE_KEY + projectId, email);
-    if (redisInviteUser.isPresent()) {
-      log.error("(inviteUser)email: {} already invited", email);
-      throw new EmailInviteStillValidException(email);
+    if(reSend == null || !reSend){
+      log.info("(inviteUser)reSend: {}", reSend);
+      var redisInviteUser = redisCacheService.get(INVITE_KEY + projectId, email);
+      if (redisInviteUser.isPresent()) {
+        log.error("(inviteUser)email: {} already invited", email);
+        throw new EmailInviteStillValidException(email);
+      }
     }
 
     var subject = "Admin has invited you to join their project";
