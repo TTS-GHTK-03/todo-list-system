@@ -5,6 +5,7 @@ import java.util.Optional;
 import org.ghtk.todo_list.dto.request.UpdateInformationRequest;
 import org.ghtk.todo_list.dto.response.AuthUserResponse;
 import org.ghtk.todo_list.dto.response.UserNameResponse;
+import org.ghtk.todo_list.dto.response.UserResponse;
 import org.ghtk.todo_list.entity.AuthUser;
 import org.ghtk.todo_list.repository.UserProjection;
 
@@ -23,6 +24,6 @@ public interface AuthUserService {
   UserNameResponse getNameUserById(String userId);
   AuthUser create(String lastName);
   AuthUser findByUnassigned();
-  List<AuthUserResponse> getAllUserByProject(String projectId);
+  List<UserResponse> getAllUserByProject(String projectId);
   AuthUser findByEmail(String email);
 }

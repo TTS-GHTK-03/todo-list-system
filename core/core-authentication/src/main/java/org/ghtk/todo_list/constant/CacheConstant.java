@@ -21,7 +21,7 @@ public class CacheConstant {
     public static final long MAIL_TTL_MINUTES = 5L;
 
     public static final String INVITE_KEY = "INVITE_KEY";
-    public static final String SHARE_KEY = "SHARE_KEY";
+    public static final String SHARE_KEY = "SHARED_KEY";
     public static final String UPDATE_STATUS_TASK = "UPDATE_STATUS_TASK";
     public static final String UPDATE_STATUS_TASK_KEY = "_UPDATE_STATUS_TASK_KEY";
 }
