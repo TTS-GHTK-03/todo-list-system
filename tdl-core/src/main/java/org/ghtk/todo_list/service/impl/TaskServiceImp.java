@@ -252,10 +252,4 @@ public class TaskServiceImp implements TaskService {
     log.info("(findAllByProjectIdAndSprintIdAndStatusNotDone)projectId: {}, sprintId: {}", projectId, sprintId);
     return taskRepository.findAllByProjectIdAndSprintIdAndStatusNotDone(projectId, sprintId);
   }
-
-  @Override
-  public List<Task> findAllTaskByAllSprint(String projectId) {
-    log.info("(findAllTaskByAllSprint)projectId: {}", projectId);
-    return taskRepository.findAllTaskByAllSprint(projectId);
-  }
 }

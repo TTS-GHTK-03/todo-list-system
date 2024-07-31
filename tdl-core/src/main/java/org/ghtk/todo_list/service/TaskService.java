@@ -53,5 +53,4 @@ public interface TaskService {
   Integer countBySprintIdAndProjectIdAndStatusDone(String sprintId, String projectId);
   void saveAll(List<Task> tasks);
   List<Task> findAllByProjectIdAndSprintIdAndStatusNotDone(String projectId, String sprintId);
-  List<Task> findAllTaskByAllSprint(String projectId);
 }
