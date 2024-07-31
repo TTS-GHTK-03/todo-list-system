@@ -18,6 +18,7 @@ import org.ghtk.todo_list.model.request.UpdateDueDateTaskRequest;
 import org.ghtk.todo_list.model.request.UpdatePointTaskRequest;
 import org.ghtk.todo_list.model.request.UpdateTitleTaskRequest;
 import org.ghtk.todo_list.model.response.SprintsProjectDetailResponse;
+import org.ghtk.todo_list.model.response.TaskDetailResponse;
 import org.ghtk.todo_list.model.response.TaskResponse;
 import org.ghtk.todo_list.model.response.UpdateDueDateTaskResponse;
 import org.springframework.http.HttpStatus;
@@ -52,7 +53,7 @@ public class TaskController {
 
   @GetMapping("/{project_id}/tasks")
   @Operation(summary = "Get all task by project id")
-  public BaseResponse<List<TaskResponse>> getTasksByProjectId(
+  public BaseResponse<List<TaskDetailResponse>> getTasksByProjectId(
       @Parameter(name = "project_id", description = "Identification project")
       @PathVariable("project_id") String projectId,
       @Parameter(name = "status", description = "Status task", example = "TODO")

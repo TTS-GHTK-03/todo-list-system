@@ -33,6 +33,7 @@ import org.ghtk.todo_list.exception.UserNotFoundException;
 import org.ghtk.todo_list.facade.TaskFacadeService;
 import org.ghtk.todo_list.model.response.SprintsProjectDetailResponse;
 import org.ghtk.todo_list.mapper.TaskMapper;
+import org.ghtk.todo_list.model.response.TaskDetailResponse;
 import org.ghtk.todo_list.model.response.TaskResponse;
 import org.ghtk.todo_list.model.response.UpdateDueDateTaskResponse;
 import org.ghtk.todo_list.service.ActivityLogService;
@@ -78,24 +79,25 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
       taskResponseList.addAll(taskService.getAllTasksByProjectId(project.getId()));
     }
 
-    for(TaskResponse taskResponse : taskResponseList) {
+    for (TaskResponse taskResponse : taskResponseList) {
       taskResponse.setUserId(taskAssigneesService.findUserIdByTaskId(taskResponse.getId()));
     }
     return taskResponseList;
   }
 
   @Override
-  public List<TaskResponse> getAllTaskByProjectId(String userId, String projectId) {
+  public List<TaskDetailResponse> getAllTaskByProjectId(String userId, String projectId) {
     log.info("(getAllTaskByProjectId)projectId: {}", projectId);
     validateProjectId(projectId);
-    List<TaskResponse> taskResponseList = taskService.getAllTasksByProjectId(projectId);
-    for(TaskResponse taskResponse : taskResponseList) {
-      taskResponse.setUserId(taskAssigneesService.findUserIdByTaskId(taskResponse.getId()));
-      if(taskResponse.getSprintId() != null){
-        taskResponse.setSprintTitle(sprintService.findById(taskResponse.getSprintId()).getTitle());
+    List<TaskDetailResponse> taskDetailResponseList = taskService.getAllTaskDetailByProjectId(projectId);
+    for (TaskDetailResponse taskDetailResponse : taskDetailResponseList) {
+      taskDetailResponse.setUserId(taskAssigneesService.findUserIdByTaskId(taskDetailResponse.getId()));
+      if (taskDetailResponse.getSprintId() != null) {
+        taskDetailResponse.setSprintTitle(
+            sprintService.findById(taskDetailResponse.getSprintId()).getTitle());
       }
     }
-    return taskResponseList;
+    return taskDetailResponseList;
   }
 
   @Override
@@ -222,7 +224,7 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
     }
     TaskAssignees taskAssignees = taskAssigneesService.findByTaskId(taskId);
     log.info("(agileTaskByUser) TaskAssignees: {}", taskAssignees);
-    if(taskAssignees == null) {
+    if (taskAssignees == null) {
       log.warn("(agileTaskByUser) is null");
       taskAssignees = new TaskAssignees();
     }
@@ -268,9 +270,7 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
         0,
         taskClone.getStatus(),
         taskClone.getKeyProjectTask(),
-        user.getId(),
-        null,
-        null);
+        user.getId());
   }
 
   @Override
@@ -318,7 +318,7 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
       for (Task task : tasks) {
         TaskResponse taskResponse = TaskResponse.of(task.getId(), task.getTitle(), task.getPoint(),
             task.getStatus(), task.getKeyProjectTask(),
-            taskAssigneesService.findUserIdByTaskId(task.getId()), null, null);
+            taskAssigneesService.findUserIdByTaskId(task.getId()));
         responses.add(taskResponse);
       }
       return responses;
@@ -409,7 +409,8 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
   @Override
   public List<TaskResponse> searchTask(String searchValue, String typeId, String labelId,
       String status, String assignee, String userId, String projectId, String sprintId) {
-    log.info("(searchTask)searchValue: {}, userId: {}, projectId: {}", searchValue, userId, projectId);
+    log.info("(searchTask)searchValue: {}, userId: {}, projectId: {}", searchValue, userId,
+        projectId);
 
     var taskSearch = taskService.searchTask(searchValue, typeId, labelId, status, assignee,
         userId, projectId, sprintId);
@@ -431,9 +432,10 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
   public List<SprintsProjectDetailResponse> getAllTaskByAllSprint(String projectId) {
     log.info("(getAllTaskByAllSprint)projectId: {}", projectId);
     validateProjectId(projectId);
-    List<Sprint> sprintList = sprintService.findSprintsByProjectIdAndStatus(projectId, SprintStatus.START.toString());
+    List<Sprint> sprintList = sprintService.findSprintsByProjectIdAndStatus(projectId,
+        SprintStatus.START.toString());
     List<SprintsProjectDetailResponse> sprintsProjectDetailResponseList = new ArrayList<>();
-    for(Sprint sprint : sprintList) {
+    for (Sprint sprint : sprintList) {
       SprintsProjectDetailResponse sprintsProjectDetailResponse = new SprintsProjectDetailResponse();
       sprintsProjectDetailResponse.setId(sprint.getId());
       sprintsProjectDetailResponse.setTitle(sprint.getTitle());
@@ -478,7 +480,7 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
   }
 
   @Override
-  public List<TaskResponse> getAllTaskByProjectIdAndStatus(String userId, String projectId,
+  public List<TaskDetailResponse> getAllTaskByProjectIdAndStatus(String userId, String projectId,
       String status) {
     log.info("(getAllTaskByProjectIdAndStatus)projectId: {}, status: {}", projectId, status);
     String statusFormat = status.trim().toUpperCase();
@@ -488,14 +490,14 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
     }
     validateProjectId(projectId);
 
-    List<TaskResponse> taskResponseList = taskMapper.toTaskResponses(taskService.getAllTasksByProjectIdAndStatus(projectId, statusFormat));
-    for (TaskResponse taskResponse : taskResponseList) {
-      taskResponse.setUserId(taskAssigneesService.findUserIdByTaskId(taskResponse.getId()));
-      if(taskResponse.getSprintId() != null){
-        taskResponse.setSprintTitle(sprintService.findById(taskResponse.getSprintId()).getTitle());
+    List<TaskDetailResponse> taskDetailResponseList = taskMapper.toTaskDetailResponses(
+        taskService.getAllTasksByProjectIdAndStatus(projectId, statusFormat));
+    for (TaskDetailResponse taskDetailResponse : taskDetailResponseList) {
+      if (taskDetailResponse.getSprintId() != null) {
+        taskDetailResponse.setSprintTitle(sprintService.findById(taskDetailResponse.getSprintId()).getTitle());
       }
     }
-    return taskResponseList;
+    return taskDetailResponseList;
   }
 
   void validateProjectIdAndTaskId(String projectId, String taskId) {
@@ -506,7 +508,7 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
     }
   }
 
-  private String generateKeyProjectTask(String projectId){
+  private String generateKeyProjectTask(String projectId) {
     Project project = projectService.getProjectById(projectId);
     int counterTask = project.getCounterTask();
     project.setCounterTask(++counterTask);

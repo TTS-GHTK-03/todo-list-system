@@ -2,12 +2,14 @@ package org.ghtk.todo_list.service;
 
 import java.util.List;
 import org.ghtk.todo_list.entity.Task;
+import org.ghtk.todo_list.model.response.TaskDetailResponse;
 import org.ghtk.todo_list.model.response.TaskResponse;
 import org.ghtk.todo_list.model.response.UpdateDueDateTaskResponse;
 
 public interface TaskService {
 
   List<TaskResponse> getAllTasksByProjectId(String projectId);
+  List<TaskDetailResponse> getAllTaskDetailByProjectId(String projectId);
 
   TaskResponse findById(String taskId, String userId);
 

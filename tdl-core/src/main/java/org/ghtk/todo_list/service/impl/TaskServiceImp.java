@@ -9,6 +9,7 @@ import org.ghtk.todo_list.constant.TaskStatus;
 import org.ghtk.todo_list.entity.Task;
 import org.ghtk.todo_list.exception.TaskNotFoundException;
 import org.ghtk.todo_list.filter.FilterTask;
+import org.ghtk.todo_list.model.response.TaskDetailResponse;
 import org.ghtk.todo_list.model.response.TaskResponse;
 import org.ghtk.todo_list.model.response.UpdateDueDateTaskResponse;
 import org.ghtk.todo_list.repository.TaskRepository;
@@ -29,12 +30,20 @@ public class TaskServiceImp implements TaskService {
   public List<TaskResponse> getAllTasksByProjectId(String projectId) {
     log.info("(getAllTasksByProjectId)projectId: {}", projectId);
     List<Task> tasks = taskRepository.getAllTasksByProjectId(projectId);
-    List<TaskResponse> taskResponseList = new ArrayList<>();
     return tasks.stream()
-        .map(task -> TaskResponse.of(task.getId(), task.getTitle(), task.getPoint(),
+        .map(task -> new TaskResponse(task.getId(), task.getTitle(), task.getPoint(),
+            task.getStatus(), task.getKeyProjectTask()))
+        .collect(Collectors.toList());
+  }
+
+  @Override
+  public List<TaskDetailResponse> getAllTaskDetailByProjectId(String projectId){
+    log.info("(getAllTaskDetailByProjectId)projectId: {}", projectId);
+    List<Task> tasks = taskRepository.getAllTasksByProjectId(projectId);
+    return tasks.stream()
+        .map(task -> TaskDetailResponse.of(task.getId(), task.getTitle(), task.getPoint(),
             task.getStatus(), task.getKeyProjectTask(), null, task.getSprintId(), null))
         .collect(Collectors.toList());
-
   }
 
   @Override
@@ -50,7 +59,7 @@ public class TaskServiceImp implements TaskService {
       throw new TaskNotFoundException();
     });
 
-    return TaskResponse.of(task.getId(), task.getTitle(), task.getPoint(), task.getStatus(), task.getKeyProjectTask(), userId, task.getSprintId(), null);
+    return TaskResponse.of(task.getId(), task.getTitle(), task.getPoint(), task.getStatus(), task.getKeyProjectTask(), userId);
   }
 
   @Override
@@ -64,7 +73,7 @@ public class TaskServiceImp implements TaskService {
         });
     task.setStatus(taskStatus);
     taskRepository.save(task);
-    return TaskResponse.of(task.getId(), task.getTitle(), task.getPoint(), task.getStatus(), task.getKeyProjectTask(), userId, task.getSprintId(), null);
+    return TaskResponse.of(task.getId(), task.getTitle(), task.getPoint(), task.getStatus(), task.getKeyProjectTask(), userId);
   }
 
   @Override
@@ -101,7 +110,7 @@ public class TaskServiceImp implements TaskService {
         });
     task.setSprintId(sprintId);
     taskRepository.save(task);
-    return TaskResponse.of(task.getId(), task.getTitle(), task.getPoint(), task.getStatus(), task.getKeyProjectTask(), userId, task.getSprintId(), null);
+    return TaskResponse.of(task.getId(), task.getTitle(), task.getPoint(), task.getStatus(), task.getKeyProjectTask(), userId);
   }
 
   @Override
