@@ -7,17 +7,15 @@ import static org.ghtk.todo_list.constant.CacheConstant.UPDATE_STATUS_TASK_KEY;
 import static org.ghtk.todo_list.constant.TaskStatus.TODO;
 
 import java.time.LocalDate;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.ghtk.todo_list.constant.CacheConstant;
 import org.ghtk.todo_list.constant.RoleProjectUser;
+import org.ghtk.todo_list.constant.SprintStatus;
 import org.ghtk.todo_list.constant.TaskStatus;
 import org.ghtk.todo_list.entity.ActivityLog;
 import org.ghtk.todo_list.entity.Project;
-import org.ghtk.todo_list.entity.SprintProgress;
 import org.ghtk.todo_list.entity.Task;
 import org.ghtk.todo_list.entity.TaskAssignees;
 import org.ghtk.todo_list.entity.Sprint;
@@ -31,10 +29,9 @@ import org.ghtk.todo_list.exception.TaskAssignmentExistsException;
 import org.ghtk.todo_list.exception.TaskNotExistUserException;
 import org.ghtk.todo_list.exception.TaskNotFoundException;
 import org.ghtk.todo_list.exception.StatusTaskKeyNotFoundException;
-import org.ghtk.todo_list.exception.TaskNotFoundException;
 import org.ghtk.todo_list.exception.UserNotFoundException;
 import org.ghtk.todo_list.facade.TaskFacadeService;
-import org.ghtk.todo_list.model.response.StartSprintResponse;
+import org.ghtk.todo_list.model.response.SprintInBoardResponse;
 import org.ghtk.todo_list.mapper.TaskMapper;
 import org.ghtk.todo_list.model.response.TaskResponse;
 import org.ghtk.todo_list.model.response.UpdateDueDateTaskResponse;
@@ -422,11 +419,23 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
   }
 
   @Override
-  public List<TaskResponse> getAllTaskByAllSprint(String projectId) {
+  public List<SprintInBoardResponse> getAllTaskByAllSprint(String projectId) {
     log.info("(getAllTaskByAllSprint)projectId: {}", projectId);
     validateProjectId(projectId);
-    List<Task> taskList = taskService.findAllTaskByAllSprint(projectId);
-    return taskMapper.toTaskResponses(taskList);
+    List<Sprint> sprintList = sprintService.findSprintsByProjectIdAndStatus(projectId, SprintStatus.START.toString());
+    List<SprintInBoardResponse> sprintInBoardResponseList = new ArrayList<>();
+    for(Sprint sprint : sprintList) {
+      SprintInBoardResponse sprintInBoardResponse = new SprintInBoardResponse();
+      sprintInBoardResponse.setId(sprint.getId());
+      sprintInBoardResponse.setTitle(sprint.getTitle());
+      sprintInBoardResponse.setStartDate(sprint.getStartDate());
+      sprintInBoardResponse.setEndDate(sprint.getEndDate());
+      List<Task> taskList = taskService.getAllBySprintId(sprint.getId());
+      sprintInBoardResponse.setTaskResponseList(taskMapper.toTaskResponses(taskList));
+      sprintInBoardResponseList.add(sprintInBoardResponse);
+    }
+
+    return sprintInBoardResponseList;
   }
 
   void validateUserId(String userId) {
