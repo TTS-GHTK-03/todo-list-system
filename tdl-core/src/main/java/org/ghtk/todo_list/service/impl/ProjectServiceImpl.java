@@ -77,10 +77,11 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     int count = 1;
-    String keyProjectCheck = stringBuilder.toString();
+    String keyProjectCheck = stringBuilder.toString() + count;
+
     while (projectRepository.existsByKeyProject(keyProjectCheck)){
-      keyProjectCheck = stringBuilder.toString() + count;
       count++;
+      keyProjectCheck = stringBuilder.toString() + count;
     }
 
     Project project = projectMapper.toProject(title, stringBuilder.append(count).toString());
