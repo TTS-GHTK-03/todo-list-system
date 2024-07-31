@@ -17,6 +17,7 @@ import org.ghtk.todo_list.model.request.CreateTaskRequest;
 import org.ghtk.todo_list.model.request.UpdateDueDateTaskRequest;
 import org.ghtk.todo_list.model.request.UpdatePointTaskRequest;
 import org.ghtk.todo_list.model.request.UpdateTitleTaskRequest;
+import org.ghtk.todo_list.model.response.SprintsProjectDetailResponse;
 import org.ghtk.todo_list.model.response.TaskResponse;
 import org.ghtk.todo_list.model.response.UpdateDueDateTaskResponse;
 import org.springframework.http.HttpStatus;
@@ -67,6 +68,17 @@ public class TaskController {
       return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
           taskFacadeService.getAllTaskByProjectIdAndStatus(getUserId(), projectId, status));
     }
+  }
+
+  @GetMapping("/{project_id}/sprints/tasks")
+  @Operation(description = "Get all task by all sprint")
+  public BaseResponse<List<SprintsProjectDetailResponse>> getAllTaskByAllSprint(
+      @Parameter(name = "project_id", description = "Identification project")
+      @PathVariable("project_id") String projectId) {
+    log.info("(getAllTaskByAllSprint)");
+    baseAuthorization.allRole(getUserId(), projectId);
+    return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
+        taskFacadeService.getAllTaskByAllSprint(projectId));
   }
 
   @PostMapping ("/{project_id}/tasks")

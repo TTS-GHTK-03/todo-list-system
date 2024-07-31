@@ -7,17 +7,15 @@ import static org.ghtk.todo_list.constant.CacheConstant.UPDATE_STATUS_TASK_KEY;
 import static org.ghtk.todo_list.constant.TaskStatus.TODO;
 
 import java.time.LocalDate;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.ghtk.todo_list.constant.CacheConstant;
 import org.ghtk.todo_list.constant.RoleProjectUser;
+import org.ghtk.todo_list.constant.SprintStatus;
 import org.ghtk.todo_list.constant.TaskStatus;
 import org.ghtk.todo_list.entity.ActivityLog;
 import org.ghtk.todo_list.entity.Project;
-import org.ghtk.todo_list.entity.SprintProgress;
 import org.ghtk.todo_list.entity.Task;
 import org.ghtk.todo_list.entity.TaskAssignees;
 import org.ghtk.todo_list.entity.Sprint;
@@ -31,10 +29,9 @@ import org.ghtk.todo_list.exception.TaskAssignmentExistsException;
 import org.ghtk.todo_list.exception.TaskNotExistUserException;
 import org.ghtk.todo_list.exception.TaskNotFoundException;
 import org.ghtk.todo_list.exception.StatusTaskKeyNotFoundException;
-import org.ghtk.todo_list.exception.TaskNotFoundException;
 import org.ghtk.todo_list.exception.UserNotFoundException;
 import org.ghtk.todo_list.facade.TaskFacadeService;
-import org.ghtk.todo_list.model.response.StartSprintResponse;
+import org.ghtk.todo_list.model.response.SprintsProjectDetailResponse;
 import org.ghtk.todo_list.mapper.TaskMapper;
 import org.ghtk.todo_list.model.response.TaskResponse;
 import org.ghtk.todo_list.model.response.UpdateDueDateTaskResponse;
@@ -419,6 +416,26 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
       responses.add(response);
     }
     return responses;
+  }
+
+  @Override
+  public List<SprintsProjectDetailResponse> getAllTaskByAllSprint(String projectId) {
+    log.info("(getAllTaskByAllSprint)projectId: {}", projectId);
+    validateProjectId(projectId);
+    List<Sprint> sprintList = sprintService.findSprintsByProjectIdAndStatus(projectId, SprintStatus.START.toString());
+    List<SprintsProjectDetailResponse> sprintsProjectDetailResponseList = new ArrayList<>();
+    for(Sprint sprint : sprintList) {
+      SprintsProjectDetailResponse sprintsProjectDetailResponse = new SprintsProjectDetailResponse();
+      sprintsProjectDetailResponse.setId(sprint.getId());
+      sprintsProjectDetailResponse.setTitle(sprint.getTitle());
+      sprintsProjectDetailResponse.setStartDate(sprint.getStartDate());
+      sprintsProjectDetailResponse.setEndDate(sprint.getEndDate());
+      List<Task> taskList = taskService.getAllBySprintId(sprint.getId());
+      sprintsProjectDetailResponse.setTaskResponseList(taskMapper.toTaskResponses(taskList));
+      sprintsProjectDetailResponseList.add(sprintsProjectDetailResponse);
+    }
+
+    return sprintsProjectDetailResponseList;
   }
 
   void validateUserId(String userId) {
