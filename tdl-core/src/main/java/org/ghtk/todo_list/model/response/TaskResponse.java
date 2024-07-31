@@ -19,7 +19,6 @@ public class TaskResponse {
   private String keyProjectTask;
   private String userId;
 
-
   public TaskResponse() {
   }
 

@@ -1,6 +1,7 @@
 package org.ghtk.todo_list.service.impl;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -8,6 +9,7 @@ import org.ghtk.todo_list.constant.TaskStatus;
 import org.ghtk.todo_list.entity.Task;
 import org.ghtk.todo_list.exception.TaskNotFoundException;
 import org.ghtk.todo_list.filter.FilterTask;
+import org.ghtk.todo_list.model.response.TaskDetailResponse;
 import org.ghtk.todo_list.model.response.TaskResponse;
 import org.ghtk.todo_list.model.response.UpdateDueDateTaskResponse;
 import org.ghtk.todo_list.repository.TaskRepository;
@@ -32,7 +34,16 @@ public class TaskServiceImp implements TaskService {
         .map(task -> new TaskResponse(task.getId(), task.getTitle(), task.getPoint(),
             task.getStatus(), task.getKeyProjectTask()))
         .collect(Collectors.toList());
+  }
 
+  @Override
+  public List<TaskDetailResponse> getAllTaskDetailByProjectId(String projectId){
+    log.info("(getAllTaskDetailByProjectId)projectId: {}", projectId);
+    List<Task> tasks = taskRepository.getAllTasksByProjectId(projectId);
+    return tasks.stream()
+        .map(task -> TaskDetailResponse.of(task.getId(), task.getTitle(), task.getPoint(),
+            task.getStatus(), task.getKeyProjectTask(), null, task.getSprintId(), null))
+        .collect(Collectors.toList());
   }
 
   @Override

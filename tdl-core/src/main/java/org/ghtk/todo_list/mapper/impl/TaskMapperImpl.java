@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import org.ghtk.todo_list.entity.Task;
 import org.ghtk.todo_list.mapper.TaskMapper;
+import org.ghtk.todo_list.model.response.TaskDetailResponse;
 import org.ghtk.todo_list.model.response.TaskResponse;
 import org.springframework.stereotype.Component;
 
@@ -18,6 +19,22 @@ public class TaskMapperImpl implements TaskMapper {
           .title(task.getTitle())
           .point(task.getPoint())
           .status(task.getStatus())
+          .build();
+    }).collect(Collectors.toList());
+  }
+
+  @Override
+  public List<TaskDetailResponse> toTaskDetailResponses(List<Task> tasks) {
+    return tasks.stream().map(task -> {
+      return TaskDetailResponse.builder()
+          .id(task.getId())
+          .title(task.getTitle())
+          .point(task.getPoint())
+          .status(task.getStatus())
+          .keyProjectTask(task.getKeyProjectTask())
+          .userId(task.getUserId())
+          .sprintId(task.getSprintId())
+          .sprintTitle(null)
           .build();
     }).collect(Collectors.toList());
   }
