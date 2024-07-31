@@ -1,10 +1,8 @@
 package org.ghtk.todo_list.facade;
 
-import java.util.Date;
 import java.util.List;
-import org.ghtk.todo_list.entity.Task;
 import org.ghtk.todo_list.entity.TaskAssignees;
-import org.ghtk.todo_list.model.response.SprintInBoardResponse;
+import org.ghtk.todo_list.model.response.SprintsProjectDetailResponse;
 import org.ghtk.todo_list.model.response.TaskResponse;
 import org.ghtk.todo_list.model.response.UpdateDueDateTaskResponse;
 
@@ -32,5 +30,5 @@ public interface TaskFacadeService {
   List<TaskResponse> getAllTaskAssigneesForUser(String userId);
   List<TaskResponse> searchTask(String searchValue, String typeId, String labelId, String status,
       String assignee, String userId, String projectId, String sprintId);
-  List<SprintInBoardResponse> getAllTaskByAllSprint(String projectId);
+  List<SprintsProjectDetailResponse> getAllTaskByAllSprint(String projectId);
 }

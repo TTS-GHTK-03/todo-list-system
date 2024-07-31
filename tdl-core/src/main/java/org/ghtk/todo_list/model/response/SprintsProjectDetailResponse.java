@@ -3,7 +3,6 @@ package org.ghtk.todo_list.model.response;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,7 +11,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class SprintInBoardResponse {
+public class SprintsProjectDetailResponse {
   private String id;
   private String title;
   private LocalDate startDate;

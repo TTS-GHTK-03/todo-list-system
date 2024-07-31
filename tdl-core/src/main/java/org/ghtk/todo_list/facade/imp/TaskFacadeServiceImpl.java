@@ -31,7 +31,7 @@ import org.ghtk.todo_list.exception.TaskNotFoundException;
 import org.ghtk.todo_list.exception.StatusTaskKeyNotFoundException;
 import org.ghtk.todo_list.exception.UserNotFoundException;
 import org.ghtk.todo_list.facade.TaskFacadeService;
-import org.ghtk.todo_list.model.response.SprintInBoardResponse;
+import org.ghtk.todo_list.model.response.SprintsProjectDetailResponse;
 import org.ghtk.todo_list.mapper.TaskMapper;
 import org.ghtk.todo_list.model.response.TaskResponse;
 import org.ghtk.todo_list.model.response.UpdateDueDateTaskResponse;
@@ -419,23 +419,23 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
   }
 
   @Override
-  public List<SprintInBoardResponse> getAllTaskByAllSprint(String projectId) {
+  public List<SprintsProjectDetailResponse> getAllTaskByAllSprint(String projectId) {
     log.info("(getAllTaskByAllSprint)projectId: {}", projectId);
     validateProjectId(projectId);
     List<Sprint> sprintList = sprintService.findSprintsByProjectIdAndStatus(projectId, SprintStatus.START.toString());
-    List<SprintInBoardResponse> sprintInBoardResponseList = new ArrayList<>();
+    List<SprintsProjectDetailResponse> sprintsProjectDetailResponseList = new ArrayList<>();
     for(Sprint sprint : sprintList) {
-      SprintInBoardResponse sprintInBoardResponse = new SprintInBoardResponse();
-      sprintInBoardResponse.setId(sprint.getId());
-      sprintInBoardResponse.setTitle(sprint.getTitle());
-      sprintInBoardResponse.setStartDate(sprint.getStartDate());
-      sprintInBoardResponse.setEndDate(sprint.getEndDate());
+      SprintsProjectDetailResponse sprintsProjectDetailResponse = new SprintsProjectDetailResponse();
+      sprintsProjectDetailResponse.setId(sprint.getId());
+      sprintsProjectDetailResponse.setTitle(sprint.getTitle());
+      sprintsProjectDetailResponse.setStartDate(sprint.getStartDate());
+      sprintsProjectDetailResponse.setEndDate(sprint.getEndDate());
       List<Task> taskList = taskService.getAllBySprintId(sprint.getId());
-      sprintInBoardResponse.setTaskResponseList(taskMapper.toTaskResponses(taskList));
-      sprintInBoardResponseList.add(sprintInBoardResponse);
+      sprintsProjectDetailResponse.setTaskResponseList(taskMapper.toTaskResponses(taskList));
+      sprintsProjectDetailResponseList.add(sprintsProjectDetailResponse);
     }
 
-    return sprintInBoardResponseList;
+    return sprintsProjectDetailResponseList;
   }
 
   void validateUserId(String userId) {
