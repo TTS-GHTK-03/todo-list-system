@@ -31,4 +31,5 @@ public interface TaskFacadeService {
   List<TaskResponse> getAllTaskAssigneesForUser(String userId);
   List<TaskResponse> searchTask(String searchValue, String typeId, String labelId, String status,
       String assignee, String userId, String projectId, String sprintId);
+  List<TaskResponse> getAllTaskByAllSprint(String projectId);
 }

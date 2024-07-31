@@ -69,6 +69,17 @@ public class TaskController {
     }
   }
 
+  @GetMapping("/{project_id}/sprints/tasks")
+  @Operation(description = "Get all task by all sprint")
+  public BaseResponse<List<TaskResponse>> getAllTaskByAllSprint(
+      @Parameter(name = "project_id", description = "Identification project")
+      @PathVariable("project_id") String projectId) {
+    log.info("(getAllTaskByAllSprint)");
+    baseAuthorization.allRole(getUserId(), projectId);
+    return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
+        taskFacadeService.getAllTaskByAllSprint(projectId));
+  }
+
   @PostMapping ("/{project_id}/tasks")
   @Operation(description = "Create task")
   public BaseResponse<TaskResponse> createTask(

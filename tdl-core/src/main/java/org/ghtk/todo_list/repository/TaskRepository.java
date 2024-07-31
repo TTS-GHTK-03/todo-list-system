@@ -101,4 +101,11 @@ public interface TaskRepository extends JpaRepository<Task, String>,
 
   @Query("SELECT t FROM Task t WHERE t.projectId = :projectId AND t.sprintId = :sprintId AND t.status <> 'DONE'")
   List<Task> findAllByProjectIdAndSprintIdAndStatusNotDone(String projectId, String sprintId);
+
+  @Query("""
+      SELECT t FROM Task t
+      JOIN Sprint s ON t.sprintId = s.id
+      WHERE t.projectId = '350cc019-5fb9-404f-8c94-02cb44dbd7fc'
+      """)
+  List<Task> findAllTaskByAllSprint(String projectId);
 }

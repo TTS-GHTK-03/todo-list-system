@@ -421,6 +421,14 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
     return responses;
   }
 
+  @Override
+  public List<TaskResponse> getAllTaskByAllSprint(String projectId) {
+    log.info("(getAllTaskByAllSprint)projectId: {}", projectId);
+    validateProjectId(projectId);
+    List<Task> taskList = taskService.findAllTaskByAllSprint(projectId);
+    return taskMapper.toTaskResponses(taskList);
+  }
+
   void validateUserId(String userId) {
     log.info("(validateUserId)userId: {}", userId);
     if (!authUserService.existById(userId)) {
