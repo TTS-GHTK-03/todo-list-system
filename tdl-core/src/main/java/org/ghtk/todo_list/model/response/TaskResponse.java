@@ -18,6 +18,8 @@ public class TaskResponse {
   private String status;
   private String keyProjectTask;
   private String userId;
+  private String sprintId;
+  private String sprintTitle;
 
 
   public TaskResponse() {
@@ -39,6 +41,19 @@ public class TaskResponse {
     response.setStatus(task.getStatus());
     response.setKeyProjectTask(task.getKeyProjectTask());
     response.setUserId(userId);
+    return response;
+  }
+
+  public static TaskResponse from(Task task, String userId, String sprintTitle) {
+    TaskResponse response = new TaskResponse();
+    response.setId(task.getId());
+    response.setTitle(task.getTitle());
+    response.setPoint(task.getPoint());
+    response.setStatus(task.getStatus());
+    response.setKeyProjectTask(task.getKeyProjectTask());
+    response.setUserId(userId);
+    response.setSprintId(task.getSprintId());
+    response.setSprintTitle(sprintTitle);
     return response;
   }
 }

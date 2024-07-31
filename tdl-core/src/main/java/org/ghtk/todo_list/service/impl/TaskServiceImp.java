@@ -1,6 +1,7 @@
 package org.ghtk.todo_list.service.impl;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,9 +29,10 @@ public class TaskServiceImp implements TaskService {
   public List<TaskResponse> getAllTasksByProjectId(String projectId) {
     log.info("(getAllTasksByProjectId)projectId: {}", projectId);
     List<Task> tasks = taskRepository.getAllTasksByProjectId(projectId);
+    List<TaskResponse> taskResponseList = new ArrayList<>();
     return tasks.stream()
-        .map(task -> new TaskResponse(task.getId(), task.getTitle(), task.getPoint(),
-            task.getStatus(), task.getKeyProjectTask()))
+        .map(task -> TaskResponse.of(task.getId(), task.getTitle(), task.getPoint(),
+            task.getStatus(), task.getKeyProjectTask(), null, task.getSprintId(), null))
         .collect(Collectors.toList());
 
   }
@@ -48,7 +50,7 @@ public class TaskServiceImp implements TaskService {
       throw new TaskNotFoundException();
     });
 
-    return TaskResponse.of(task.getId(), task.getTitle(), task.getPoint(), task.getStatus(), task.getKeyProjectTask(), userId);
+    return TaskResponse.of(task.getId(), task.getTitle(), task.getPoint(), task.getStatus(), task.getKeyProjectTask(), userId, task.getSprintId(), null);
   }
 
   @Override
@@ -62,7 +64,7 @@ public class TaskServiceImp implements TaskService {
         });
     task.setStatus(taskStatus);
     taskRepository.save(task);
-    return TaskResponse.of(task.getId(), task.getTitle(), task.getPoint(), task.getStatus(), task.getKeyProjectTask(), userId);
+    return TaskResponse.of(task.getId(), task.getTitle(), task.getPoint(), task.getStatus(), task.getKeyProjectTask(), userId, task.getSprintId(), null);
   }
 
   @Override
@@ -99,7 +101,7 @@ public class TaskServiceImp implements TaskService {
         });
     task.setSprintId(sprintId);
     taskRepository.save(task);
-    return TaskResponse.of(task.getId(), task.getTitle(), task.getPoint(), task.getStatus(), task.getKeyProjectTask(), userId);
+    return TaskResponse.of(task.getId(), task.getTitle(), task.getPoint(), task.getStatus(), task.getKeyProjectTask(), userId, task.getSprintId(), null);
   }
 
   @Override

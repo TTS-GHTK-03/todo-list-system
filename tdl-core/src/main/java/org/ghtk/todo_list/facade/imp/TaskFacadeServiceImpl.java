@@ -88,7 +88,14 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
   public List<TaskResponse> getAllTaskByProjectId(String userId, String projectId) {
     log.info("(getAllTaskByProjectId)projectId: {}", projectId);
     validateProjectId(projectId);
-    return taskService.getAllTasksByProjectId(projectId);
+    List<TaskResponse> taskResponseList = taskService.getAllTasksByProjectId(projectId);
+    for(TaskResponse taskResponse : taskResponseList) {
+      taskResponse.setUserId(taskAssigneesService.findUserIdByTaskId(taskResponse.getId()));
+      if(taskResponse.getSprintId() != null){
+        taskResponse.setSprintTitle(sprintService.findById(taskResponse.getSprintId()).getTitle());
+      }
+    }
+    return taskResponseList;
   }
 
   @Override
@@ -261,7 +268,9 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
         0,
         taskClone.getStatus(),
         taskClone.getKeyProjectTask(),
-        user.getId());
+        user.getId(),
+        null,
+        null);
   }
 
   @Override
@@ -309,7 +318,7 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
       for (Task task : tasks) {
         TaskResponse taskResponse = TaskResponse.of(task.getId(), task.getTitle(), task.getPoint(),
             task.getStatus(), task.getKeyProjectTask(),
-            taskAssigneesService.findUserIdByTaskId(task.getId()));
+            taskAssigneesService.findUserIdByTaskId(task.getId()), null, null);
         responses.add(taskResponse);
       }
       return responses;
@@ -479,8 +488,14 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
     }
     validateProjectId(projectId);
 
-    return taskMapper.toTaskResponses(
-        taskService.getAllTasksByProjectIdAndStatus(projectId, statusFormat));
+    List<TaskResponse> taskResponseList = taskMapper.toTaskResponses(taskService.getAllTasksByProjectIdAndStatus(projectId, statusFormat));
+    for (TaskResponse taskResponse : taskResponseList) {
+      taskResponse.setUserId(taskAssigneesService.findUserIdByTaskId(taskResponse.getId()));
+      if(taskResponse.getSprintId() != null){
+        taskResponse.setSprintTitle(sprintService.findById(taskResponse.getSprintId()).getTitle());
+      }
+    }
+    return taskResponseList;
   }
 
   void validateProjectIdAndTaskId(String projectId, String taskId) {
