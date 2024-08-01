@@ -13,6 +13,7 @@ application:
     resources:
       - classpath:core-authentication/message
       - classpath:tdl-core/message
+      - classpath:core-exception/message
 
 spring:
   application:
