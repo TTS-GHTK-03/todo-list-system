@@ -2,15 +2,18 @@ application:
   authentication:
     access_token:
       jwt_secret: "Z8GJ64eimY"
-      life_time: "3600000"
+      life_time: "36000000"
     refresh_token:
       jwt_secret: "Z8GJ64eimY"
-      life_time: "3600000"
+      life_time: "72000000"
+    share_token:
+      jwt_secret: "asgsdgsgsdsg"
 
   i18n:
     resources:
       - classpath:core-authentication/message
       - classpath:tdl-core/message
+      - classpath:core-exception/message
 
 spring:
   application:

@@ -6,6 +6,6 @@ public class ProjectUserExistedException extends BadRequestException {
 
   public ProjectUserExistedException() {
     setStatus(400);
-    setCode("org.ghtk.todo_list.exception.ProjectUserExistedException");
+    setCode("ProjectUserExistedException");
   }
 }

@@ -6,6 +6,6 @@ public class AccountLockedException extends BadRequestException {
 
   public AccountLockedException() {
     setStatus(400);
-    setCode("org.ghtk.todo_list.exception.AccountLockedException");
+    setCode("AccountLockedException");
   }
 }

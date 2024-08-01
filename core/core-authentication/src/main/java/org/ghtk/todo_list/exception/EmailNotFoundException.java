@@ -6,7 +6,7 @@ public class EmailNotFoundException extends NotFoundException {
 
   public EmailNotFoundException(String email) {
     setStatus(404);
-    setCode("org.ghtk.todo_list.exception.EmailNotFoundException");
+    setCode("EmailNotFoundException");
     addParams("email", email);
   }
 }

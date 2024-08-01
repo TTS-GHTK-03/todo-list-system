@@ -6,6 +6,6 @@ public class PasswordConfirmNotMatchException extends BadRequestException {
 
   public PasswordConfirmNotMatchException() {
     setStatus(400);
-    setCode("org.ghtk.todo_list.exception.PasswordConfirmNotMatchException");
+    setCode("PasswordConfirmNotMatchException");
   }
 }

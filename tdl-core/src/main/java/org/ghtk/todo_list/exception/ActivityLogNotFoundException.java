@@ -6,6 +6,6 @@ public class ActivityLogNotFoundException extends NotFoundException {
 
   public ActivityLogNotFoundException() {
     setStatus(404);
-    setCode("org.ghtk.todo_list.exception.ActivityLogNotFoundException");
+    setCode("ActivityLogNotFoundException");
   }
 }

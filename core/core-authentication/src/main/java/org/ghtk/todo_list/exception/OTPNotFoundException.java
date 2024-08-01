@@ -6,7 +6,7 @@ public class OTPNotFoundException extends NotFoundException {
 
   public OTPNotFoundException(String email) {
     setStatus(404);
-    setCode("org.ghtk.todo_list.exception.OTPNotFoundException");
+    setCode("OTPNotFoundException");
     addParams("email", email);
   }
 }

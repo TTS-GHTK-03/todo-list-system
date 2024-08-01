@@ -6,6 +6,6 @@ public class AccountNotFoundException extends NotFoundException {
 
   public AccountNotFoundException() {
     setStatus(404);
-    setCode("org.ghtk.todo_list.exception.AccountNotFoundException");
+    setCode("AccountNotFoundException");
   }
 }

@@ -6,7 +6,7 @@ public class UsernameNotFoundException extends NotFoundException {
 
   public UsernameNotFoundException(String username) {
     setStatus(404);
-    setCode("org.ghtk.todo_list.exception.UsernameNotFoundException");
+    setCode("UsernameNotFoundException");
     addParams("username", username);
   }
 }

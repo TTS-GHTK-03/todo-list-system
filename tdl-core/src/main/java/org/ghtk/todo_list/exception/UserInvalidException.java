@@ -6,6 +6,6 @@ public class UserInvalidException extends BadRequestException {
 
   public UserInvalidException(){
     setStatus(400);
-    setCode("org.ghtk.todo_list.exception.UserInvalidException");
+    setCode("UserInvalidException");
   }
 }

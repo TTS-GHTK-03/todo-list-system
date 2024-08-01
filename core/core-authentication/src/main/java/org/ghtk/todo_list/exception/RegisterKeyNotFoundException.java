@@ -6,7 +6,7 @@ public class RegisterKeyNotFoundException extends NotFoundException {
 
   public RegisterKeyNotFoundException(String email) {
     setStatus(404);
-    setCode("org.ghtk.todo_list.exception.RegisterKeyNotFoundException");
+    setCode("RegisterKeyNotFoundException");
     addParams("email", email);
   }
 }
