@@ -6,6 +6,6 @@ public class InvalidOtpException extends BadRequestException {
 
     public InvalidOtpException() {
         setStatus(400);
-        setCode("org.ghtk.todo_list.exception.InvalidOtpException");
+        setCode("InvalidOtpException");
     }
 }

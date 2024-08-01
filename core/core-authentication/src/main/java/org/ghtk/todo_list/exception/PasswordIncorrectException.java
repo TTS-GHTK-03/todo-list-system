@@ -6,7 +6,7 @@ public class PasswordIncorrectException extends BadRequestException {
 
   public PasswordIncorrectException() {
     setStatus(400);
-    setCode("org.ghtk.todo_list.exception.PasswordIncorrectException");
+    setCode("PasswordIncorrectException");
   }
 }
 

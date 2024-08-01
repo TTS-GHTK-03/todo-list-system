@@ -6,7 +6,7 @@ public class UsernameAlreadyExistedException extends ConflictException {
 
   public UsernameAlreadyExistedException(String username) {
     setStatus(409);
-    setCode("org.ghtk.todo_list.exception.UsernameAlreadyExistedException");
+    setCode("UsernameAlreadyExistedException");
     addParams("username", username);
   }
 }

@@ -6,6 +6,6 @@ public class LabelAttachedNotFoundException extends NotFoundException {
 
   public LabelAttachedNotFoundException(){
     setStatus(404);
-    setCode("org.ghtk.todo_list.exception.LabelAttachedNotFoundException");
+    setCode("LabelAttachedNotFoundException");
   }
 }

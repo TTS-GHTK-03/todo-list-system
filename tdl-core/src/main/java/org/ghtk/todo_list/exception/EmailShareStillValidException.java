@@ -6,7 +6,7 @@ public class EmailShareStillValidException extends BadRequestException {
 
   public EmailShareStillValidException(String email) {
     setStatus(400);
-    setCode("org.ghtk.todo_list.exception.EmailShareStillValidException");
+    setCode("EmailShareStillValidException");
     addParams("email", email);
   }
 }

@@ -6,6 +6,6 @@ public class ActivityLogNotExistedException extends BadRequestException {
 
   public ActivityLogNotExistedException() {
     setStatus(400);
-    setCode("org.ghtk.todo_list.exception.ActivityLogNotExistedException");
+    setCode("ActivityLogNotExistedException");
   }
 }

@@ -6,6 +6,6 @@ public class StatusTaskInvalidException extends BadRequestException {
 
   public StatusTaskInvalidException(){
     setStatus(400);
-    setCode("org.ghtk.todo_list.exception.StatusTaskInvalidException");
+    setCode("StatusTaskInvalidException");
   }
 }

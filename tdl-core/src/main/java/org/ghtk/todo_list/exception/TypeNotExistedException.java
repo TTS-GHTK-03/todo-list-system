@@ -6,6 +6,6 @@ public class TypeNotExistedException extends BadRequestException {
 
   public TypeNotExistedException() {
     setStatus(400);
-    setCode("org.ghtk.todo_list.exception.TypeNotExistedException");
+    setCode("TypeNotExistedException");
   }
 }

@@ -6,6 +6,6 @@ public class AccountAlreadyHasUserException extends ConflictException {
 
   public AccountAlreadyHasUserException() {
     setStatus(409);
-    setCode("org.ghtk.todo_list.exception.AccountAlreadyHasUserException");
+    setCode("AccountAlreadyHasUserException");
   }
 }

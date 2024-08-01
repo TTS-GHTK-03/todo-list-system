@@ -6,6 +6,6 @@ public class UserNotFoundException extends NotFoundException {
 
   public UserNotFoundException() {
     setStatus(404);
-    setCode("org.ghtk.todo_list.exception.UserNotFoundException");
+    setCode("UserNotFoundException");
   }
 }

@@ -6,6 +6,6 @@ public class UserUnauthorizedException extends UnauthorizedException {
 
   public UserUnauthorizedException(){
     setStatus(401);
-    setCode("org.ghtk.todo_list.exception.UserUnauthorizedException");
+    setCode("UserUnauthorizedException");
   }
 }

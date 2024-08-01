@@ -6,7 +6,7 @@ public class EmailAlreadyExistedException extends ConflictException {
 
   public EmailAlreadyExistedException(String email) {
     setStatus(409);
-    setCode("org.ghtk.todo_list.exception.EmailAlreadyExistedException");
+    setCode("EmailAlreadyExistedException");
     addParams("email", email);
   }
 }

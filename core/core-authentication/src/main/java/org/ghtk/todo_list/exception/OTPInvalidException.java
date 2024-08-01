@@ -6,7 +6,7 @@ public class OTPInvalidException extends BadRequestException {
 
   public OTPInvalidException(String otp) {
     setStatus(400);
-    setCode("org.ghtk.todo_list.exception.OTPInvalidException");
+    setCode("OTPInvalidException");
     addParams("otp", otp);
   }
 }

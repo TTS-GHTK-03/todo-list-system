@@ -6,6 +6,6 @@ public class TaskNotFoundException extends NotFoundException {
 
   public TaskNotFoundException() {
     setStatus(404);
-    setCode("org.ghtk.todo_list.exception.TaskNotFoundException");
+    setCode("TaskNotFoundException");
   }
 }
