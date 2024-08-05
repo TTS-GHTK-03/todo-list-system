@@ -62,9 +62,8 @@ public class ProjectUserController {
       @Parameter(name = "projectId", description = "Identification project")
       @Valid @RequestParam(value = "projectId") String projectId) {
     log.info("(accept)");
-    projectUserFacadeService.accept(getUserId(), emailEncode, projectId);
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
-        "Accepted invitation!");
+        projectUserFacadeService.accept(getUserId(), emailEncode, projectId));
   }
 
   @PostMapping("/projects/{project_id}/share")

@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.constant.RoleProjectUser;
 import org.ghtk.todo_list.constant.URL;
+import org.ghtk.todo_list.constant.UserActionStatus;
 import org.ghtk.todo_list.core_email.helper.EmailHelper;
 import org.ghtk.todo_list.entity.ActivityLog;
 import org.ghtk.todo_list.entity.AuthUser;
@@ -31,6 +32,7 @@ import org.ghtk.todo_list.exception.UserNotFoundException;
 import org.ghtk.todo_list.facade.ProjectUserFacadeService;
 import org.ghtk.todo_list.model.request.RedisInviteUserRequest;
 import org.ghtk.todo_list.dto.response.UserResponse;
+import org.ghtk.todo_list.model.response.AcceptInviteResponse;
 import org.ghtk.todo_list.service.ActivityLogService;
 import org.ghtk.todo_list.service.AuthTokenService;
 import org.ghtk.todo_list.service.AuthUserService;
@@ -54,23 +56,24 @@ public class ProjectUserFacadeServiceImpl implements ProjectUserFacadeService {
   private final ActivityLogService activityLogService;
 
   @Override
-  public void inviteUser(String userId, String projectId, String email, String role, Boolean reSend) {
+  public void inviteUser(String userId, String projectId, String email, String role,
+      Boolean reSend) {
     log.info("(inviteUser)user: {}, project: {}", userId, projectId);
 
     validateProjectId(projectId);
 
-    if(!RoleProjectUser.isValid(role)){
+    if (!RoleProjectUser.isValid(role)) {
       log.error("(inviteUser)role: {} not found", role);
       throw new RoleProjectUserNotFound();
     }
 
     String invitedUserId = authUserService.getUserId(email);
-    if(projectUserService.existsByUserIdAndProjectId(invitedUserId, projectId)){
+    if (projectUserService.existsByUserIdAndProjectId(invitedUserId, projectId)) {
       log.error("(inviteUser)user: {} already in project: {}", userId, projectId);
       throw new ProjectUserExistedException();
     }
 
-    if(reSend == null || !reSend){
+    if (reSend == null || !reSend) {
       log.info("(inviteUser)reSend: {}", reSend);
       var redisInviteUser = redisCacheService.get(INVITE_KEY + projectId, email);
       if (redisInviteUser.isPresent()) {
@@ -102,15 +105,10 @@ public class ProjectUserFacadeServiceImpl implements ProjectUserFacadeService {
   }
 
   @Override
-  public String accept(String userId, String emailEncode, String projectId) {
+  public AcceptInviteResponse accept(String userId, String emailEncode, String projectId) {
     log.info("(accept)user: {}, email: {}, project: {}", userId, emailEncode, projectId);
 
     String email = decryptionEmailEncode(emailEncode);
-
-    if(!email.equals(authUserService.findById(userId).getEmail())){
-      log.error("(accept)email: {} invalid with token", email);
-      throw new EmailInvalidWithToken(email);
-    }
 
     var redisRequest = redisCacheService.get(INVITE_KEY + projectId, email);
 
@@ -129,32 +127,49 @@ public class ProjectUserFacadeServiceImpl implements ProjectUserFacadeService {
       throw new RoleProjectUserNotFound();
     }
 
-    ProjectUser projectUser = projectUserService.createProjectUser(userId, projectId, role);
-    String acceptEmailKey = generateAcceptEmailKey(email, projectId, role);
-    redisCacheService.delete(INVITE_KEY + projectId, email);
+    AcceptInviteResponse acceptInviteResponse = new AcceptInviteResponse();
+    acceptInviteResponse.setEmail(email);
+    acceptInviteResponse.setProjectId(projectId);
+    if (userId != null && !userId.isEmpty() && !userId.isBlank()) {
+      log.info("(accept)user: log in");
+      if (email.equals(authUserService.findById(userId).getEmail())) {
+        log.info("(accept)email: {} valid with token", email);
+        projectUserService.createProjectUser(userId, projectId, role);
+        redisCacheService.delete(INVITE_KEY + projectId, email);
+        acceptInviteResponse.setStatus(UserActionStatus.LOGGED_ACCEPTED.toString());
 
-    var notification = new ActivityLog();
-    notification.setAction(ACCEPT_INVITE);
-    notification.setUserId(authUserService.findByEmail(email).getId());
-    activityLogService.create(notification);
+        var notification = new ActivityLog();
+        notification.setAction(ACCEPT_INVITE);
+        notification.setUserId(authUserService.findByEmail(email).getId());
+        activityLogService.create(notification);
+      } else {
+        log.warn("(accept)email: {} invalid with token", email);
+        checkEmailAccept(userId, email, projectId, role, acceptInviteResponse);
+      }
+    } else {
+      log.info("(accept)user: not log in");
+      checkEmailAccept(authUserService.findByEmail(email).getId(), email, projectId, role,
+          acceptInviteResponse);
+    }
 
-    //call project page
-    return null;
+    return acceptInviteResponse;
   }
 
   @Override
-  public void shareProject(String userId, String projectId, String email, String role, Time expireTime) {
-    log.info("(shareProject)user: {}, project: {}, email: {}, role: {}, expireDate: {}", userId, projectId, email, role, expireTime);
+  public void shareProject(String userId, String projectId, String email, String role,
+      Time expireTime) {
+    log.info("(shareProject)user: {}, project: {}, email: {}, role: {}, expireDate: {}", userId,
+        projectId, email, role, expireTime);
 
     String sharedUserId = authUserService.getUserId(email);
-    if(projectUserService.existsByUserIdAndProjectId(sharedUserId, projectId)){
+    if (projectUserService.existsByUserIdAndProjectId(sharedUserId, projectId)) {
       log.error("(shareProject)user: {} already in project: {}", userId, projectId);
       throw new ProjectUserExistedException();
     }
 
     validateProjectId(projectId);
 
-    if(!RoleProjectUser.isValid(role)){
+    if (!RoleProjectUser.isValid(role)) {
       log.error("(shareProject)role: {} not found", role);
       throw new RoleProjectUserNotFound();
     }
@@ -174,7 +189,8 @@ public class ProjectUserFacadeServiceImpl implements ProjectUserFacadeService {
     int minutes = expireTime.getMinutes();
     int second = expireTime.getSeconds();
 
-    String shareToken = authTokenService.generateShareToken(email, role, projectId, (long)(hours * 3600 + minutes * 60 + second) * 1000);
+    String shareToken = authTokenService.generateShareToken(email, role, projectId,
+        (long) (hours * 3600 + minutes * 60 + second) * 1000);
 
     param.put("projectId", projectId);
     param.put("email", email);
@@ -182,7 +198,8 @@ public class ProjectUserFacadeServiceImpl implements ProjectUserFacadeService {
     param.put("shareToken", shareToken);
     emailHelper.send(subject, email, "email-share-project-template", param);
 
-    redisCacheService.save(SHARE_KEY + projectId + email, email, MAIL_TTL_MINUTES, TimeUnit.MINUTES);
+    redisCacheService.save(SHARE_KEY + projectId + email, email, MAIL_TTL_MINUTES,
+        TimeUnit.MINUTES);
 
     var notification = new ActivityLog();
     notification.setAction(SHARE_KEY);
@@ -200,7 +217,7 @@ public class ProjectUserFacadeServiceImpl implements ProjectUserFacadeService {
     String role = claims.get("role", String.class);
     String projectId = claims.get("projectId", String.class);
 
-    if(!email.equals(authUserService.findById(userId).getEmail())){
+    if (!email.equals(authUserService.findById(userId).getEmail())) {
       log.error("(viewShareProject)email: {} invalid with token", email);
       throw new EmailInvalidWithToken(email);
     }
@@ -219,7 +236,7 @@ public class ProjectUserFacadeServiceImpl implements ProjectUserFacadeService {
     validateProjectId(projectId);
 
     List<UserResponse> userResponseList = authUserService.getAllUserByProject(projectId);
-    for(UserResponse userResponse : userResponseList){
+    for (UserResponse userResponse : userResponseList) {
       userResponse.setRole(projectUserService.getRoleProjectUser(userResponse.getId(), projectId));
     }
     return userResponseList;
@@ -228,15 +245,16 @@ public class ProjectUserFacadeServiceImpl implements ProjectUserFacadeService {
   @Override
   @Transactional
   public String updateRoleProjectUser(String projectId, String memberId, String role) {
-    log.info("(updateRoleProjectUser)projectId: {}, memberId: {}, role: {}", projectId, memberId, role);
+    log.info("(updateRoleProjectUser)projectId: {}, memberId: {}, role: {}", projectId, memberId,
+        role);
     validateProjectId(projectId);
 
-    if(!RoleProjectUser.isValid(role)){
+    if (!RoleProjectUser.isValid(role)) {
       log.error("(updateRoleProjectUser)role: {} not found", role);
       throw new RoleProjectUserNotFound();
     }
 
-    if(!authUserService.existById(memberId)){
+    if (!authUserService.existById(memberId)) {
       log.error("(updateRoleProjectUser)memberId: {} not found", memberId);
       throw new UserNotFoundException();
     }
@@ -262,7 +280,7 @@ public class ProjectUserFacadeServiceImpl implements ProjectUserFacadeService {
       fullName = "Admin";
     }
     param.put("email", userMember.getEmail());
-    param.put("title", fullName+" kicked you out of the project: " + project.getTitle());
+    param.put("title", fullName + " kicked you out of the project: " + project.getTitle());
     param.put("subtitle", "If you want to join with our, contact me!");
     emailHelper.send(subject, userMember.getEmail(), "email-kick-user-in-project-template", param);
 
@@ -309,5 +327,24 @@ public class ProjectUserFacadeServiceImpl implements ProjectUserFacadeService {
       return "";
     }
     return name.substring(0, 1).toUpperCase() + name.substring(1).toLowerCase();
+  }
+
+  private void checkEmailAccept(String userId, String email, String projectId, String role,
+      AcceptInviteResponse acceptInviteResponse) {
+    log.info("(checkEmailAccept)email: {}", email);
+    if (authUserService.existsByEmail(email)) {
+      log.info("(checkEmailAccept)email: {} existed", email);
+      projectUserService.createProjectUser(userId, projectId, role);
+      redisCacheService.delete(INVITE_KEY + projectId, email);
+      acceptInviteResponse.setStatus(UserActionStatus.ACCEPTED.toString());
+
+      var notification = new ActivityLog();
+      notification.setAction(ACCEPT_INVITE);
+      notification.setUserId(authUserService.findByEmail(email).getId());
+      activityLogService.create(notification);
+    } else {
+      log.warn("(checkEmailAccept)email: {} not existed", email);
+      acceptInviteResponse.setStatus(UserActionStatus.UNREGISTERED.toString());
+    }
   }
 }
