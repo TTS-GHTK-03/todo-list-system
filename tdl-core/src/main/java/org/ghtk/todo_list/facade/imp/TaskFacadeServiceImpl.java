@@ -494,7 +494,7 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
     }
     validateProjectId(projectId);
 
-    List<TaskDetailResponse> taskDetailResponseList = taskMapper.toTaskDetailResponses(
+    List<TaskDetailResponse> taskDetailResponseList = taskMapper.toTaskDetailResponsesWithUserId(
         taskService.getAllTasksByProjectIdAndStatus(projectId, statusFormat));
     for (TaskDetailResponse taskDetailResponse : taskDetailResponseList) {
       log.info("(getAllTaskByProjectIdAndStatus)taskDetailResponse: {}", taskDetailResponse);

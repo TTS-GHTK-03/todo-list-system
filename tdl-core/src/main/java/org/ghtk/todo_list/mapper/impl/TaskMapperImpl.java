@@ -25,7 +25,7 @@ public class TaskMapperImpl implements TaskMapper {
   }
 
   @Override
-  public List<TaskDetailResponse> toTaskDetailResponses(List<Task> tasks) {
+  public List<TaskDetailResponse> toTaskDetailResponsesWithUserId(List<Task> tasks) {
     return tasks.stream().map(task -> {
       return TaskDetailResponse.builder()
           .id(task.getId())
