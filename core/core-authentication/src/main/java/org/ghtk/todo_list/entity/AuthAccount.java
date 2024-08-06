@@ -20,7 +20,7 @@ public class AuthAccount extends BaseEntity {
   private Boolean isFirstLogin = true;
 
   public static AuthAccount of(String username, String password) {
-    return AuthAccount.of(username, password, false, false, true);
+    return AuthAccount.of(username, password, true, false, true);
   }
 
 }
