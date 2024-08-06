@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.ghtk.todo_list.dto.response.UserResponse;
 
 @Getter
 @Setter
@@ -18,7 +19,7 @@ public class TaskDetailResponse {
   private Integer point;
   private String status;
   private String keyProjectTask;
-  private String userId;
+  private UserResponse userResponse;
   private String sprintId;
   private String sprintTitle;
 }

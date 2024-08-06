@@ -148,7 +148,7 @@ public class ProjectUserFacadeServiceImpl implements ProjectUserFacadeService {
       }
     } else {
       log.info("(accept)user: not log in");
-      checkEmailAccept(authUserService.findByEmail(email).getId(), email, projectId, role,
+      checkEmailAccept(null, email, projectId, role,
           acceptInviteResponse);
     }
 
