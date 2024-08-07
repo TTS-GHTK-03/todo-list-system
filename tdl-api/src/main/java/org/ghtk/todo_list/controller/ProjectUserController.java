@@ -73,7 +73,7 @@ public class ProjectUserController {
       @PathVariable(name = "project_id") String projectId,
       @RequestBody @Valid ShareUserRequest shareUserRequest) {
     log.info("(shareProject)projectId: {}", projectId);
-    //bổ sung vào base authorization
+    baseAuthorization.roleAdmin(getUserId(), projectId);
     projectUserFacadeService.shareProject(getUserId(), projectId, shareUserRequest.getEmail(),
         shareUserRequest.getRole(), shareUserRequest.getExpireTime());
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
