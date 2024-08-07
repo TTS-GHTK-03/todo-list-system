@@ -97,7 +97,7 @@ public class ProjectUserController {
       @Parameter(name = "project_id", description = "Identification project")
       @PathVariable("project_id") String projectId) {
     log.info("(getAllUserByProject)projectId: {}", projectId);
-    baseAuthorization.roleAdmin(getUserId(), projectId);
+    baseAuthorization.roleAdminAndEdit(getUserId(), projectId);
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         projectUserFacadeService.getAllUserByProject(getUserId(), projectId));
   }
