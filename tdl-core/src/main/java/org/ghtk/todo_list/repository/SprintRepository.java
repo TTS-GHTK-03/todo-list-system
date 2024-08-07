@@ -21,12 +21,6 @@ public interface SprintRepository extends JpaRepository<Sprint, String> {
       """)
   List<Sprint> findByProjectIdAndStatus(String projectId, String status);
 
-  @Query("""
-      SELECT sp FROM Sprint sp
-      WHERE sp.projectId = :projectId AND sp.id = :sprintId
-      """)
-  Sprint findByProjectIdAndSprintId(String projectId, String sprintId);
-
   boolean existsByProjectIdAndTitle(String projectId, String title);
 
   void deleteAllByProjectId(String projectId);

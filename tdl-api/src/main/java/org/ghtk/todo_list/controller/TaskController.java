@@ -185,7 +185,6 @@ public class TaskController {
     baseAuthorization.roleAdminAndEdit(getUserId(), projectId);
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         taskFacadeService.updateStartDateDueDateTask(getUserId(), projectId, sprintId, taskId,
-            updateDueDateTaskRequest.getStatusTaskKey(),
             updateDueDateTaskRequest.getDueDate()));
   }
 

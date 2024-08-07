@@ -24,7 +24,9 @@ import org.ghtk.todo_list.exception.DueDateTaskInvalidSprintEndDateException;
 import org.ghtk.todo_list.exception.DueDateTaskInvalidStartDateException;
 import org.ghtk.todo_list.exception.ProjectNotFoundException;
 import org.ghtk.todo_list.exception.RoleProjectNotAllowException;
+import org.ghtk.todo_list.exception.SprintDoneException;
 import org.ghtk.todo_list.exception.SprintNotFoundException;
+import org.ghtk.todo_list.exception.SprintNotStartException;
 import org.ghtk.todo_list.exception.StatusTaskInvalidException;
 import org.ghtk.todo_list.exception.TaskAssignmentExistsException;
 import org.ghtk.todo_list.exception.TaskNotExistUserException;
@@ -144,7 +146,7 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
   @Override
   @Transactional
   public TaskResponse updatePointTask(String userId, String projectId, String taskId, int point) {
-    log.info("(updateStatusTask)taskId: {},projectId: {}", taskId, projectId);
+    log.info("(updatePointTask)taskId: {},projectId: {}", taskId, projectId);
     validateProjectId(projectId);
     return taskService.updatePoint(taskId, point, userId);
   }
@@ -279,31 +281,38 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
 
   @Override
   public UpdateDueDateTaskResponse updateStartDateDueDateTask(String userId, String projectId,
-      String sprintId, String taskId, String statusTaskKey, String dueDate) {
+      String sprintId, String taskId, String dueDate) {
     log.info("(updateStartDateDueDateTask)projectId: {}, sprintId: {}, taskId: {}", projectId,
         sprintId, taskId);
 
     validateUserId(userId);
     validateProjectId(projectId);
     validateSprintId(sprintId);
+
+    Sprint sprint = sprintService.findById(sprintId);
+
+    if(sprint.getStatus().equals(SprintStatus.COMPLETE.toString())) {
+      log.error("(updateStartDateDueDateTask)sprintId: {} done", sprintId);
+      throw new SprintDoneException();
+    }
+
+    if(!sprint.getStatus().equals(SprintStatus.START.toString())) {
+      log.error("(updateStartDateDueDateTask)sprintId: {} not start", sprintId);
+      throw new SprintNotStartException();
+    }
+
     validateTaskId(taskId);
-    validateDueDateTask(projectId, sprintId, dueDate);
+    validateDueDateTask(sprint, dueDate);
 
     var redisStatusTaskKey = redisCacheService.get(UPDATE_STATUS_TASK, taskId);
     if (redisStatusTaskKey.isEmpty()) {
-      log.error("(updateStartDateDueDateTask)statusTaskKey: {} not found", statusTaskKey);
+      log.error("(updateStartDateDueDateTask)redisStatusTaskKey not found");
       throw new StatusTaskKeyNotFoundException();
     }
     redisCacheService.delete(UPDATE_STATUS_TASK, taskId);
 
-    String roleProjectUser = projectUserService.getRoleProjectUser(userId, projectId);
-    if (roleProjectUser.equals(RoleProjectUser.VIEWER.toString())) {
-      log.error("(updateStartDateDueDateTask)role: {} not allowed", roleProjectUser);
-      throw new RoleProjectNotAllowException();
-    }
-
     var notification = new ActivityLog();
-    notification.setAction(UPDATE_DUE_DATE_TASK);
+    notification.setAction(taskId + UPDATE_STATUS_TASK_KEY);
     notification.setUserId(userId);
     notification.setTaskId(taskId);
     activityLogService.create(notification);
@@ -469,9 +478,8 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
     }
   }
 
-  void validateDueDateTask(String projectId, String sprintId, String dueDate) {
-    log.info("(validateDueDateTask)projectId: {}, sprintId: {}", projectId, sprintId);
-    Sprint sprint = sprintService.findSprintByProjectIdAndSprintId(projectId, sprintId);
+  void validateDueDateTask(Sprint sprint, String dueDate) {
+    log.info("(validateDueDateTask)sprint: {}, dueDate: {}", sprint, dueDate);
 
     if (!LocalDate.now().isBefore(LocalDate.parse(dueDate))) {
       log.error("(validateDueDateTask)dueDate: {} invalid", dueDate);

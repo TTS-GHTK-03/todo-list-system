@@ -14,10 +14,6 @@ import org.ghtk.todo_list.validation.ValidateLocalDate;
 @NoArgsConstructor
 public class UpdateDueDateTaskRequest {
 
-  @NotBlank(message = "Status task key is required")
-  @Schema(description = "Status task key", example = "abc")
-  private String statusTaskKey;
-
   @NotBlank(message = "Due date is required")
   @ValidateLocalDate
   @Schema(description = "Due date", example = "2022-09-01")
