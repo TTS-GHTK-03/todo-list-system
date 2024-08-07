@@ -22,7 +22,7 @@ public interface TaskFacadeService {
   TaskAssignees agileTaskByUser(String email, String id);
   TaskResponse cloneTask(String userId, String projectId, String taskId);
   UpdateDueDateTaskResponse updateStartDateDueDateTask(String userId, String projectId,
-      String sprintId, String taskId, String statusTaskKey, String dueDate);
+      String sprintId, String taskId, String dueDate);
   List<TaskDetailResponse> getAllTaskByProjectIdAndStatus(String userId,String projectId, String status);
   List<TaskResponse> getAllBySprintId(String projectId, String sprintId);
   TaskResponse createTask(String userId, String projectId, String title);
