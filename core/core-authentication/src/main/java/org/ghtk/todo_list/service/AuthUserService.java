@@ -13,6 +13,7 @@ public interface AuthUserService {
 
   AuthUser findById(String id);
   AuthUser create(String email, String accountId);
+  AuthUser createTemporaryUser(String email);
   boolean existsByEmail(String email);
   boolean existById(String id);
   Optional<AuthUser> findByAccountId(String accountId);
