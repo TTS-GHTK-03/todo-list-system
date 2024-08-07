@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.constant.RoleProjectUser;
 import org.ghtk.todo_list.constant.SprintStatus;
 import org.ghtk.todo_list.constant.TaskStatus;
+import org.ghtk.todo_list.dto.response.UserResponse;
 import org.ghtk.todo_list.entity.ActivityLog;
 import org.ghtk.todo_list.entity.Project;
 import org.ghtk.todo_list.entity.Task;
@@ -31,6 +32,7 @@ import org.ghtk.todo_list.exception.TaskNotFoundException;
 import org.ghtk.todo_list.exception.StatusTaskKeyNotFoundException;
 import org.ghtk.todo_list.exception.UserNotFoundException;
 import org.ghtk.todo_list.facade.TaskFacadeService;
+import org.ghtk.todo_list.mapper.UserResponseMapper;
 import org.ghtk.todo_list.model.response.SprintsProjectDetailResponse;
 import org.ghtk.todo_list.mapper.TaskMapper;
 import org.ghtk.todo_list.model.response.TaskDetailResponse;
@@ -91,7 +93,9 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
     validateProjectId(projectId);
     List<TaskDetailResponse> taskDetailResponseList = taskService.getAllTaskDetailByProjectId(projectId);
     for (TaskDetailResponse taskDetailResponse : taskDetailResponseList) {
-      taskDetailResponse.setUserId(taskAssigneesService.findUserIdByTaskId(taskDetailResponse.getId()));
+      log.info("(getAllTaskByProjectId)taskDetailResponse: {}", taskDetailResponse);
+      UserResponse userResponse = authUserService.getUserResponseById(taskAssigneesService.findUserIdByTaskId(taskDetailResponse.getId()));
+      taskDetailResponse.setUserResponse(userResponse);
       if (taskDetailResponse.getSprintId() != null) {
         taskDetailResponse.setSprintTitle(
             sprintService.findById(taskDetailResponse.getSprintId()).getTitle());
@@ -490,9 +494,12 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
     }
     validateProjectId(projectId);
 
-    List<TaskDetailResponse> taskDetailResponseList = taskMapper.toTaskDetailResponses(
+    List<TaskDetailResponse> taskDetailResponseList = taskMapper.toTaskDetailResponsesWithUserId(
         taskService.getAllTasksByProjectIdAndStatus(projectId, statusFormat));
     for (TaskDetailResponse taskDetailResponse : taskDetailResponseList) {
+      log.info("(getAllTaskByProjectIdAndStatus)taskDetailResponse: {}", taskDetailResponse);
+      UserResponse userResponse = authUserService.getUserResponseById(taskDetailResponse.getUserResponse().getId());
+      taskDetailResponse.setUserResponse(userResponse);
       if (taskDetailResponse.getSprintId() != null) {
         taskDetailResponse.setSprintTitle(sprintService.findById(taskDetailResponse.getSprintId()).getTitle());
       }
