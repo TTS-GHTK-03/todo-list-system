@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.ghtk.todo_list.constant.RegisterResponse;
 import org.ghtk.todo_list.dto.request.VerifyEmailRequest;
 import org.ghtk.todo_list.dto.request.VerifyRegisterRequest;
 import org.ghtk.todo_list.dto.request.ForgotPasswordRequest;
@@ -56,7 +57,7 @@ public class AuthUserController {
   @PostMapping("/register/email/validate")
   @ResponseStatus(HttpStatus.OK)
   @Operation(description = "Verify email")
-  public BaseResponse<String> verifyEmail(@RequestBody @Valid VerifyEmailRequest request) {
+  public BaseResponse<RegisterResponse> verifyEmail(@RequestBody @Valid VerifyEmailRequest request) {
     log.info("(verifyEmail)email: {}", request.getEmail());
     return BaseResponse.of(HttpStatus.CREATED.value(), LocalDateTime.now().toString(),
         authFacadeService.verifyEmail(request));

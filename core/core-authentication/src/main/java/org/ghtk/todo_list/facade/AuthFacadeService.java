@@ -1,5 +1,6 @@
 package org.ghtk.todo_list.facade;
 
+import org.ghtk.todo_list.constant.RegisterResponse;
 import org.ghtk.todo_list.dto.request.VerifyEmailRequest;
 import org.ghtk.todo_list.dto.request.VerifyRegisterRequest;
 import org.ghtk.todo_list.dto.request.ForgotPasswordRequest;
@@ -21,7 +22,7 @@ public interface AuthFacadeService {
   LoginResponse login(LoginRequest request);
 
   void resetPassword(ResetPasswordRequest request);
-  String verifyEmail(VerifyEmailRequest request);
+  RegisterResponse verifyEmail(VerifyEmailRequest request);
   void changePassword(ChangePasswordRequest request, String userId);
   void resendOtp(ResendOtpRequest request);
 }

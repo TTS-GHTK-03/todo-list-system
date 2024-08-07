@@ -26,4 +26,5 @@ public interface AuthUserService {
   AuthUser findByUnassigned();
   List<UserResponse> getAllUserByProject(String projectId);
   AuthUser findByEmail(String email);
+  boolean existsByEmailAndAccountId(String email, String accountId);
 }

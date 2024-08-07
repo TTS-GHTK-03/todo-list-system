@@ -9,6 +9,7 @@ import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.constant.AccountLockedTime;
+import org.ghtk.todo_list.constant.RegisterResponse;
 import org.ghtk.todo_list.constant.ResendOtpType;
 import org.ghtk.todo_list.core_email.helper.EmailHelper;
 import org.ghtk.todo_list.dto.request.VerifyEmailRequest;
@@ -41,6 +42,9 @@ import org.ghtk.todo_list.service.RedisCacheService;
 import org.ghtk.todo_list.util.CryptUtil;
 
 import static org.ghtk.todo_list.constant.CacheConstant.*;
+import static org.ghtk.todo_list.constant.RegisterResponse.ACTIVE;
+import static org.ghtk.todo_list.constant.RegisterResponse.INACTIVE;
+import static org.ghtk.todo_list.constant.RegisterResponse.UNREGISTERED;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -208,7 +212,7 @@ public class AuthFacadeServiceImpl implements AuthFacadeService {
   }
 
   @Override
-  public String verifyEmail(VerifyEmailRequest request) {
+  public RegisterResponse verifyEmail(VerifyEmailRequest request) {
     log.info("(verifyEmail)email: {}", request.getEmail());
     if (!authUserService.existsByEmail(request.getEmail())) {
       log.info("(verifyEmail)email don't registered: {}", request.getEmail());
@@ -227,10 +231,14 @@ public class AuthFacadeServiceImpl implements AuthFacadeService {
       param.put("otp", otp);
       param.put("otp_life", String.valueOf(OTP_TTL_MINUTES));
       emailHelper.send(subject, request.getEmail(), "OTP-template", param);
-      return "Register success and otp to activate has been sent to the email";
+      return UNREGISTERED;
     } else {
       log.info("(verifyEmail)email has been registered: {}", request.getEmail());
-      return "Account has been registered";
+      if (authUserService.existsByEmailAndAccountId(request.getEmail(), null)) {
+        return INACTIVE;
+      } else {
+        return ACTIVE;
+      }
     }
   }
 
