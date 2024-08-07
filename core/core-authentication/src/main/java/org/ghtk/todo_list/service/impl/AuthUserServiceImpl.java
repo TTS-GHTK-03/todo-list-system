@@ -151,6 +151,12 @@ public class AuthUserServiceImpl implements AuthUserService {
   }
 
   @Override
+  public UserResponse getUserResponseById(String userId) {
+    log.info("(getUserResponseById)userId: {}", userId);
+    return userResponseMapper.toUserResponse(repository.findById(userId).get());
+  }
+
+  @Override
   public AuthUser findByEmail(String email) {
     log.info("(findByEmail)email: {}", email);
     return repository

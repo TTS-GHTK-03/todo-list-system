@@ -145,10 +145,16 @@ public class TaskController {
       @PathVariable("task_id") String taskId,
       @Parameter(name = "sprint_id", description = "Identification sprint")
       @PathVariable("sprint_id") String sprintId) {
-    log.info("(updateSprintTask)");
     baseAuthorization.roleAdminAndEdit(getUserId(), projectId);
-    return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
-        taskFacadeService.updateSprintTask(getUserId(), projectId, sprintId, taskId));
+    if (sprintId.equals("null")) {
+      log.warn("(updateSprintTask)sprint: {}", sprintId);
+      return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
+          taskFacadeService.updateSprintTask(getUserId(), projectId, null, taskId));
+    } else {
+      log.info("(updateSprintTask)sprint: {}", sprintId);
+      return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
+          taskFacadeService.updateSprintTask(getUserId(), projectId, sprintId, taskId));
+    }
   }
 
   @PostMapping("/{project_id}/tasks/{task_id}/clone")
@@ -179,7 +185,6 @@ public class TaskController {
     baseAuthorization.roleAdminAndEdit(getUserId(), projectId);
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         taskFacadeService.updateStartDateDueDateTask(getUserId(), projectId, sprintId, taskId,
-            updateDueDateTaskRequest.getStatusTaskKey(),
             updateDueDateTaskRequest.getDueDate()));
   }
 

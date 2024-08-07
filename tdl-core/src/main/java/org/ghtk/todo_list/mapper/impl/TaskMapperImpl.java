@@ -2,6 +2,7 @@ package org.ghtk.todo_list.mapper.impl;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import org.ghtk.todo_list.dto.response.UserResponse;
 import org.ghtk.todo_list.entity.Task;
 import org.ghtk.todo_list.mapper.TaskMapper;
 import org.ghtk.todo_list.model.response.TaskDetailResponse;
@@ -24,7 +25,7 @@ public class TaskMapperImpl implements TaskMapper {
   }
 
   @Override
-  public List<TaskDetailResponse> toTaskDetailResponses(List<Task> tasks) {
+  public List<TaskDetailResponse> toTaskDetailResponsesWithUserId(List<Task> tasks) {
     return tasks.stream().map(task -> {
       return TaskDetailResponse.builder()
           .id(task.getId())
@@ -32,7 +33,7 @@ public class TaskMapperImpl implements TaskMapper {
           .point(task.getPoint())
           .status(task.getStatus())
           .keyProjectTask(task.getKeyProjectTask())
-          .userId(task.getUserId())
+          .userResponse(new UserResponse(task.getUserId(), null, null, null, null, null))
           .sprintId(task.getSprintId())
           .sprintTitle(null)
           .build();
