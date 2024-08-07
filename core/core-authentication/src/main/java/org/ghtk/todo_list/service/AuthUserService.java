@@ -27,4 +27,5 @@ public interface AuthUserService {
   List<UserResponse> getAllUserByProject(String projectId);
   UserResponse getUserResponseById(String userId);
   AuthUser findByEmail(String email);
+  boolean existsByEmailAndAccountId(String email, String accountId);
 }

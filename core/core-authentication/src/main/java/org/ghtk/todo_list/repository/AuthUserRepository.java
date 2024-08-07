@@ -54,4 +54,6 @@ public interface AuthUserRepository extends JpaRepository<AuthUser, String>,
   List<AuthUser> getAllUserByProject(String projectId);
 
   Optional<AuthUser> findByEmail(String email);
+
+  boolean existsByEmailAndAccountId(String email, String accountId);
 }

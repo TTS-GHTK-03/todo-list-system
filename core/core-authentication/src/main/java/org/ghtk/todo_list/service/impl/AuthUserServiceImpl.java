@@ -168,6 +168,12 @@ public class AuthUserServiceImpl implements AuthUserService {
   }
 
   @Override
+  public boolean existsByEmailAndAccountId(String email, String accountId) {
+    log.info("(existsByEmailAndAccountId)email: {}, accountId: {}", email, accountId);
+    return repository.existsByEmailAndAccountId(email, accountId);
+  }
+
+  @Override
   public UserProjection getByUserId(String userId) {
     log.info("(getByUserId)userId: {}", userId);
     return repository.findByUserId(userId)
