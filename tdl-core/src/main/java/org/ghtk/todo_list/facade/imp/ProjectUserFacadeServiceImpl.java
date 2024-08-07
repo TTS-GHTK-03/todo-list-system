@@ -20,7 +20,6 @@ import org.ghtk.todo_list.core_email.helper.EmailHelper;
 import org.ghtk.todo_list.entity.ActivityLog;
 import org.ghtk.todo_list.entity.AuthUser;
 import org.ghtk.todo_list.entity.Project;
-import org.ghtk.todo_list.entity.ProjectUser;
 import org.ghtk.todo_list.exception.EmailInvalidWithToken;
 import org.ghtk.todo_list.exception.EmailInviteStillValidException;
 import org.ghtk.todo_list.exception.EmailNotInviteException;
@@ -28,11 +27,13 @@ import org.ghtk.todo_list.exception.EmailShareStillValidException;
 import org.ghtk.todo_list.exception.ProjectNotFoundException;
 import org.ghtk.todo_list.exception.ProjectUserExistedException;
 import org.ghtk.todo_list.exception.RoleProjectUserNotFound;
+import org.ghtk.todo_list.exception.RoleSharedUserExceededException;
 import org.ghtk.todo_list.exception.UserNotFoundException;
 import org.ghtk.todo_list.facade.ProjectUserFacadeService;
 import org.ghtk.todo_list.model.request.RedisInviteUserRequest;
 import org.ghtk.todo_list.dto.response.UserResponse;
 import org.ghtk.todo_list.model.response.AcceptInviteResponse;
+import org.ghtk.todo_list.model.response.AcceptShareResponse;
 import org.ghtk.todo_list.service.ActivityLogService;
 import org.ghtk.todo_list.service.AuthTokenService;
 import org.ghtk.todo_list.service.AuthUserService;
@@ -56,7 +57,7 @@ public class ProjectUserFacadeServiceImpl implements ProjectUserFacadeService {
   private final ActivityLogService activityLogService;
 
   @Override
-  public void inviteUser(String userId, String projectId, String email, String role,
+  public void inviteUser(String userId, String projectId, String invitedUserEmail, String role,
       Boolean reSend) {
     log.info("(inviteUser)user: {}, project: {}", userId, projectId);
 
@@ -67,36 +68,37 @@ public class ProjectUserFacadeServiceImpl implements ProjectUserFacadeService {
       throw new RoleProjectUserNotFound();
     }
 
-    String invitedUserId = authUserService.getUserId(email);
-    if (projectUserService.existsByUserIdAndProjectId(invitedUserId, projectId)) {
+    String invitedUserId = authUserService.getUserId(invitedUserEmail);
+    if (invitedUserId != null && projectUserService.existsByUserIdAndProjectId(invitedUserId,
+        projectId)) {
       log.error("(inviteUser)user: {} already in project: {}", userId, projectId);
       throw new ProjectUserExistedException();
     }
 
     if (reSend == null || !reSend) {
       log.info("(inviteUser)reSend: {}", reSend);
-      var redisInviteUser = redisCacheService.get(INVITE_KEY + projectId, email);
+      var redisInviteUser = redisCacheService.get(INVITE_KEY + projectId, invitedUserEmail);
       if (redisInviteUser.isPresent()) {
-        log.error("(inviteUser)email: {} already invited", email);
-        throw new EmailInviteStillValidException(email);
+        log.error("(inviteUser)email: {} already invited", invitedUserEmail);
+        throw new EmailInviteStillValidException(invitedUserEmail);
       }
     }
 
     var subject = "Admin has invited you to join their project";
     var param = new HashMap<String, Object>();
-    String emailEncode = encodeEmail(email);
+    String emailEncode = encodeEmail(invitedUserEmail);
 
-    param.put("email", email);
+    param.put("email", invitedUserEmail);
     param.put("projectId", projectId);
     param.put("domain", URL.DOMAIN);
     param.put("emailEncode", emailEncode);
-    emailHelper.send(subject, email, "email-invite-to-project-template", param);
+    emailHelper.send(subject, invitedUserEmail, "email-invite-to-project-template", param);
 
     RedisInviteUserRequest redisInviteUserRequest = new RedisInviteUserRequest();
     redisInviteUserRequest.setProjectId(projectId);
     redisInviteUserRequest.setRole(role);
 
-    redisCacheService.save(INVITE_KEY + projectId, email, redisInviteUserRequest);
+    redisCacheService.save(INVITE_KEY + projectId, invitedUserEmail, redisInviteUserRequest);
 
     var notification = new ActivityLog();
     notification.setAction(INVITE_USER);
@@ -156,16 +158,10 @@ public class ProjectUserFacadeServiceImpl implements ProjectUserFacadeService {
   }
 
   @Override
-  public void shareProject(String userId, String projectId, String email, String role,
+  public void shareProject(String userId, String projectId, String sharedUserEmail, String role,
       Time expireTime) {
-    log.info("(shareProject)user: {}, project: {}, email: {}, role: {}, expireDate: {}", userId,
-        projectId, email, role, expireTime);
-
-    String sharedUserId = authUserService.getUserId(email);
-    if (projectUserService.existsByUserIdAndProjectId(sharedUserId, projectId)) {
-      log.error("(shareProject)user: {} already in project: {}", userId, projectId);
-      throw new ProjectUserExistedException();
-    }
+    log.info("(shareProject)user: {}, project: {}, sharedUserEmail: {}, role: {}, expireTime: {}",
+        userId, projectId, sharedUserEmail, role, expireTime);
 
     validateProjectId(projectId);
 
@@ -174,12 +170,26 @@ public class ProjectUserFacadeServiceImpl implements ProjectUserFacadeService {
       throw new RoleProjectUserNotFound();
     }
 
-    //Bo sung check quyen nguoi moi
+    String sharerRole = projectUserService.getRoleProjectUser(userId, projectId);
+    if ((sharerRole.equals(RoleProjectUser.ADMIN.toString()) && role.equals(
+        RoleProjectUser.ADMIN.toString())) || (
+        sharerRole.equals(RoleProjectUser.EDIT.toString()) && !role.equals(
+            RoleProjectUser.VIEWER.toString()))) {
+      log.error("(shareProject)role: {} exceeded sharerRole: {}", role, sharerRole);
+      throw new RoleSharedUserExceededException();
+    }
 
-    var redisShareUser = redisCacheService.get(SHARE_KEY + projectId + email);
+    String sharedUserId = authUserService.getUserId(sharedUserEmail);
+    if (sharedUserId != null && projectUserService.existsByUserIdAndProjectId(sharedUserId,
+        projectId)) {
+      log.error("(shareProject)user: {} already in project: {}", userId, projectId);
+      throw new ProjectUserExistedException();
+    }
+
+    var redisShareUser = redisCacheService.get(SHARE_KEY + projectId + sharedUserEmail);
     if (redisShareUser.isPresent()) {
-      log.error("(shareProject)email: {} already shared", email);
-      throw new EmailShareStillValidException(email);
+      log.error("(shareProject)email: {} already shared", sharedUserEmail);
+      throw new EmailShareStillValidException(sharedUserEmail);
     }
 
     var subject = "Admin shared you to their project in Todo List";
@@ -189,17 +199,17 @@ public class ProjectUserFacadeServiceImpl implements ProjectUserFacadeService {
     int minutes = expireTime.getMinutes();
     int second = expireTime.getSeconds();
 
-    String shareToken = authTokenService.generateShareToken(email, role, projectId,
+    String shareToken = authTokenService.generateShareToken(sharedUserEmail, role, projectId,
         (long) (hours * 3600 + minutes * 60 + second) * 1000);
 
     param.put("projectId", projectId);
-    param.put("email", email);
+    param.put("email", sharedUserEmail);
     param.put("domain", URL.DOMAIN);
     param.put("shareToken", shareToken);
-    emailHelper.send(subject, email, "email-share-project-template", param);
+    emailHelper.send(subject, sharedUserEmail, "email-share-project-template", param);
 
-    redisCacheService.save(SHARE_KEY + projectId + email, email, MAIL_TTL_MINUTES,
-        TimeUnit.MINUTES);
+    redisCacheService.save(SHARE_KEY + projectId + sharedUserEmail, sharedUserEmail,
+        MAIL_TTL_MINUTES, TimeUnit.MINUTES);
 
     var notification = new ActivityLog();
     notification.setAction(SHARE_KEY);
@@ -208,7 +218,7 @@ public class ProjectUserFacadeServiceImpl implements ProjectUserFacadeService {
   }
 
   @Override
-  public String viewShareProject(String userId, String shareToken) {
+  public AcceptShareResponse viewShareProject(String userId, String shareToken) {
     log.info("(viewShareProject)shareToken: {}", shareToken);
 
     Claims claims = authTokenService.getClaimsFromShareToken(shareToken);
@@ -217,17 +227,32 @@ public class ProjectUserFacadeServiceImpl implements ProjectUserFacadeService {
     String role = claims.get("role", String.class);
     String projectId = claims.get("projectId", String.class);
 
-    if (!email.equals(authUserService.findById(userId).getEmail())) {
-      log.error("(viewShareProject)email: {} invalid with token", email);
-      throw new EmailInvalidWithToken(email);
-    }
-
     validateProjectId(projectId);
 
-    var projectUser = projectUserService.createProjectUser(userId, projectId, role);
+    if (!RoleProjectUser.isValid(role)) {
+      log.error("(viewShareProject)role: {} not found", role);
+      throw new RoleProjectUserNotFound();
+    }
 
-    //call login page and return token share
-    return null;
+    AcceptShareResponse acceptShareResponse = new AcceptShareResponse();
+    acceptShareResponse.setEmail(email);
+    acceptShareResponse.setShareToken(shareToken);
+    acceptShareResponse.setProjectId(projectId);
+    if (userId != null && !userId.isEmpty() && !userId.isBlank()) {
+      log.info("(viewShareProject)user: log in");
+      if (email.equals(authUserService.findById(userId).getEmail())) {
+        log.info("(viewShareProject)email: {} valid with token", email);
+        projectUserService.createProjectUser(userId, projectId, role);
+        acceptShareResponse.setStatus(UserActionStatus.LOGGED_ACCEPTED.toString());
+      } else {
+        log.warn("(viewShareProject)email: {} invalid with token", email);
+        checkEmailAcceptShare(userId, email, projectId, role, acceptShareResponse);
+      }
+    } else {
+      log.info("(viewShareProject)user: not log in");
+      checkEmailAcceptShare(null, email, projectId, role, acceptShareResponse);
+    }
+    return acceptShareResponse;
   }
 
   @Override
@@ -299,11 +324,6 @@ public class ProjectUserFacadeServiceImpl implements ProjectUserFacadeService {
     }
   }
 
-  private String generateAcceptEmailKey(String email, String projectId, String role) {
-    return Base64.getEncoder()
-        .encodeToString((email + projectId + role + System.currentTimeMillis()).getBytes());
-  }
-
   private String encodeEmail(String email) {
     return Base64.getEncoder().encodeToString((email).getBytes());
   }
@@ -347,6 +367,22 @@ public class ProjectUserFacadeServiceImpl implements ProjectUserFacadeService {
       AuthUser authUser = authUserService.createTemporaryUser(email);
       projectUserService.createProjectUser(authUser.getId(), projectId, role);
       acceptInviteResponse.setStatus(UserActionStatus.UNREGISTERED.toString());
+    }
+  }
+
+  private void checkEmailAcceptShare(String userId, String email, String projectId, String role,
+      AcceptShareResponse acceptShareResponse) {
+    log.info("(checkEmailAcceptShare)email: {}", email);
+    if (authUserService.existsByEmail(email)) {
+      log.info("(checkEmailAcceptShare)email: {} existed", email);
+      projectUserService.createProjectUser(userId, projectId, role);
+      acceptShareResponse.setStatus(UserActionStatus.ACCEPTED.toString());
+
+    } else {
+      log.warn("(checkEmailAcceptShare)email: {} not existed", email);
+      AuthUser authUser = authUserService.createTemporaryUser(email);
+      projectUserService.createProjectUser(authUser.getId(), projectId, role);
+      acceptShareResponse.setStatus(UserActionStatus.UNREGISTERED.toString());
     }
   }
 }

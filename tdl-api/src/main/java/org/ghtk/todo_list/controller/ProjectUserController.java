@@ -54,7 +54,7 @@ public class ProjectUserController {
         "Invitation sent successfully!");
   }
 
-  @GetMapping("/accept")
+  @PostMapping("/accept")
   @Operation(description = "Accept invitation")
   public BaseResponse<?> accept(
       @Parameter(name = "emailEncode", description = "Email encode")
@@ -73,22 +73,21 @@ public class ProjectUserController {
       @PathVariable(name = "project_id") String projectId,
       @RequestBody @Valid ShareUserRequest shareUserRequest) {
     log.info("(shareProject)projectId: {}", projectId);
-    baseAuthorization.roleAdmin(getUserId(), projectId);
+    baseAuthorization.roleAdminAndEdit(getUserId(), projectId);
     projectUserFacadeService.shareProject(getUserId(), projectId, shareUserRequest.getEmail(),
         shareUserRequest.getRole(), shareUserRequest.getExpireTime());
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
         "Share project successfully!");
   }
 
-  @GetMapping("/view_share")
+  @PostMapping("/view_share")
   @Operation(description = "View share project")
   public BaseResponse<?> viewShareProject(
       @Parameter(name = "shareToken", description = "Share token")
       @Valid @RequestParam(name = "shareToken") String shareToken) {
     log.info("(viewShareProject)shareToken: {}", shareToken);
-    projectUserFacadeService.viewShareProject(getUserId(), shareToken);
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
-        "View share project successfully!");
+        projectUserFacadeService.viewShareProject(getUserId(), shareToken));
   }
 
   @GetMapping("/users/projects/{project_id}")
