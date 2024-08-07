@@ -53,6 +53,18 @@ public class AuthUserServiceImpl implements AuthUserService {
   }
 
   @Override
+  public AuthUser createTemporaryUser(String email) {
+    log.info("(createTemporaryUser)email: {}", email);
+    if (repository.existsByEmail(email)) {
+      log.error("(createTemporaryUser)email: {} already exist", email);
+      throw new EmailAlreadyExistedException(email);
+    }
+
+    return repository.save(AuthUser.from(email));
+  }
+
+
+  @Override
   public boolean existsByEmail(String email) {
     log.info("(existsByEmail)email: {}", email);
     return repository.existsByEmail(email);

@@ -344,6 +344,8 @@ public class ProjectUserFacadeServiceImpl implements ProjectUserFacadeService {
       activityLogService.create(notification);
     } else {
       log.warn("(checkEmailAccept)email: {} not existed", email);
+      AuthUser authUser = authUserService.createTemporaryUser(email);
+      projectUserService.createProjectUser(authUser.getId(), projectId, role);
       acceptInviteResponse.setStatus(UserActionStatus.UNREGISTERED.toString());
     }
   }
