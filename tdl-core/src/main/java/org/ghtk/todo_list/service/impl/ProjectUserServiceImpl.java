@@ -20,7 +20,7 @@ public class ProjectUserServiceImpl implements ProjectUserService {
 
   @Override
   public ProjectUser createProjectUser(String userId, String projectId, String role) {
-    log.info("(createProjectUser)project user: {}", userId);
+    log.info("(createProjectUser)user: {}, project: {}, role: {}", userId, projectId, role);
     ProjectUser projectUser = projectUserMapper.toProjectUser(userId, projectId, role);
     return projectUserRepository.save(projectUser);
   }
