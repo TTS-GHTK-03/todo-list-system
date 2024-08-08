@@ -235,6 +235,7 @@ public class AuthFacadeServiceImpl implements AuthFacadeService {
     } else {
       log.info("(verifyEmail)email has been registered: {}", request.getEmail());
       if (authUserService.existsByEmailAndAccountId(request.getEmail(), null)) {
+        log.info("(verifyEmail)email has been registered and active: {}", request.getEmail());
         return INACTIVE;
       } else {
         return ACTIVE;
