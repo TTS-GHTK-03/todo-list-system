@@ -10,7 +10,6 @@ import org.ghtk.todo_list.validation.ValidatePassword;
 @Data
 public class RegisterRequest {
 
-  @NotBlank(message = "registerKey is required")
   @Schema(description = "Register key", example = "dafagagagasgas==")
   private String registerKey;
   @NotBlank(message = "email is required")
