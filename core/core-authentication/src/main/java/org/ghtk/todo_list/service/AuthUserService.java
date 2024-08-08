@@ -29,4 +29,5 @@ public interface AuthUserService {
   UserResponse getUserResponseById(String userId);
   AuthUser findByEmail(String email);
   boolean existsByEmailAndAccountId(String email, String accountId);
+  void saveUserShare(String email, String accountId);
 }

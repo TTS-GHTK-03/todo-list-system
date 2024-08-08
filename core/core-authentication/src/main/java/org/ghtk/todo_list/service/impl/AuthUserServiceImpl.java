@@ -17,6 +17,7 @@ import org.ghtk.todo_list.mapper.UserResponseMapper;
 import org.ghtk.todo_list.repository.AuthUserRepository;
 import org.ghtk.todo_list.repository.UserProjection;
 import org.ghtk.todo_list.service.AuthUserService;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -183,6 +184,13 @@ public class AuthUserServiceImpl implements AuthUserService {
   public boolean existsByEmailAndAccountId(String email, String accountId) {
     log.info("(existsByEmailAndAccountId)email: {}, accountId: {}", email, accountId);
     return repository.existsByEmailAndAccountId(email, accountId);
+  }
+
+  @Override
+  @Transactional
+  public void saveUserShare(String email, String accountId) {
+    log.info("(save)email: {}, accountId: {}", email, accountId);
+    repository.updateUserByEmail(email, accountId);
   }
 
   @Override
