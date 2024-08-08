@@ -5,11 +5,13 @@ import org.ghtk.todo_list.dto.response.UserNameResponse;
 import org.ghtk.todo_list.entity.AuthUser;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
+import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 public interface AuthUserRepository extends JpaRepository<AuthUser, String>,
@@ -56,4 +58,11 @@ public interface AuthUserRepository extends JpaRepository<AuthUser, String>,
   Optional<AuthUser> findByEmail(String email);
 
   boolean existsByEmailAndAccountId(String email, String accountId);
+
+  @Modifying
+  @Transactional
+  @Query("""
+    update AuthUser au set au.accountId = :accountId where au.email = :email
+  """)
+  void updateUserByEmail(String email, String accountId);
 }

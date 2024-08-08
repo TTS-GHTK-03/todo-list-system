@@ -24,4 +24,5 @@ public class CacheConstant {
     public static final String SHARE_KEY = "SHARED_KEY";
     public static final String UPDATE_STATUS_TASK = "UPDATE_STATUS_TASK";
     public static final String UPDATE_STATUS_TASK_KEY = "_UPDATE_STATUS_TASK_KEY";
+    public static final String REGISTER_SHARE_KEY = "REGISTER_SHARE_KEY";
 }

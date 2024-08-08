@@ -42,9 +42,7 @@ import org.ghtk.todo_list.service.RedisCacheService;
 import org.ghtk.todo_list.util.CryptUtil;
 
 import static org.ghtk.todo_list.constant.CacheConstant.*;
-import static org.ghtk.todo_list.constant.RegisterResponse.ACTIVE;
-import static org.ghtk.todo_list.constant.RegisterResponse.INACTIVE;
-import static org.ghtk.todo_list.constant.RegisterResponse.UNREGISTERED;
+import static org.ghtk.todo_list.constant.RegisterResponse.*;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -61,26 +59,44 @@ public class AuthFacadeServiceImpl implements AuthFacadeService {
   @Override
   public void register(RegisterRequest request) {
     log.info("(register)request: {}", request);
-    if (!Objects.equals(request.getPassword(), request.getConfirmPassword())) {
-      log.error(
-          "(register)password: {}, confirmPassword:{}  don't match",
-          request.getPassword(),
-          request.getConfirmPassword());
-      throw new PasswordConfirmNotMatchException();
-    }
-    var registerKeyCache = redisCacheService.get(REGISTER_KEY, request.getEmail());
-    log.error("(registerKeyCache) registerKeyCache: {}", registerKeyCache);
 
-    if (registerKeyCache.isEmpty() || !registerKeyCache.get().equals(request.getRegisterKey())) {
-      log.error("(register) RegisterKey not found for email: {}", request.getEmail());
-      throw new RegisterKeyNotFoundException(request.getEmail());
+    var key = redisCacheService.get(REGISTER_SHARE_KEY, request.getEmail());
+    if (key.isEmpty() || !key.get().equals(INACTIVE)) {
+      if (!Objects.equals(request.getPassword(), request.getConfirmPassword())) {
+        log.error(
+            "(register)password: {}, confirmPassword:{}  don't match",
+            request.getPassword(),
+            request.getConfirmPassword());
+        throw new PasswordConfirmNotMatchException();
+      }
+      var registerKeyCache = redisCacheService.get(REGISTER_KEY, request.getEmail());
+      log.error("(registerKeyCache) registerKeyCache: {}", registerKeyCache);
+
+      if (registerKeyCache.isEmpty() || !registerKeyCache.get().equals(request.getRegisterKey())) {
+        log.error("(register) RegisterKey not found for email: {}", request.getEmail());
+        throw new RegisterKeyNotFoundException(request.getEmail());
+      }
+      var authAccount = authAccountService.create(
+          request.getUsername(),
+          CryptUtil.getPasswordEncoder().encode(request.getPassword())
+      );
+      authUserService.create(request.getEmail(), authAccount.getId());
+      redisCacheService.delete(REGISTER_KEY, request.getEmail());
+    } else {
+      if (!Objects.equals(request.getPassword(), request.getConfirmPassword())) {
+        log.error(
+            "(register)password: {}, confirmPassword:{}  don't match",
+            request.getPassword(),
+            request.getConfirmPassword());
+        throw new PasswordConfirmNotMatchException();
+      }
+      var authAccount = authAccountService.create(
+          request.getUsername(),
+          CryptUtil.getPasswordEncoder().encode(request.getPassword())
+      );
+      authUserService.saveUserShare(request.getEmail(), authAccount.getId());
+      redisCacheService.delete(REGISTER_SHARE_KEY, request.getEmail());
     }
-    var authAccount = authAccountService.create(
-        request.getUsername(),
-        CryptUtil.getPasswordEncoder().encode(request.getPassword())
-    );
-    authUserService.create(request.getEmail(), authAccount.getId());
-    redisCacheService.delete(REGISTER_KEY, request.getEmail());
   }
 
   @Override
@@ -212,7 +228,7 @@ public class AuthFacadeServiceImpl implements AuthFacadeService {
   }
 
   @Override
-  public RegisterResponse verifyEmail(VerifyEmailRequest request) {
+  public String verifyEmail(VerifyEmailRequest request) {
     log.info("(verifyEmail)email: {}", request.getEmail());
     if (!authUserService.existsByEmail(request.getEmail())) {
       log.info("(verifyEmail)email don't registered: {}", request.getEmail());
@@ -235,7 +251,7 @@ public class AuthFacadeServiceImpl implements AuthFacadeService {
     } else {
       log.info("(verifyEmail)email has been registered: {}", request.getEmail());
       if (authUserService.existsByEmailAndAccountId(request.getEmail(), null)) {
-        log.info("(verifyEmail)email has been registered and active: {}", request.getEmail());
+        redisCacheService.save(REGISTER_SHARE_KEY, request.getEmail(), INACTIVE);
         return INACTIVE;
       } else {
         return ACTIVE;

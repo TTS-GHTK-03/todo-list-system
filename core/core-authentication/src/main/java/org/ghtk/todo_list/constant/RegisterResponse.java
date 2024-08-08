@@ -1,9 +1,11 @@
 package org.ghtk.todo_list.constant;
 
 import lombok.Data;
-import lombok.Getter;
 
-@Getter
-public enum RegisterResponse {
-  UNREGISTERED, ACTIVE, INACTIVE
+@Data
+public class RegisterResponse {
+
+  public static final String UNREGISTERED = "UNREGISTERED";
+  public static final String ACTIVE = "ACTIVE";
+  public static final String INACTIVE = "INACTIVE";
 }
