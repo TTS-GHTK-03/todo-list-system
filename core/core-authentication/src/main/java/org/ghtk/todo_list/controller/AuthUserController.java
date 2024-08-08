@@ -57,7 +57,7 @@ public class AuthUserController {
   @PostMapping("/register/email/validate")
   @ResponseStatus(HttpStatus.OK)
   @Operation(description = "Verify email")
-  public BaseResponse<RegisterResponse> verifyEmail(@RequestBody @Valid VerifyEmailRequest request) {
+  public BaseResponse<String> verifyEmail(@RequestBody @Valid VerifyEmailRequest request) {
     log.info("(verifyEmail)email: {}", request.getEmail());
     return BaseResponse.of(HttpStatus.CREATED.value(), LocalDateTime.now().toString(),
         authFacadeService.verifyEmail(request));

@@ -22,7 +22,7 @@ public interface AuthFacadeService {
   LoginResponse login(LoginRequest request);
 
   void resetPassword(ResetPasswordRequest request);
-  RegisterResponse verifyEmail(VerifyEmailRequest request);
+  String verifyEmail(VerifyEmailRequest request);
   void changePassword(ChangePasswordRequest request, String userId);
   void resendOtp(ResendOtpRequest request);
 }

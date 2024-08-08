@@ -42,9 +42,7 @@ import org.ghtk.todo_list.service.RedisCacheService;
 import org.ghtk.todo_list.util.CryptUtil;
 
 import static org.ghtk.todo_list.constant.CacheConstant.*;
-import static org.ghtk.todo_list.constant.RegisterResponse.ACTIVE;
-import static org.ghtk.todo_list.constant.RegisterResponse.INACTIVE;
-import static org.ghtk.todo_list.constant.RegisterResponse.UNREGISTERED;
+import static org.ghtk.todo_list.constant.RegisterResponse.*;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -212,7 +210,7 @@ public class AuthFacadeServiceImpl implements AuthFacadeService {
   }
 
   @Override
-  public RegisterResponse verifyEmail(VerifyEmailRequest request) {
+  public String verifyEmail(VerifyEmailRequest request) {
     log.info("(verifyEmail)email: {}", request.getEmail());
     if (!authUserService.existsByEmail(request.getEmail())) {
       log.info("(verifyEmail)email don't registered: {}", request.getEmail());
