@@ -4,6 +4,7 @@ import static org.ghtk.todo_list.constant.ActivityLogConstant.AssigneeAction.ADD
 import static org.ghtk.todo_list.constant.ActivityLogConstant.TaskAction.*;
 import static org.ghtk.todo_list.constant.CacheConstant.UPDATE_STATUS_TASK;
 import static org.ghtk.todo_list.constant.CacheConstant.UPDATE_STATUS_TASK_KEY;
+import static org.ghtk.todo_list.constant.TaskStatus.IN_PROGRESS;
 import static org.ghtk.todo_list.constant.TaskStatus.TODO;
 
 import java.time.LocalDate;
@@ -29,6 +30,7 @@ import org.ghtk.todo_list.exception.SprintNotFoundException;
 import org.ghtk.todo_list.exception.SprintNotStartException;
 import org.ghtk.todo_list.exception.StatusTaskInvalidException;
 import org.ghtk.todo_list.exception.TaskAssignmentExistsException;
+import org.ghtk.todo_list.exception.TaskHasNotStartedException;
 import org.ghtk.todo_list.exception.TaskNotExistUserException;
 import org.ghtk.todo_list.exception.TaskNotFoundException;
 import org.ghtk.todo_list.exception.StatusTaskKeyNotFoundException;
@@ -122,6 +124,12 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
       log.error("(updateStatusTask)taskId: {},projectId: {}", taskId, projectId);
       throw new StatusTaskInvalidException();
     }
+
+    if(taskService.findById(taskId).getStatus().equals(TODO.toString()) && !status.toUpperCase().equals(IN_PROGRESS.toString())) {
+      log.error("(updateStatusTask)taskId: {} hasn't started", taskId);
+      throw new TaskHasNotStartedException();
+    }
+
     if (status.toUpperCase().equals(TaskStatus.IN_PROGRESS.toString())) {
       log.info("(updateStatusTask)status: {}", status);
       String statusTaskKey = taskId + UPDATE_STATUS_TASK_KEY;
