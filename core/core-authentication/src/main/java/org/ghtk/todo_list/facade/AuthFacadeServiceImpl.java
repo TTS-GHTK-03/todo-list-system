@@ -95,7 +95,7 @@ public class AuthFacadeServiceImpl implements AuthFacadeService {
           CryptUtil.getPasswordEncoder().encode(request.getPassword())
       );
       authUserService.create(request.getEmail(), authAccount.getId());
-      redisCacheService.delete(REGISTER_KEY, request.getEmail());
+      redisCacheService.delete(REGISTER_SHARE_KEY, request.getEmail());
     }
   }
 
