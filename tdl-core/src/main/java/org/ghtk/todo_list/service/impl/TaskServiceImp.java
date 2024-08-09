@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.ghtk.todo_list.constant.SprintStatus;
 import org.ghtk.todo_list.constant.TaskStatus;
 import org.ghtk.todo_list.entity.Task;
 import org.ghtk.todo_list.exception.TaskNotFoundException;
@@ -42,7 +43,7 @@ public class TaskServiceImp implements TaskService {
     List<Task> tasks = taskRepository.getAllTasksByProjectId(projectId);
     return tasks.stream()
         .map(task -> TaskDetailResponse.of(task.getId(), task.getTitle(), task.getPoint(),
-            task.getStatus(), task.getKeyProjectTask(), null, task.getSprintId(), null))
+            task.getStatus(), task.getKeyProjectTask(), null, task.getSprintId(), null, null))
         .collect(Collectors.toList());
   }
 

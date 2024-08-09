@@ -22,4 +22,5 @@ public class TaskDetailResponse {
   private UserResponse userResponse;
   private String sprintId;
   private String sprintTitle;
+  private String sprintStatus;
 }

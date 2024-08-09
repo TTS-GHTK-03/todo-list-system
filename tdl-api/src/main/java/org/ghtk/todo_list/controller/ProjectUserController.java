@@ -80,7 +80,7 @@ public class ProjectUserController {
         "Share project successfully!");
   }
 
-  @PostMapping("/view_share")
+  @GetMapping("/view_share")
   @Operation(description = "View share project")
   public BaseResponse<?> viewShareProject(
       @Parameter(name = "shareToken", description = "Share token")
