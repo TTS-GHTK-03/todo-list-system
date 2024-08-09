@@ -10,6 +10,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.constant.SprintStatus;
+import org.ghtk.todo_list.constant.TaskStatus;
 import org.ghtk.todo_list.entity.ActivityLog;
 import org.ghtk.todo_list.entity.Project;
 import org.ghtk.todo_list.entity.Sprint;
@@ -244,13 +245,10 @@ public class SprintFacadeServiceImpl implements SprintFacadeService {
 
     sprintProgressService.deleteAllBySprintId(id);
     List<Task> tasks = taskService.getAllBySprintId(id);
-    for (Task o : tasks) {
-      taskAssigneesService.deleteAllByTaskId(o.getId());
-      commentService.deleteAllCommentByTaskId(o.getId());
-      labelAttachedService.deleteAllByTaskId(o.getId());
-      activityLogService.deleteAllByTaskId(o.getId());
+    for (Task task : tasks) {
+      taskService.updateStatus(task.getId(), TODO.toString(), userId);
+      taskService.updateSprintId(projectId,task.getId(), null, userId);
     }
-    taskService.deleteAllBySprintId(id);
     sprintService.deleteById(id);
 
     var notification = new ActivityLog();
