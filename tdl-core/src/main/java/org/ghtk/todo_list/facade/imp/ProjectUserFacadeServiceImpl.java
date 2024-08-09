@@ -159,7 +159,7 @@ public class ProjectUserFacadeServiceImpl implements ProjectUserFacadeService {
 
   @Override
   public void shareProject(String userId, String projectId, String sharedUserEmail, String role,
-      Time expireTime) {
+      String expireTime) {
     log.info("(shareProject)user: {}, project: {}, sharedUserEmail: {}, role: {}, expireTime: {}",
         userId, projectId, sharedUserEmail, role, expireTime);
 
@@ -194,13 +194,13 @@ public class ProjectUserFacadeServiceImpl implements ProjectUserFacadeService {
 
     var subject = "Admin shared you to their project in Todo List";
     var param = new HashMap<String, Object>();
-
-    int hours = expireTime.getHours();
-    int minutes = expireTime.getMinutes();
-    int second = expireTime.getSeconds();
+    String[] time = expireTime.split(":");
+    long hours = Long.parseLong(time[0]);
+    long minutes = Long.parseLong(time[1]);
+    long second = Long.parseLong(time[2]);
 
     String shareToken = authTokenService.generateShareToken(sharedUserEmail, role, projectId,
-        (long) (hours * 3600 + minutes * 60 + second) * 1000);
+        (hours * 3600 + minutes * 60 + second) * 1000);
 
     param.put("projectId", projectId);
     param.put("email", sharedUserEmail);

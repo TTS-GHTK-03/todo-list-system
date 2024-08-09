@@ -10,7 +10,7 @@ public interface ProjectUserFacadeService {
   void inviteUser(String userId, String projectId, String invitedUserEmail, String role, Boolean reSend);
   AcceptInviteResponse accept(String userId, String email, String projectId);
 
-  void shareProject(String userId, String projectId, String sharedUserEmail, String role, Time expireDate);
+  void shareProject(String userId, String projectId, String sharedUserEmail, String role, String expireDate);
   AcceptShareResponse viewShareProject(String userId, String shareToken);
 
   List<UserResponse> getAllUserByProject(String userId, String projectId);
