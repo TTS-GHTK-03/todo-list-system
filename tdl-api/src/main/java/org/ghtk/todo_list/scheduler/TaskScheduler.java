@@ -20,9 +20,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class TaskScheduler {
 
-  public static final String TASK_STATUS_DONE = "DONE";
   public static final String SPRINT_STATUS_START = "START";
-  public static final String ROLE = "ROLE";
 
   private final EmailHelper emailHelper;
   private final TaskRepository taskRepository;
@@ -34,7 +32,7 @@ public class TaskScheduler {
   private void checkTasks() {
     log.info("(checkTasks)Check for tasks that are about to expire");
     List<Task> allTasks = new ArrayList<>();
-    List<String> ids = projectRepository.findProjectIdByUserId(ROLE);
+    List<String> ids = projectRepository.findAllProjectId();
 
     for (String id : ids) {
       List<Task> tasks = getTasksFromSprint(id);
@@ -62,6 +60,6 @@ public class TaskScheduler {
 
   private List<Task> getTasksFromSprint(String projectId) {
     log.info("(getTasksFromSprint)projectId: {}", projectId);
-    return taskRepository.findAllByProjectId(projectId, TASK_STATUS_DONE, SPRINT_STATUS_START);
+    return taskRepository.findAllByProjectId(projectId, SPRINT_STATUS_START);
   }
 }
