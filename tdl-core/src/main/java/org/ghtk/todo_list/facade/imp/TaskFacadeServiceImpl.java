@@ -130,12 +130,6 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
       throw new TaskHasNotStartedException();
     }
 
-    if (status.toUpperCase().equals(TaskStatus.IN_PROGRESS.toString())) {
-      log.info("(updateStatusTask)status: {}", status);
-      String statusTaskKey = taskId + UPDATE_STATUS_TASK_KEY;
-      redisCacheService.save(UPDATE_STATUS_TASK, taskId, statusTaskKey);
-    }
-
     if (status.toUpperCase().equals(TaskStatus.DONE.toString())) {
       log.info("(updateStatusTask)status: {}", status);
       sprintProgressService.updateCompleteTask(taskId);
@@ -311,13 +305,6 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
 
     validateTaskId(taskId);
     validateDueDateTask(sprint, dueDate);
-
-    var redisStatusTaskKey = redisCacheService.get(UPDATE_STATUS_TASK, taskId);
-    if (redisStatusTaskKey.isEmpty()) {
-      log.error("(updateStartDateDueDateTask)redisStatusTaskKey not found");
-      throw new StatusTaskKeyNotFoundException();
-    }
-    redisCacheService.delete(UPDATE_STATUS_TASK, taskId);
 
     var notification = new ActivityLog();
     notification.setAction(taskId + UPDATE_STATUS_TASK_KEY);
