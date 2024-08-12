@@ -1,6 +1,7 @@
 package org.ghtk.todo_list.service.impl;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.ghtk.todo_list.entity.ProjectUser;
@@ -20,7 +21,7 @@ public class ProjectUserServiceImpl implements ProjectUserService {
 
   @Override
   public ProjectUser createProjectUser(String userId, String projectId, String role) {
-    log.info("(createProjectUser)project user: {}", userId);
+    log.info("(createProjectUser)user: {}, project: {}, role: {}", userId, projectId, role);
     ProjectUser projectUser = projectUserMapper.toProjectUser(userId, projectId, role);
     return projectUserRepository.save(projectUser);
   }
@@ -70,5 +71,17 @@ public class ProjectUserServiceImpl implements ProjectUserService {
       throw new ProjectUserNotFoundException();
     }
     projectUserRepository.deleteByUserIdAndProjectId(memberId, projectId);
+  }
+
+  @Override
+  public List<ProjectUser> getAll() {
+    log.info("(getAll)");
+    return projectUserRepository.findAll();
+  }
+
+  @Override
+  public void deleteById(String id) {
+    log.info("(deleteById)id: {}", id);
+    projectUserRepository.deleteById(id);
   }
 }

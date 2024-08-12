@@ -24,5 +24,5 @@ public class ShareUserRequest {
 
   @Schema(description = "Expire date", example = "hh:MM:ss")
 
-  private Time expireTime;
+  private String expireTime;
 }

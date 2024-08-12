@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.ghtk.todo_list.constant.RegisterResponse;
 import org.ghtk.todo_list.dto.request.VerifyEmailRequest;
 import org.ghtk.todo_list.dto.request.VerifyRegisterRequest;
 import org.ghtk.todo_list.dto.request.ForgotPasswordRequest;

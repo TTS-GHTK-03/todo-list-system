@@ -33,10 +33,10 @@ public interface TaskRepository extends JpaRepository<Task, String>,
 
   @Query("""
         SELECT t FROM Task t 
-        WHERE t.status != :taskStatusDone AND t.sprintId IN 
+        WHERE t.status != 'DONE'AND t.status != 'TODO' AND t.sprintId IN 
         (SELECT s.id FROM Sprint s WHERE s.status = :sprintStatusStart AND s.projectId = :projectId)
       """)
-  List<Task> findAllByProjectId(String projectId, String taskStatusDone, String sprintStatusStart);
+  List<Task> findAllByProjectId(String projectId, String sprintStatusStart);
 
   Optional<Task> findByProjectIdAndId(String projectId, String id);
 

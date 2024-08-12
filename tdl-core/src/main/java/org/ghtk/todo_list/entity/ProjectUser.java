@@ -19,4 +19,5 @@ public class ProjectUser extends BaseEntity implements Serializable {
   private String userId;
   private String projectId;
   private String role;
+  private String shareToken;
 }

@@ -13,6 +13,7 @@ public interface AuthUserService {
 
   AuthUser findById(String id);
   AuthUser create(String email, String accountId);
+  AuthUser createTemporaryUser(String email);
   boolean existsByEmail(String email);
   boolean existById(String id);
   Optional<AuthUser> findByAccountId(String accountId);
@@ -27,4 +28,7 @@ public interface AuthUserService {
   List<UserResponse> getAllUserByProject(String projectId);
   UserResponse getUserResponseById(String userId);
   AuthUser findByEmail(String email);
+  boolean existsByEmailAndAccountId(String email, String accountId);
+  void saveUserShare(String email, String accountId);
+  AuthUser findByUserId(String userId);
 }

@@ -37,6 +37,7 @@ import org.ghtk.todo_list.service.LabelAttachedService;
 import org.ghtk.todo_list.service.LabelService;
 import org.ghtk.todo_list.service.ProjectService;
 import org.ghtk.todo_list.service.ProjectUserService;
+import org.ghtk.todo_list.service.ShareTokenService;
 import org.ghtk.todo_list.service.SprintProgressService;
 import org.ghtk.todo_list.service.SprintService;
 import org.ghtk.todo_list.service.TaskAssigneesService;
@@ -87,11 +88,11 @@ public class TdlCoreConfiguration {
   @Bean
   public ProjectUserFacadeService projectUserFacadeService(ProjectUserService projectUserService,
       ProjectService projectService,
-      AuthUserService authUserService, AuthTokenService authTokenService,
+      AuthUserService authUserService, ShareTokenService shareTokenService,
       RedisCacheService redisCacheService, TaskAssigneesService taskAssigneesService,
       EmailHelper emailHelper, ActivityLogService activityLogService) {
     return new ProjectUserFacadeServiceImpl(projectUserService, projectService, authUserService,
-        authTokenService,
+        shareTokenService,
         redisCacheService, taskAssigneesService, emailHelper, activityLogService);
   }
 

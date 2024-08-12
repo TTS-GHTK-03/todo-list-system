@@ -381,4 +381,10 @@
   <changeSet id="20240724-1549-delete-column-tsk" author="Phan Kieu">
     <dropColumn tableName="task" columnName="label"/>
   </changeSet>
+
+  <changeSet id="20240723-1050-add-share-token" author="Phan Kieu">
+    <addColumn tableName="project_user">
+      <column name="share_token" type="varchar(255)"/>
+    </addColumn>
+  </changeSet>
 </databaseChangeLog>

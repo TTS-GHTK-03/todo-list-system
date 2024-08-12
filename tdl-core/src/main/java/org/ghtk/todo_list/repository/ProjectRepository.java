@@ -36,4 +36,9 @@ public interface ProjectRepository extends JpaRepository<Project, String>,
 
   boolean existsByTitle(String title);
   boolean existsByKeyProject(String keyProject);
+  @Query("""
+      SELECT p.title FROM Project p
+      WHERE p.id = :projectId
+  """)
+  String findTitleProjectById(String projectId);
 }

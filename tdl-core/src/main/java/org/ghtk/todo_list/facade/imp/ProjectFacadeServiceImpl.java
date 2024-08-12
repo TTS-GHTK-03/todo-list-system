@@ -128,8 +128,8 @@ public class ProjectFacadeServiceImpl implements ProjectFacadeService {
     log.info("(updateProject)userId: {}, projectId: {}, title: {}, keyProject: {}", userId, projectId, title, keyProject);
 
     validateProjectId(projectId);
-    validateTitle(title);
-    validateKeyProject(keyProject);
+    validateTitle(projectId, title);
+    validateKeyProject(projectId, keyProject);
 
     var notification = new ActivityLog();
     notification.setAction(UPDATE_PROJECT);
@@ -198,17 +198,17 @@ public class ProjectFacadeServiceImpl implements ProjectFacadeService {
     }
   }
 
-  private void validateTitle(String title){
-    log.info("(validateTitle)title: {}", title);
-    if(projectService.existByTitle(title)){
+  private void validateTitle(String projectId, String title){
+    log.info("(validateTitle)project: {}, title: {}", projectId, title);
+    if(projectService.existByTitle(title) && !title.equals(projectService.getProjectById(projectId).getTitle())){
       log.error("(validateTitle)title: {} already existed", title);
       throw new ProjectTitleAlreadyExistedException();
     }
   }
 
-  private void validateKeyProject(String keyProject){
-    log.info("(validateKeyProject)keyProject: {}", keyProject);
-    if(projectService.existByKeyProject(keyProject)){
+  private void validateKeyProject(String projectId, String keyProject){
+    log.info("(validateKeyProject)project: {}, keyProject: {}", projectId, keyProject);
+    if(projectService.existByKeyProject(keyProject) && !keyProject.equals(projectService.getProjectById(projectId).getKeyProject())){
       log.error("(validateKeyProject)keyProject: {} already existed", keyProject);
       throw new ProjectKeyAlreadyExistedException();
     }
