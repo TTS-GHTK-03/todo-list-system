@@ -65,4 +65,9 @@ public interface AuthUserRepository extends JpaRepository<AuthUser, String>,
     update AuthUser au set au.accountId = :accountId where au.email = :email
   """)
   void updateUserByEmail(String email, String accountId);
+
+  @Query("""
+    select au from AuthUser au where au.id = :userId
+  """)
+  AuthUser getByUserId(String userId);
 }

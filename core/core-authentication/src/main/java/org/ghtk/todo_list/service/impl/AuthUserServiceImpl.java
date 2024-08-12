@@ -194,6 +194,12 @@ public class AuthUserServiceImpl implements AuthUserService {
   }
 
   @Override
+  public AuthUser findByUserId(String userId) {
+    log.info("(findByUserId)userId: {}", userId);
+    return repository.getByUserId(userId);
+  }
+
+  @Override
   public UserProjection getByUserId(String userId) {
     log.info("(getByUserId)userId: {}", userId);
     return repository.findByUserId(userId)
