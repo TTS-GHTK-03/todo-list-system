@@ -1,6 +1,7 @@
 package org.ghtk.todo_list.service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import org.ghtk.todo_list.entity.ProjectUser;
 
 public interface ProjectUserService {
@@ -16,4 +17,8 @@ public interface ProjectUserService {
   void deleteAllByProjectId(String projectId);
 
   void deleteByUserIdAndProjectId(String memberId, String projectId);
+
+  List<ProjectUser> getAll();
+
+  void deleteById(String id);
 }

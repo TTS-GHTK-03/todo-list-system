@@ -151,4 +151,10 @@ public class ProjectServiceImpl implements ProjectService {
     log.info("(searchProjects)searchValue: {}", searchValue);
     return new PagingRes<>(projectRepository.findAll(FilterProject.getProjectsByCriteria(searchValue, userId), pageable));
   }
+
+  @Override
+  public String findTitleProjectById(String projectId) {
+    log.info("(findTitleProjectById)projectId: {}", projectId);
+    return projectRepository.findTitleProjectById(projectId);
+  }
 }
