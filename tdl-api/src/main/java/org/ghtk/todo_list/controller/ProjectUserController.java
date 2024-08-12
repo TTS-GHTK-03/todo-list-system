@@ -17,6 +17,7 @@ import org.ghtk.todo_list.model.request.InviteUserRequest;
 import org.ghtk.todo_list.model.request.ShareUserRequest;
 import org.ghtk.todo_list.dto.response.UserResponse;
 import org.ghtk.todo_list.model.request.UpdateRoleProjectUserRequest;
+import org.ghtk.todo_list.model.response.AcceptShareResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -82,7 +83,7 @@ public class ProjectUserController {
 
   @PostMapping("/view_share")
   @Operation(description = "View share project")
-  public BaseResponse<?> viewShareProject(
+  public BaseResponse<AcceptShareResponse> viewShareProject(
       @Parameter(name = "shareToken", description = "Share token")
       @Valid @RequestParam(name = "shareToken") String shareToken) {
     log.info("(viewShareProject)shareToken: {}", shareToken);

@@ -4,7 +4,6 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -12,7 +11,6 @@ import java.util.Collections;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.ghtk.todo_list.exception.EmailNotSharedException;
 import org.ghtk.todo_list.service.AuthAccountService;
 import org.ghtk.todo_list.service.AuthTokenService;
 import org.ghtk.todo_list.service.AuthUserService;
@@ -38,7 +36,6 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
       FilterChain filterChain) throws ServletException, IOException {
     log.info("(doFilterInternal)request: {}, response: {}, filterChain: {}", request, response, filterChain);
     final String accessToken = request.getHeader(HttpHeaders.AUTHORIZATION);
-    final String shareToken = request.getHeader("Share-Token");
 
     if (Objects.isNull(accessToken)) {
       filterChain.doFilter(request, response);
@@ -52,7 +49,6 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
 
     var jwtToken = accessToken.substring(7);
     String userId;
-
     try {
       userId = authTokenService.getSubjectFromAccessToken(jwtToken);
     } catch (Exception ex) {
@@ -70,31 +66,6 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
                 account.getUsername(), user.getId(), new ArrayList<>());
         usernamePasswordAuthToken.setDetails(user);
         SecurityContextHolder.getContext().setAuthentication(usernamePasswordAuthToken);
-      }
-    }
-
-    if (!Objects.isNull(shareToken)) {
-      if (!authTokenService.validateShareToken(shareToken, userId)) {
-        log.error("(doFilterInternal)request: {}, response: {}, filterChain: {}", request, response, filterChain);
-        filterChain.doFilter(request, response);
-        return;
-      }
-
-      var jwtTokenShare = shareToken.substring(7);
-      String email;
-      try {
-        email = authTokenService.getSubjectFromShareToken(jwtTokenShare);
-      } catch (Exception ex) {
-        log.error("(doFilterInternal)request: {}, response: {}, filterChain: {}", request, response, filterChain);
-        filterChain.doFilter(request, response);
-        return;
-      }
-      if(Objects.nonNull(email) && Objects.isNull(SecurityContextHolder.getContext().getAuthentication())) {
-        var user = authUserService.findById(userId);
-        if(!email.equals(user.getEmail())) {
-          log.error("(doFilterInternal)email: {} not found", email);
-          throw new EmailNotSharedException();
-        }
       }
     }
     filterChain.doFilter(request, response);
