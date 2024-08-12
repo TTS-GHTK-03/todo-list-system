@@ -19,9 +19,6 @@ public class AuthTokenServiceImpl implements AuthTokenService {
   @Value("${application.authentication.access_token.jwt_secret:asfasfasfafasfafasf}")
   private String accessTokenJwtSecret;
 
-  @Value("${application.authentication.share_token.jwt_secret:otitraiwjga}")
-  private String shareTokenJwtSecret;
-
   @Value("${application.authentication.access_token.life_time:435346}")
   private Long accessTokenLifeTime;
 
@@ -93,34 +90,6 @@ public class AuthTokenServiceImpl implements AuthTokenService {
   public boolean validateRefreshToken(String refreshToken, String userId) {
     log.info("(validateRefreshToken)refreshToken: {}, userId: {}", refreshToken, userId);
     return getSubjectFromRefreshToken(refreshToken).equals(userId) && isActiveToken(refreshToken, refreshTokenJwtSecret);
-  }
-
-  @Override
-  public String generateShareToken(String email, String role, String projectId, Long expireTime) {
-    log.info("(generateShareToken)email: {}, role: {}, projectId: {}, expireTime: {}", email, role, projectId, expireTime);
-    var claims = new HashMap<String, Object>();
-    claims.put("projectId", projectId);
-    claims.put("email", email);
-    claims.put("role", role);
-    return generateToken(email, claims, expireTime, shareTokenJwtSecret);
-  }
-
-  @Override
-  public String getSubjectFromShareToken(String shareToken) {
-    log.debug("(getSubjectFromShareToken)shareToken: {}", shareToken);
-    return getClaim(shareToken, Claims::getSubject, shareTokenJwtSecret);
-  }
-
-  @Override
-  public Claims getClaimsFromShareToken(String shareToken) {
-    log.debug("(getClaimsFromShareToken)shareToken: {}", shareToken);
-    return getClaims(shareToken, shareTokenJwtSecret);
-  }
-
-  @Override
-  public boolean validateShareToken(String shareToken, String email) {
-    log.info("(validateShareToken)shareToken: {}, projectId: {}", shareToken, email);
-    return getSubjectFromShareToken(shareToken).equals(email) && isActiveToken(shareToken, shareTokenJwtSecret);
   }
 
   @Override

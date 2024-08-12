@@ -6,7 +6,7 @@ import static org.ghtk.todo_list.constant.CacheConstant.MAIL_TTL_MINUTES;
 import static org.ghtk.todo_list.constant.CacheConstant.SHARE_KEY;
 
 import io.jsonwebtoken.Claims;
-import java.sql.Time;
+import io.jsonwebtoken.ExpiredJwtException;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
@@ -20,7 +20,6 @@ import org.ghtk.todo_list.core_email.helper.EmailHelper;
 import org.ghtk.todo_list.entity.ActivityLog;
 import org.ghtk.todo_list.entity.AuthUser;
 import org.ghtk.todo_list.entity.Project;
-import org.ghtk.todo_list.exception.EmailInvalidWithToken;
 import org.ghtk.todo_list.exception.EmailInviteStillValidException;
 import org.ghtk.todo_list.exception.EmailNotInviteException;
 import org.ghtk.todo_list.exception.EmailShareStillValidException;
@@ -35,11 +34,11 @@ import org.ghtk.todo_list.dto.response.UserResponse;
 import org.ghtk.todo_list.model.response.AcceptInviteResponse;
 import org.ghtk.todo_list.model.response.AcceptShareResponse;
 import org.ghtk.todo_list.service.ActivityLogService;
-import org.ghtk.todo_list.service.AuthTokenService;
 import org.ghtk.todo_list.service.AuthUserService;
 import org.ghtk.todo_list.service.ProjectService;
 import org.ghtk.todo_list.service.ProjectUserService;
 import org.ghtk.todo_list.service.RedisCacheService;
+import org.ghtk.todo_list.service.ShareTokenService;
 import org.ghtk.todo_list.service.TaskAssigneesService;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,7 +49,7 @@ public class ProjectUserFacadeServiceImpl implements ProjectUserFacadeService {
   private final ProjectUserService projectUserService;
   private final ProjectService projectService;
   private final AuthUserService authUserService;
-  private final AuthTokenService authTokenService;
+  private final ShareTokenService shareTokenService;
   private final RedisCacheService redisCacheService;
   private final TaskAssigneesService taskAssigneesService;
   private final EmailHelper emailHelper;
@@ -199,7 +198,7 @@ public class ProjectUserFacadeServiceImpl implements ProjectUserFacadeService {
     long minutes = Long.parseLong(time[1]);
     long second = Long.parseLong(time[2]);
 
-    String shareToken = authTokenService.generateShareToken(sharedUserEmail, role, projectId,
+    String shareToken = shareTokenService.generateShareToken(sharedUserEmail, role, projectId,
         (hours * 3600 + minutes * 60 + second) * 1000);
 
     param.put("projectId", projectId);
@@ -221,7 +220,27 @@ public class ProjectUserFacadeServiceImpl implements ProjectUserFacadeService {
   public AcceptShareResponse viewShareProject(String userId, String shareToken) {
     log.info("(viewShareProject)shareToken: {}", shareToken);
 
-    Claims claims = authTokenService.getClaimsFromShareToken(shareToken);
+    Claims claims;
+
+    try {
+      claims = shareTokenService.getClaimsFromShareToken(shareToken);
+    } catch (ExpiredJwtException ex) {
+      log.error("(viewShareProject)shareToken: {} expired", shareToken);
+      return AcceptShareResponse.builder()
+          .email(null)
+          .shareToken(shareToken)
+          .status("EXPIRED")
+          .projectId(null)
+          .build();
+    } catch (Exception e) {
+      log.error("(viewShareProject)shareToken: {} invalid", shareToken);
+      return AcceptShareResponse.builder()
+          .email(null)
+          .shareToken(shareToken)
+          .status("INVALID")
+          .projectId(null)
+          .build();
+    }
 
     String email = claims.get("email", String.class);
     String role = claims.get("role", String.class);
