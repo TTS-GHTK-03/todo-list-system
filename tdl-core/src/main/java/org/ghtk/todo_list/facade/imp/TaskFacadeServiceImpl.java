@@ -4,6 +4,7 @@ import static org.ghtk.todo_list.constant.ActivityLogConstant.AssigneeAction.ADD
 import static org.ghtk.todo_list.constant.ActivityLogConstant.TaskAction.*;
 import static org.ghtk.todo_list.constant.CacheConstant.UPDATE_STATUS_TASK;
 import static org.ghtk.todo_list.constant.CacheConstant.UPDATE_STATUS_TASK_KEY;
+import static org.ghtk.todo_list.constant.TaskStatus.DONE;
 import static org.ghtk.todo_list.constant.TaskStatus.IN_PROGRESS;
 import static org.ghtk.todo_list.constant.TaskStatus.TODO;
 
@@ -21,6 +22,7 @@ import org.ghtk.todo_list.entity.Project;
 import org.ghtk.todo_list.entity.Task;
 import org.ghtk.todo_list.entity.TaskAssignees;
 import org.ghtk.todo_list.entity.Sprint;
+import org.ghtk.todo_list.exception.ApproachEndDateSprintException;
 import org.ghtk.todo_list.exception.DueDateTaskInvalidSprintEndDateException;
 import org.ghtk.todo_list.exception.DueDateTaskInvalidStartDateException;
 import org.ghtk.todo_list.exception.ProjectNotFoundException;
@@ -101,8 +103,9 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
       UserResponse userResponse = authUserService.getUserResponseById(taskAssigneesService.findUserIdByTaskId(taskDetailResponse.getId()));
       taskDetailResponse.setUserResponse(userResponse);
       if (taskDetailResponse.getSprintId() != null) {
-        taskDetailResponse.setSprintTitle(
-            sprintService.findById(taskDetailResponse.getSprintId()).getTitle());
+        Sprint sprint = sprintService.findById(taskDetailResponse.getSprintId());
+        taskDetailResponse.setSprintTitle(sprint.getTitle());
+        taskDetailResponse.setSprintStatus(sprint.getStatus());
       }
     }
     return taskDetailResponseList;
@@ -172,7 +175,11 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
       log.info("(updateSprintTask)task not in sprintId ");
       var sprintProgress = sprintProgressService.findBySprintId(sprintId);
       sprintProgress.setTotalTask(sprintProgress.getTotalTask() + 1);
+      if(task.getStatus().equals(DONE.toString())) {
+        sprintProgress.setCompleteTask(sprintProgress.getCompleteTask() - 1);
+      }
       sprintProgressService.save(sprintProgress);
+      taskService.updateStatus(taskId, TODO.toString(), userId);
       return taskService.updateSprintId(projectId, taskId, sprintId,
           taskAssigneesService.findUserIdByTaskId(taskId));
     } else if (task.getSprintId() != null && sprintId != null) {
@@ -180,7 +187,11 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
       log.info("(updateSprintTask)task allocated to another sprint");
       var sprintProgress = sprintProgressService.findBySprintId(task.getSprintId());
       sprintProgress.setTotalTask(sprintProgress.getTotalTask() - 1);
+      if(task.getStatus().equals(DONE.toString())) {
+        sprintProgress.setCompleteTask(sprintProgress.getCompleteTask() - 1);
+      }
       sprintProgressService.save(sprintProgress);
+      taskService.updateStatus(taskId, TODO.toString(), userId);
       var sprintProgress1 = sprintProgressService.findBySprintId(sprintId);
       sprintProgress1.setTotalTask(sprintProgress1.getTotalTask() + 1);
       sprintProgressService.save(sprintProgress1);
@@ -190,7 +201,11 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
       log.info("(updateSprintTask)task out sprint");
       var sprintProgress = sprintProgressService.findBySprintId(task.getSprintId());
       sprintProgress.setTotalTask(sprintProgress.getTotalTask() - 1);
+      if(task.getStatus().equals(DONE.toString())) {
+        sprintProgress.setCompleteTask(sprintProgress.getCompleteTask() - 1);
+      }
       sprintProgressService.save(sprintProgress);
+      taskService.updateStatus(taskId, TODO.toString(), userId);
       return taskService.updateSprintId(projectId, taskId, null,
           taskAssigneesService.findUserIdByTaskId(taskId));
     } else {
@@ -479,6 +494,10 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
     if (!LocalDate.now().isBefore(LocalDate.parse(dueDate))) {
       log.error("(validateDueDateTask)dueDate: {} invalid", dueDate);
       throw new DueDateTaskInvalidStartDateException();
+    }
+    if(sprint.getEndDate().equals(LocalDate.now())){
+      log.error("(validateDueDateTask)dueDate: {} invalid", dueDate);
+      throw new ApproachEndDateSprintException();
     }
     if (sprint.getEndDate().isBefore(LocalDate.parse(dueDate))) {
       log.error("(validateDueDateTask)dueDate: {} invalid", dueDate);
