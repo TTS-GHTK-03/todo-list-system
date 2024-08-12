@@ -39,6 +39,7 @@ public class UserScheduler {
             "Your participation in our Todo list project has expired. If you have any problems, please contact our manager.");
         emailHelper.send(subject, authUser.getEmail(), "email-kick-user-in-project-template",
             param);
+        projectUserService.deleteById(projectUser.getId());
       }
     }
 
