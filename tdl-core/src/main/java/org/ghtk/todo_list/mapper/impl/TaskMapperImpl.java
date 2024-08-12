@@ -20,6 +20,7 @@ public class TaskMapperImpl implements TaskMapper {
           .title(task.getTitle())
           .point(task.getPoint())
           .status(task.getStatus())
+          .keyProjectTask(task.getKeyProjectTask())
           .build();
     }).collect(Collectors.toList());
   }
