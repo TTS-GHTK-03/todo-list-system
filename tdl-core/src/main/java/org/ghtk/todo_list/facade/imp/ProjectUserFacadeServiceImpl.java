@@ -186,11 +186,11 @@ public class ProjectUserFacadeServiceImpl implements ProjectUserFacadeService {
       throw new ProjectUserExistedException();
     }
 
-//    var redisShareUser = redisCacheService.get(SHARE_KEY + projectId + sharedUserEmail);
-//    if (redisShareUser.isPresent()) {
-//      log.error("(shareProject)email: {} already shared", sharedUserEmail);
-//      throw new EmailShareStillValidException(sharedUserEmail);
-//    }
+    var redisShareUser = redisCacheService.get(SHARE_KEY + projectId + sharedUserEmail);
+    if (redisShareUser.isPresent()) {
+      log.error("(shareProject)email: {} already shared", sharedUserEmail);
+      throw new EmailShareStillValidException(sharedUserEmail);
+    }
 
     var subject = "Admin shared you to their project in Todo List";
     var param = new HashMap<String, Object>();
