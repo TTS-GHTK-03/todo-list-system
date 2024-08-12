@@ -155,6 +155,6 @@ public class ProjectServiceImpl implements ProjectService {
   @Override
   public String findTitleProjectById(String projectId) {
     log.info("(findTitleProjectById)projectId: {}", projectId);
-    return "";
+    return projectRepository.findTitleProjectById(projectId);
   }
 }
