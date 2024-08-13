@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <style>
+    .hx .ii {
+      margin: 8px 0 0 0;
+      overflow-x: hidden;
+      padding: 0;
+    }
+    .gt {
+      font-size: 0.96rem;
+    }
+    .ii {
+      direction: ltr;
+      position: relative;
+    }
+    .ii a[href] {
+      color: #15c;
+    }
+    .a3s {
+      direction: initial;
+      font: small / 1.5 Arial, Helvetica, sans-serif;
+      overflow-x: auto;
+      overflow-y: hidden;
+      position: relative;
+    }
+
+  </style>
+</head>
+<body>
+<div id=":18n" class="ii gt" >
+  <div id=":18o" class="a3s aiL ">Xin chào
+    <a th:href="'mailto:'+ ${email}" target="_blank" th:text="${email}"></a>,
+    <br>
+    <p th:text="${title}"></p>
+    <p th:text="${subtitle}"></p>
+    Thank you,<br>
+    Todo List account group<br>
+    <div class="yj6qo"></div>
+    <div class="adL"><br></div>
+  </div>
+</div>
+</body>
+</html>
