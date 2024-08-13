@@ -391,7 +391,7 @@
   <changeSet id="20240723-1050-add-expire-date-share" author="Phan Kieu">
     <dropColumn tableName="project_user" columnName="share_token"/>
     <addColumn tableName="project_user">
-      <column name="expire_date_share" type="date"/>
+      <column name="expire_date_share" type="datetime"/>
     </addColumn>
   </changeSet>
 </databaseChangeLog>
