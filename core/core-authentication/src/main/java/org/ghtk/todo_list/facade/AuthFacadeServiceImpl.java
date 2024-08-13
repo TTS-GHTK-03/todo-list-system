@@ -22,6 +22,7 @@ import org.ghtk.todo_list.dto.response.ActiveLoginResponse;
 import org.ghtk.todo_list.dto.response.LoginResponse;
 import org.ghtk.todo_list.dto.response.UnactiveLoginResponse;
 import org.ghtk.todo_list.dto.response.VerifyRegisterResponse;
+import org.ghtk.todo_list.entity.AuthUser;
 import org.ghtk.todo_list.exception.AccountLockedException;
 import org.ghtk.todo_list.exception.EmailNotFoundException;
 import org.ghtk.todo_list.exception.OTPInvalidException;
@@ -59,17 +60,18 @@ public class AuthFacadeServiceImpl implements AuthFacadeService {
   @Override
   public void register(RegisterRequest request) {
     log.info("(register)request: {}", request);
+    if (!Objects.equals(request.getPassword(), request.getConfirmPassword())) {
+      log.error(
+          "(register)password: {}, confirmPassword:{}  don't match",
+          request.getPassword(),
+          request.getConfirmPassword());
+      throw new PasswordConfirmNotMatchException();
+    }
 
     var key = redisCacheService.get(REGISTER_SHARE_KEY, request.getEmail());
+    var registerKeyCache = redisCacheService.get(REGISTER_KEY, request.getEmail());
     if (key.isEmpty() || !key.get().equals(INACTIVE)) {
-      if (!Objects.equals(request.getPassword(), request.getConfirmPassword())) {
-        log.error(
-            "(register)password: {}, confirmPassword:{}  don't match",
-            request.getPassword(),
-            request.getConfirmPassword());
-        throw new PasswordConfirmNotMatchException();
-      }
-      var registerKeyCache = redisCacheService.get(REGISTER_KEY, request.getEmail());
+
       log.error("(registerKeyCache) registerKeyCache: {}", registerKeyCache);
 
       if (registerKeyCache.isEmpty() || !registerKeyCache.get().equals(request.getRegisterKey())) {
@@ -83,13 +85,6 @@ public class AuthFacadeServiceImpl implements AuthFacadeService {
       authUserService.create(request.getEmail(), authAccount.getId());
       redisCacheService.delete(REGISTER_KEY, request.getEmail());
     } else {
-      if (!Objects.equals(request.getPassword(), request.getConfirmPassword())) {
-        log.error(
-            "(register)password: {}, confirmPassword:{}  don't match",
-            request.getPassword(),
-            request.getConfirmPassword());
-        throw new PasswordConfirmNotMatchException();
-      }
       var authAccount = authAccountService.create(
           request.getUsername(),
           CryptUtil.getPasswordEncoder().encode(request.getPassword())
@@ -214,17 +209,7 @@ public class AuthFacadeServiceImpl implements AuthFacadeService {
     redisCacheService.delete(LOGIN_UNLOCK_TIME_KEY, user.getEmail());
     redisCacheService.delete(LOGIN_FAILED_ATTEMPT_KEY, user.getEmail());
 
-    ActiveLoginResponse loginResponse = new ActiveLoginResponse();
-    loginResponse.setAccessToken(
-        authTokenService.generateAccessToken(user.getId(), user.getEmail(),
-            account.getUsername()));
-    loginResponse.setRefreshToken(
-        authTokenService.generateRefreshToken(user.getId(), user.getEmail(),
-            account.getUsername()));
-    loginResponse.setAccessTokenLifeTime(authTokenService.getAccessTokenLifeTime());
-    loginResponse.setRefreshTokenLifeTime(authTokenService.getRefreshTokenLifeTime());
-
-    return loginResponse;
+    return createLoginResponse(user, account);
   }
 
   @Override
@@ -407,6 +392,19 @@ public class AuthFacadeServiceImpl implements AuthFacadeService {
 
   private String generateResetPasswordKey(String email) {
     return Base64.getEncoder().encodeToString((email + System.currentTimeMillis()).getBytes());
+  }
+
+  private LoginResponse createLoginResponse(AuthUser user, AuthAccount account) {
+    ActiveLoginResponse loginResponse = new ActiveLoginResponse();
+    loginResponse.setAccessToken(
+        authTokenService.generateAccessToken(user.getId(), user.getEmail(),
+            account.getUsername()));
+    loginResponse.setRefreshToken(
+        authTokenService.generateRefreshToken(user.getId(), user.getEmail(),
+            account.getUsername()));
+    loginResponse.setAccessTokenLifeTime(authTokenService.getAccessTokenLifeTime());
+    loginResponse.setRefreshTokenLifeTime(authTokenService.getRefreshTokenLifeTime());
+    return loginResponse;
   }
 
 }
