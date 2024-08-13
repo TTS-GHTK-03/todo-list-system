@@ -399,7 +399,6 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
     var notification = new ActivityLog();
     notification.setAction(DELETE_TASK);
     notification.setUserId(userId);
-    notification.setTaskId(taskId);
     activityLogService.create(notification);
   }
 
