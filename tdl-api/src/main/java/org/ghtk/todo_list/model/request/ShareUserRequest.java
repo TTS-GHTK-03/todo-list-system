@@ -22,7 +22,7 @@ public class ShareUserRequest {
   @NotBlank(message = "Role is required")
   private String role;
 
-  @Schema(description = "Expire date", example = "hh:MM:ss")
+  @Schema(description = "Expire time", example = "1")
 
-  private String expireTime;
+  private long expireTime;
 }

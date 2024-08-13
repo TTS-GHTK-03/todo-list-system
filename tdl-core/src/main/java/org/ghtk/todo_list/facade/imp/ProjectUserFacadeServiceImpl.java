@@ -7,6 +7,11 @@ import static org.ghtk.todo_list.constant.CacheConstant.SHARE_KEY;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
+import java.sql.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoField;
+import java.time.temporal.ChronoUnit;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
@@ -20,6 +25,7 @@ import org.ghtk.todo_list.core_email.helper.EmailHelper;
 import org.ghtk.todo_list.entity.ActivityLog;
 import org.ghtk.todo_list.entity.AuthUser;
 import org.ghtk.todo_list.entity.Project;
+import org.ghtk.todo_list.entity.ProjectUser;
 import org.ghtk.todo_list.exception.EmailInviteStillValidException;
 import org.ghtk.todo_list.exception.EmailNotInviteException;
 import org.ghtk.todo_list.exception.EmailShareStillValidException;
@@ -158,8 +164,8 @@ public class ProjectUserFacadeServiceImpl implements ProjectUserFacadeService {
 
   @Override
   public void shareProject(String userId, String projectId, String sharedUserEmail, String role,
-      String expireTime) {
-    log.info("(shareProject)user: {}, project: {}, sharedUserEmail: {}, role: {}, expireTime: {}",
+      long expireTime) {
+    log.info("(shareProject)user: {}, project: {}, sharedUserEmail: {}, role: {}, expireDate: {}",
         userId, projectId, sharedUserEmail, role, expireTime);
 
     validateProjectId(projectId);
@@ -185,6 +191,29 @@ public class ProjectUserFacadeServiceImpl implements ProjectUserFacadeService {
       throw new ProjectUserExistedException();
     }
 
+    ProjectUser projectUser = new ProjectUser();
+    projectUser.setProjectId(projectId);
+    projectUser.setRole(role);
+    if (authUserService.existsByEmail(sharedUserEmail)) {
+      AuthUser authUser = authUserService.findByEmail(sharedUserEmail);
+      log.info("(shareProject)email: {} has account", sharedUserEmail);
+      if(!projectUserService.existsByUserIdAndProjectId(authUser.getId(), projectId)) {
+        log.info("(shareProject)email: {} not in project: {}", sharedUserEmail, projectId);
+        projectUser.setUserId(authUser.getId());
+        projectUser.setExpireDateShare(LocalDateTime.now().plusDays(expireTime));
+        projectUserService.createProjectUserShare(projectUser);
+      } else {
+        log.error("(shareProject)email: {} already in project: {}", sharedUserEmail, projectId);
+        throw new ProjectUserExistedException();
+      }
+    } else {
+      log.warn("(shareProject)email: {} don't have account", sharedUserEmail);
+      AuthUser authUser = authUserService.createTemporaryUser(sharedUserEmail);
+      projectUser.setUserId(authUser.getId());
+      projectUser.setExpireDateShare(LocalDateTime.now().plusDays(expireTime));
+      projectUserService.createProjectUserShare(projectUser);
+    }
+
     var redisShareUser = redisCacheService.get(SHARE_KEY + projectId + sharedUserEmail);
     if (redisShareUser.isPresent()) {
       log.error("(shareProject)email: {} already shared", sharedUserEmail);
@@ -193,13 +222,9 @@ public class ProjectUserFacadeServiceImpl implements ProjectUserFacadeService {
 
     var subject = "Admin shared you to their project in Todo List";
     var param = new HashMap<String, Object>();
-    String[] time = expireTime.split(":");
-    long hours = Long.parseLong(time[0]);
-    long minutes = Long.parseLong(time[1]);
-    long second = Long.parseLong(time[2]);
 
     String shareToken = shareTokenService.generateShareToken(sharedUserEmail, role, projectId,
-        (hours * 3600 + minutes * 60 + second) * 1000);
+        expireTime * 24 * 60 * 60 * 1000);
 
     param.put("projectId", projectId);
     param.put("email", sharedUserEmail);
@@ -245,7 +270,8 @@ public class ProjectUserFacadeServiceImpl implements ProjectUserFacadeService {
     String email = claims.get("email", String.class);
     String role = claims.get("role", String.class);
     String projectId = claims.get("projectId", String.class);
-
+    long expireTime = claims.get("expireTime", Long.class);
+    log.info("(viewShareProject)expireTime: {}", expireTime);
     validateProjectId(projectId);
 
     if (!RoleProjectUser.isValid(role)) {
@@ -261,15 +287,14 @@ public class ProjectUserFacadeServiceImpl implements ProjectUserFacadeService {
       log.info("(viewShareProject)user: log in");
       if (email.equals(authUserService.findById(userId).getEmail())) {
         log.info("(viewShareProject)email: {} valid with token", email);
-        projectUserService.createProjectUser(userId, projectId, role);
         acceptShareResponse.setStatus(UserActionStatus.LOGGED_ACCEPTED.toString());
       } else {
         log.warn("(viewShareProject)email: {} invalid with token", email);
-        checkEmailAcceptShare(userId, email, projectId, role, acceptShareResponse);
+        checkEmailAcceptShare(email, acceptShareResponse);
       }
     } else {
       log.info("(viewShareProject)user: not log in");
-      checkEmailAcceptShare(null, email, projectId, role, acceptShareResponse);
+      checkEmailAcceptShare(email, acceptShareResponse);
     }
     return acceptShareResponse;
   }
@@ -389,18 +414,14 @@ public class ProjectUserFacadeServiceImpl implements ProjectUserFacadeService {
     }
   }
 
-  private void checkEmailAcceptShare(String userId, String email, String projectId, String role,
-      AcceptShareResponse acceptShareResponse) {
+  private void checkEmailAcceptShare(String email,AcceptShareResponse acceptShareResponse) {
     log.info("(checkEmailAcceptShare)email: {}", email);
     if (authUserService.existsByEmail(email)) {
       log.info("(checkEmailAcceptShare)email: {} existed", email);
-      projectUserService.createProjectUser(userId, projectId, role);
       acceptShareResponse.setStatus(UserActionStatus.ACCEPTED.toString());
 
     } else {
       log.warn("(checkEmailAcceptShare)email: {} not existed", email);
-      AuthUser authUser = authUserService.createTemporaryUser(email);
-      projectUserService.createProjectUser(authUser.getId(), projectId, role);
       acceptShareResponse.setStatus(UserActionStatus.UNREGISTERED.toString());
     }
   }
