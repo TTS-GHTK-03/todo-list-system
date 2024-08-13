@@ -4,6 +4,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Table;
 import java.io.Serializable;
+import java.sql.Date;
+import java.time.LocalDateTime;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.ghtk.todo_list.entity.base.BaseEntity;
@@ -19,5 +21,5 @@ public class ProjectUser extends BaseEntity implements Serializable {
   private String userId;
   private String projectId;
   private String role;
-  private String shareToken;
+  private LocalDateTime expireDateShare;
 }

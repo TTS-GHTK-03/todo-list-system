@@ -3,6 +3,7 @@ package org.ghtk.todo_list.service.impl;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -42,12 +43,13 @@ public class ShareTokenServiceImpl implements ShareTokenService {
   }
 
   @Override
-  public String generateShareToken(String email, String role, String projectId, Long expireTime) {
+  public String generateShareToken(String email, String role, String projectId, long expireTime) {
     log.info("(generateShareToken)email: {}, role: {}, projectId: {}, expireTime: {}", email, role, projectId, expireTime);
     var claims = new HashMap<String, Object>();
     claims.put("projectId", projectId);
     claims.put("email", email);
     claims.put("role", role);
+    claims.put("expireTime", expireTime);
     return generateToken(email, claims, expireTime, shareTokenJwtSecret);
   }
 
