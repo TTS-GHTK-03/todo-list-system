@@ -9,5 +9,5 @@ public interface TaskMapper {
 
   List<TaskResponse> toTaskResponses(List<Task> tasks);
 
-  List<TaskDetailResponse> toTaskDetailResponsesWithUserId(List<Task> tasks);
+  List<TaskDetailResponse> toTaskDetailResponses(List<Task> tasks);
 }

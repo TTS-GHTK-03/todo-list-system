@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.ghtk.todo_list.constant.RoleProjectUser;
+import org.ghtk.todo_list.constant.ImageConstant;
 import org.ghtk.todo_list.constant.SprintStatus;
 import org.ghtk.todo_list.constant.TaskStatus;
 import org.ghtk.todo_list.dto.response.UserResponse;
@@ -22,11 +22,11 @@ import org.ghtk.todo_list.entity.Project;
 import org.ghtk.todo_list.entity.Task;
 import org.ghtk.todo_list.entity.TaskAssignees;
 import org.ghtk.todo_list.entity.Sprint;
+import org.ghtk.todo_list.entity.Type;
 import org.ghtk.todo_list.exception.ApproachEndDateSprintException;
 import org.ghtk.todo_list.exception.DueDateTaskInvalidSprintEndDateException;
 import org.ghtk.todo_list.exception.DueDateTaskInvalidStartDateException;
 import org.ghtk.todo_list.exception.ProjectNotFoundException;
-import org.ghtk.todo_list.exception.RoleProjectNotAllowException;
 import org.ghtk.todo_list.exception.SprintDoneException;
 import org.ghtk.todo_list.exception.SprintNotFoundException;
 import org.ghtk.todo_list.exception.SprintNotStartException;
@@ -35,19 +35,21 @@ import org.ghtk.todo_list.exception.TaskAssignmentExistsException;
 import org.ghtk.todo_list.exception.TaskHasNotStartedException;
 import org.ghtk.todo_list.exception.TaskNotExistUserException;
 import org.ghtk.todo_list.exception.TaskNotFoundException;
-import org.ghtk.todo_list.exception.StatusTaskKeyNotFoundException;
 import org.ghtk.todo_list.exception.UserNotFoundException;
 import org.ghtk.todo_list.facade.TaskFacadeService;
-import org.ghtk.todo_list.mapper.UserResponseMapper;
+import org.ghtk.todo_list.model.response.LabelResponse;
+import org.ghtk.todo_list.model.response.SprintDetailResponse;
 import org.ghtk.todo_list.model.response.SprintsProjectDetailResponse;
 import org.ghtk.todo_list.mapper.TaskMapper;
 import org.ghtk.todo_list.model.response.TaskDetailResponse;
 import org.ghtk.todo_list.model.response.TaskResponse;
+import org.ghtk.todo_list.model.response.TypeResponse;
 import org.ghtk.todo_list.model.response.UpdateDueDateTaskResponse;
 import org.ghtk.todo_list.service.ActivityLogService;
 import org.ghtk.todo_list.service.AuthUserService;
 import org.ghtk.todo_list.service.CommentService;
 import org.ghtk.todo_list.service.LabelAttachedService;
+import org.ghtk.todo_list.service.LabelService;
 import org.ghtk.todo_list.service.ProjectService;
 import org.ghtk.todo_list.service.ProjectUserService;
 import org.ghtk.todo_list.service.RedisCacheService;
@@ -55,6 +57,7 @@ import org.ghtk.todo_list.service.SprintProgressService;
 import org.ghtk.todo_list.service.SprintService;
 import org.ghtk.todo_list.service.TaskAssigneesService;
 import org.ghtk.todo_list.service.TaskService;
+import org.ghtk.todo_list.service.TypeService;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -67,6 +70,8 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
   private final TaskService taskService;
   private final AuthUserService authUserService;
   private final SprintService sprintService;
+  private final TypeService typeService;
+  private final LabelService labelService;
   private final TaskAssigneesService taskAssigneesService;
   private final ProjectUserService projectUserService;
   private final RedisCacheService redisCacheService;
@@ -100,22 +105,18 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
     List<TaskDetailResponse> taskDetailResponseList = taskService.getAllTaskDetailByProjectId(projectId);
     for (TaskDetailResponse taskDetailResponse : taskDetailResponseList) {
       log.info("(getAllTaskByProjectId)taskDetailResponse: {}", taskDetailResponse);
-      UserResponse userResponse = authUserService.getUserResponseById(taskAssigneesService.findUserIdByTaskId(taskDetailResponse.getId()));
-      taskDetailResponse.setUserResponse(userResponse);
-      if (taskDetailResponse.getSprintId() != null) {
-        Sprint sprint = sprintService.findById(taskDetailResponse.getSprintId());
-        taskDetailResponse.setSprintTitle(sprint.getTitle());
-        taskDetailResponse.setSprintStatus(sprint.getStatus());
-      }
+      fillData(taskDetailResponse);
     }
     return taskDetailResponseList;
   }
 
   @Override
-  public TaskResponse getTaskByTaskId(String userId, String projectId, String taskId) {
+  public TaskDetailResponse getTaskByTaskId(String userId, String projectId, String taskId) {
     log.info("(getTaskByTaskId)taskId: {},projectId: {}", taskId, projectId);
     validateProjectId(projectId);
-    return taskService.findById(taskId, taskAssigneesService.findUserIdByTaskId(taskId));
+    TaskDetailResponse taskDetailResponse = taskService.findById(taskId, taskAssigneesService.findUserIdByTaskId(taskId));
+    fillData(taskDetailResponse);
+    return taskDetailResponse;
   }
 
   @Override
@@ -362,6 +363,7 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
     task.setProjectId(projectId);
     task.setStatus(TODO.toString());
     task.setKeyProjectTask(generateKeyProjectTask(projectId));
+    task.setTypeId(typeService.findByProjectIdAndTitle(projectId, ImageConstant.STORY).getId());
     Task savedTask = taskService.save(task);
 
     var user = authUserService.findByUnassigned();
@@ -429,22 +431,29 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
   }
 
   @Override
-  public List<TaskResponse> searchTask(String searchValue, String typeId, String labelId,
+  public List<TaskDetailResponse> searchTask(String searchValue, String typeId, String labelId,
       String status, String assignee, String userId, String projectId, String sprintId) {
     log.info("(searchTask)searchValue: {}, userId: {}, projectId: {}", searchValue, userId,
         projectId);
 
     var taskSearch = taskService.searchTask(searchValue, typeId, labelId, status, assignee,
         userId, projectId, sprintId);
-    List<TaskResponse> responses = new ArrayList<>();
+    List<TaskDetailResponse> responses = new ArrayList<>();
     for (var task : taskSearch) {
-      TaskResponse response = new TaskResponse();
+      TaskDetailResponse response = new TaskDetailResponse();
+      response.setUserResponse(new UserResponse());
+      response.setTypeResponse(new TypeResponse());
+      response.setSprintDetailResponse(new SprintDetailResponse());
+
       response.setId(task.getId());
       response.setTitle(task.getTitle());
       response.setPoint(task.getPoint());
       response.setStatus(task.getStatus());
       response.setKeyProjectTask(task.getKeyProjectTask());
-      response.setUserId(taskAssigneesService.findUserIdByTaskId(task.getId()));
+      response.getUserResponse().setId(taskAssigneesService.findUserIdByTaskId(task.getId()));
+      response.getSprintDetailResponse().setSprintId(task.getSprintId());
+      response.getTypeResponse().setId(task.getTypeId());
+      fillData(response);
       responses.add(response);
     }
     return responses;
@@ -515,15 +524,11 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
     }
     validateProjectId(projectId);
 
-    List<TaskDetailResponse> taskDetailResponseList = taskMapper.toTaskDetailResponsesWithUserId(
+    List<TaskDetailResponse> taskDetailResponseList = taskMapper.toTaskDetailResponses(
         taskService.getAllTasksByProjectIdAndStatus(projectId, statusFormat));
     for (TaskDetailResponse taskDetailResponse : taskDetailResponseList) {
       log.info("(getAllTaskByProjectIdAndStatus)taskDetailResponse: {}", taskDetailResponse);
-      UserResponse userResponse = authUserService.getUserResponseById(taskDetailResponse.getUserResponse().getId());
-      taskDetailResponse.setUserResponse(userResponse);
-      if (taskDetailResponse.getSprintId() != null) {
-        taskDetailResponse.setSprintTitle(sprintService.findById(taskDetailResponse.getSprintId()).getTitle());
-      }
+      fillData(taskDetailResponse);
     }
     return taskDetailResponseList;
   }
@@ -540,7 +545,29 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
     Project project = projectService.getProjectById(projectId);
     int counterTask = project.getCounterTask();
     project.setCounterTask(++counterTask);
+    System.out.println(project.getCounterTask());
     projectService.updateProject(project);
     return project.getKeyProject() + "-" + project.getCounterTask();
+  }
+
+  private void fillData(TaskDetailResponse taskDetailResponse){
+    log.info("(fillData)taskDetailResponse: {}", taskDetailResponse);
+    UserResponse userResponse = authUserService.getUserResponseById(taskDetailResponse.getUserResponse().getId());
+    taskDetailResponse.setUserResponse(userResponse);
+    if (taskDetailResponse.getSprintDetailResponse().getSprintId() != null) {
+      Sprint sprint = sprintService.findById(taskDetailResponse.getSprintDetailResponse().getSprintId());
+      taskDetailResponse.getSprintDetailResponse().setSprintTitle(sprint.getTitle());
+      taskDetailResponse.getSprintDetailResponse().setSprintStatus(sprint.getStatus());
+    }
+
+    if (taskDetailResponse.getTypeResponse().getId() != null) {
+      Type type = typeService.findById(taskDetailResponse.getTypeResponse().getId());
+      taskDetailResponse.getTypeResponse().setTitle(type.getTitle());
+      taskDetailResponse.getTypeResponse().setImage(type.getImage());
+      taskDetailResponse.getTypeResponse().setDescription(type.getDescription());
+    }
+
+    List<LabelResponse> labelResponseList = labelService.getAllLabelByTask(taskDetailResponse.getId());
+    taskDetailResponse.setLabelResponseList(labelResponseList);
   }
 }

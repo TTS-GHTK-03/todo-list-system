@@ -12,7 +12,7 @@ public interface TaskFacadeService {
   List<TaskResponse> getAllTaskByProjectParticipant(String userId);
   List<TaskDetailResponse> getAllTaskByProjectId(String userId, String projectId);
 
-  TaskResponse getTaskByTaskId(String userId, String projectId, String taskId);
+  TaskDetailResponse getTaskByTaskId(String userId, String projectId, String taskId);
 
   TaskResponse updateStatusTask(String userId, String projectId, String taskId, String status);
   TaskResponse updatePointTask(String userId, String projectId, String taskId, int point);
@@ -29,7 +29,7 @@ public interface TaskFacadeService {
   void deleteTask(String userId, String projectId, String taskId);
   TaskResponse updateTitleTask(String userId, String projectId, String taskId, String title);
   List<TaskResponse> getAllTaskAssigneesForUser(String userId);
-  List<TaskResponse> searchTask(String searchValue, String typeId, String labelId, String status,
+  List<TaskDetailResponse> searchTask(String searchValue, String typeId, String labelId, String status,
       String assignee, String userId, String projectId, String sprintId);
   List<SprintsProjectDetailResponse> getAllTaskByAllSprint(String projectId);
 }

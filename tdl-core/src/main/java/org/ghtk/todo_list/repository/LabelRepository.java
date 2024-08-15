@@ -21,6 +21,13 @@ public interface LabelRepository extends JpaRepository<Label, String> {
       """)
   List<Label> getAllLabelByProjectIdAndLabelAttached(String projectId);
 
+  @Query("""
+      SELECT l FROM Label l
+      JOIN LabelAttached la ON la.labelId = l.id
+      JOIN Task t ON t.id = la.taskId AND t.id = :taskId
+      """)
+  List<Label> getAllLabelByTask(String taskId);
+
   void deleteAllByTypeId(String typeId);
 
   void deleteByTypeId(String typeId);
