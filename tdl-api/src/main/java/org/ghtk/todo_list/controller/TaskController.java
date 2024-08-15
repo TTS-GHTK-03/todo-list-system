@@ -84,7 +84,7 @@ public class TaskController {
 
   @PostMapping ("/{project_id}/tasks")
   @Operation(description = "Create task")
-  public BaseResponse<TaskResponse> createTask(
+  public BaseResponse<TaskDetailResponse> createTask(
       @Parameter(name = "project_id", description = "Identification project")
       @PathVariable("project_id") String projectId,
       @Valid @RequestBody CreateTaskRequest createTaskRequest) {
