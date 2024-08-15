@@ -96,7 +96,7 @@ public class TaskController {
 
   @GetMapping("/{project_id}/tasks/{task_id}")
   @Operation(description = "Get task by task id")
-  public BaseResponse<TaskResponse> getTaskByTaskId(
+  public BaseResponse<TaskDetailResponse> getTaskByTaskId(
       @Parameter(name = "project_id", description = "Identification project")
       @PathVariable("project_id") String projectId,
       @Parameter(name = "task_id", description = "Identification task")
@@ -231,7 +231,7 @@ public class TaskController {
   }
   @GetMapping("/{project_id}/tasks/search")
   @Operation(description = "Filter search task")
-  public BaseResponse<List<TaskResponse>> searchTask(
+  public BaseResponse<List<TaskDetailResponse>> searchTask(
       @Parameter(name = "project_id", description = "Identification project")
       @PathVariable("project_id") String projectId,
       @Parameter(name = "search", description = "KeyProjectTask or title")

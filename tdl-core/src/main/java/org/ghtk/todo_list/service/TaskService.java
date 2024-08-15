@@ -11,7 +11,7 @@ public interface TaskService {
   List<TaskResponse> getAllTasksByProjectId(String projectId);
   List<TaskDetailResponse> getAllTaskDetailByProjectId(String projectId);
 
-  TaskResponse findById(String taskId, String userId);
+  TaskDetailResponse findById(String taskId, String userId);
 
   TaskResponse updateStatus(String taskId, String taskStatus, String userId);
 

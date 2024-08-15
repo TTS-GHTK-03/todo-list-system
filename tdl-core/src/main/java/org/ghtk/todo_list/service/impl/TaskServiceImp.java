@@ -1,17 +1,18 @@
 package org.ghtk.todo_list.service.impl;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.ghtk.todo_list.constant.SprintStatus;
 import org.ghtk.todo_list.constant.TaskStatus;
+import org.ghtk.todo_list.dto.response.UserResponse;
 import org.ghtk.todo_list.entity.Task;
 import org.ghtk.todo_list.exception.TaskNotFoundException;
 import org.ghtk.todo_list.filter.FilterTask;
+import org.ghtk.todo_list.model.response.SprintDetailResponse;
 import org.ghtk.todo_list.model.response.TaskDetailResponse;
 import org.ghtk.todo_list.model.response.TaskResponse;
+import org.ghtk.todo_list.model.response.TypeResponse;
 import org.ghtk.todo_list.model.response.UpdateDueDateTaskResponse;
 import org.ghtk.todo_list.repository.TaskRepository;
 import org.ghtk.todo_list.service.TaskService;
@@ -38,12 +39,15 @@ public class TaskServiceImp implements TaskService {
   }
 
   @Override
-  public List<TaskDetailResponse> getAllTaskDetailByProjectId(String projectId){
+  public List<TaskDetailResponse> getAllTaskDetailByProjectId(String projectId) {
     log.info("(getAllTaskDetailByProjectId)projectId: {}", projectId);
     List<Task> tasks = taskRepository.getAllTasksByProjectId(projectId);
     return tasks.stream()
         .map(task -> TaskDetailResponse.of(task.getId(), task.getTitle(), task.getPoint(),
-            task.getStatus(), task.getKeyProjectTask(), null, task.getSprintId(), null, null))
+            task.getStatus(), task.getKeyProjectTask(),
+            new UserResponse(task.getUserId(), null, null, null, null, null),
+            SprintDetailResponse.of(task.getSprintId(), null, null),
+            TypeResponse.of(task.getTypeId(), null, null, null), null))
         .collect(Collectors.toList());
   }
 
@@ -54,13 +58,16 @@ public class TaskServiceImp implements TaskService {
   }
 
   @Override
-  public TaskResponse findById(String taskId, String userId) {
+  public TaskDetailResponse findById(String taskId, String userId) {
     log.info("(getTaskByTaskId)projectId: {}", taskId);
     var task = taskRepository.findById(taskId).orElseThrow(() -> {
       throw new TaskNotFoundException();
     });
 
-    return TaskResponse.of(task.getId(), task.getTitle(), task.getPoint(), task.getStatus(), task.getKeyProjectTask(), userId);
+    return TaskDetailResponse.of(task.getId(), task.getTitle(), task.getPoint(), task.getStatus(),
+        task.getKeyProjectTask(), new UserResponse(task.getUserId(), null, null, null, null, null),
+        SprintDetailResponse.of(task.getSprintId(), null, null),
+        TypeResponse.of(task.getTypeId(), null, null, null), null);
   }
 
   @Override
@@ -74,7 +81,8 @@ public class TaskServiceImp implements TaskService {
         });
     task.setStatus(taskStatus);
     taskRepository.save(task);
-    return TaskResponse.of(task.getId(), task.getTitle(), task.getPoint(), task.getStatus(), task.getKeyProjectTask(), userId);
+    return TaskResponse.of(task.getId(), task.getTitle(), task.getPoint(), task.getStatus(),
+        task.getKeyProjectTask(), userId);
   }
 
   @Override
@@ -87,7 +95,7 @@ public class TaskServiceImp implements TaskService {
           log.error("(updateStatus)taskId: {}, userID: {}", taskId, userId);
           throw new TaskNotFoundException();
         });
-    taskRepository.updatePoint(task.getId(),point);
+    taskRepository.updatePoint(task.getId(), point);
     task.setPoint(point);
     return TaskResponse.from(task, userId);
   }
@@ -99,7 +107,8 @@ public class TaskServiceImp implements TaskService {
   }
 
   @Override
-  public TaskResponse updateSprintId(String projectId, String taskId, String sprintId, String userId) {
+  public TaskResponse updateSprintId(String projectId, String taskId, String sprintId,
+      String userId) {
     log.info("(updateSprintId)projectId: {}, taskId: {}, sprintId: {}, userId: {}",
         projectId, taskId, sprintId, userId);
     var task = taskRepository
@@ -111,7 +120,8 @@ public class TaskServiceImp implements TaskService {
         });
     task.setSprintId(sprintId);
     taskRepository.save(task);
-    return TaskResponse.of(task.getId(), task.getTitle(), task.getPoint(), task.getStatus(), task.getKeyProjectTask(), userId);
+    return TaskResponse.of(task.getId(), task.getTitle(), task.getPoint(), task.getStatus(),
+        task.getKeyProjectTask(), userId);
   }
 
   @Override
@@ -141,7 +151,9 @@ public class TaskServiceImp implements TaskService {
     log.info("(save)task: {}", task);
     return taskRepository.save(task);
   }
-  public UpdateDueDateTaskResponse updateDueDate(String projectId, String sprintId, String taskId, String dueDate){
+
+  public UpdateDueDateTaskResponse updateDueDate(String projectId, String sprintId, String taskId,
+      String dueDate) {
     log.info("(updateDueDate)projectId: {}, sprintId: {}, taskId: {}",
         projectId, sprintId, taskId);
     var task = taskRepository
@@ -204,7 +216,8 @@ public class TaskServiceImp implements TaskService {
 
   @Override
   public void updateTaskTypeIdByTypeId(String defaultTypeId, String oldTypeId) {
-    log.info("(updateTaskTypeIdByTypeId)defaultTypeId: {}, oldTypeId: {}", defaultTypeId, oldTypeId);
+    log.info("(updateTaskTypeIdByTypeId)defaultTypeId: {}, oldTypeId: {}", defaultTypeId,
+        oldTypeId);
     taskRepository.updateTaskTypeIdByTypeId(defaultTypeId, oldTypeId);
   }
 
@@ -235,7 +248,8 @@ public class TaskServiceImp implements TaskService {
 
   @Override
   public List<Task> searchTask(String searchValue, String typeId,
-      String labelId, String status, String assignee, String userId, String projectId, String sprintId) {
+      String labelId, String status, String assignee, String userId, String projectId,
+      String sprintId) {
     log.info("(searchTask)searchValue: {}", searchValue);
     return taskRepository.findAll(FilterTask.getTasksByCriteria(searchValue, typeId,
         labelId, status, assignee, userId, projectId, sprintId));
@@ -243,13 +257,15 @@ public class TaskServiceImp implements TaskService {
 
   @Override
   public Integer countBySprintIdAndProjectIdAndStatusNotDone(String sprintId, String projectId) {
-    log.info("(countBySprintIdAndProjectIdAndStatusNotDone)sprintId: {}, projectId: {}", sprintId, projectId);
+    log.info("(countBySprintIdAndProjectIdAndStatusNotDone)sprintId: {}, projectId: {}", sprintId,
+        projectId);
     return taskRepository.countBySprintIdAndProjectIdAndStatusNotDone(sprintId, projectId);
   }
 
   @Override
   public Integer countBySprintIdAndProjectIdAndStatusDone(String sprintId, String projectId) {
-    log.info("(countBySprintIdAndProjectIdAndStatusDone)sprintId: {}, projectId: {}", sprintId, projectId);
+    log.info("(countBySprintIdAndProjectIdAndStatusDone)sprintId: {}, projectId: {}", sprintId,
+        projectId);
     return taskRepository.countBySprintIdAndProjectIdAndStatusDone(sprintId, projectId);
   }
 
@@ -260,8 +276,10 @@ public class TaskServiceImp implements TaskService {
   }
 
   @Override
-  public List<Task> findAllByProjectIdAndSprintIdAndStatusNotDone(String projectId, String sprintId) {
-    log.info("(findAllByProjectIdAndSprintIdAndStatusNotDone)projectId: {}, sprintId: {}", projectId, sprintId);
+  public List<Task> findAllByProjectIdAndSprintIdAndStatusNotDone(String projectId,
+      String sprintId) {
+    log.info("(findAllByProjectIdAndSprintIdAndStatusNotDone)projectId: {}, sprintId: {}",
+        projectId, sprintId);
     return taskRepository.findAllByProjectIdAndSprintIdAndStatusNotDone(projectId, sprintId);
   }
 }

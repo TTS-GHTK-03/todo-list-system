@@ -1,17 +1,19 @@
 package org.ghtk.todo_list.model.response;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
-@NoArgsConstructor
+@Builder
 @AllArgsConstructor(staticName = "of")
-public class TypeResponse {
-  private String id;
-  private String title;
-  private String image;
-  private String description;
+@NoArgsConstructor
+public class SprintDetailResponse {
+
+  private String sprintId;
+  private String sprintTitle;
+  private String sprintStatus;
 }

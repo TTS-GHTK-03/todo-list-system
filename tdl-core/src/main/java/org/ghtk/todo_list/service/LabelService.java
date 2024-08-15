@@ -14,6 +14,8 @@ public interface LabelService {
 
   List<Label> getLabelsByType(String typeId);
   List<Label> getAllLabelByProjectIdAndLabelAttached(String projectId);
+  List<LabelResponse> getAllLabelByTask(String taskId);
+
   void deleteLabel(String id);
   void deleteByTypeId(String typeId);
   boolean existsById(String id);
