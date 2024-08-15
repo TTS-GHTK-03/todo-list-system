@@ -545,7 +545,6 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
     Project project = projectService.getProjectById(projectId);
     int counterTask = project.getCounterTask();
     project.setCounterTask(++counterTask);
-    System.out.println(project.getCounterTask());
     projectService.updateProject(project);
     return project.getKeyProject() + "-" + project.getCounterTask();
   }
