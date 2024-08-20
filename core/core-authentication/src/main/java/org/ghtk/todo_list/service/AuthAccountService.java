@@ -11,4 +11,5 @@ public interface AuthAccountService {
   AuthAccount save(AuthAccount authAccount);
   Optional<AuthAccount> findByUsername(String username);
   void updateLockPermanentById(String id, boolean isLockPermanent);
+  String findUsernameByUserId(String userId);
 }

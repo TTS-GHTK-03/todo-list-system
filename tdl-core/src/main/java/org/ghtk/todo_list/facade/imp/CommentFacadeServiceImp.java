@@ -16,6 +16,7 @@ import org.ghtk.todo_list.exception.UserNotFoundException;
 import org.ghtk.todo_list.facade.CommentFacadeService;
 import org.ghtk.todo_list.model.response.CommentResponse;
 import org.ghtk.todo_list.service.ActivityLogService;
+import org.ghtk.todo_list.service.AuthAccountService;
 import org.ghtk.todo_list.service.CommentService;
 import org.ghtk.todo_list.service.ProjectService;
 import org.ghtk.todo_list.service.TaskService;
@@ -30,6 +31,7 @@ public class CommentFacadeServiceImp implements CommentFacadeService {
   private final CommentService commentService;
   private final ProjectService projectService;
   private final ActivityLogService activityLogService;
+  private final AuthAccountService authAccountService;
 
   @Override
   public CommentResponse createComment(String userId, String projectId, String taskid,
@@ -43,8 +45,7 @@ public class CommentFacadeServiceImp implements CommentFacadeService {
     notification.setUserId(userId);
     notification.setTaskId(taskid);
     activityLogService.create(notification);
-
-    return commentService.createComment(userId, taskid, text);
+    return CommentResponse.from(commentService.createComment(userId, taskid, text), authAccountService.findUsernameByUserId(userId));
   }
 
   @Override
@@ -67,6 +68,7 @@ public class CommentFacadeServiceImp implements CommentFacadeService {
         .parentId(savedComment.getParentId())
         .taskId(savedComment.getTaskId())
         .userId(savedComment.getUserId())
+        .username(authAccountService.findUsernameByUserId(userId))
         .createdAt(savedComment.getCreatedAt())
         .lastUpdatedAt(savedComment.getLastUpdatedAt())
         .build();
@@ -98,6 +100,7 @@ public class CommentFacadeServiceImp implements CommentFacadeService {
         .parentId(comment.getParentId())
         .taskId(comment.getTaskId())
         .userId(comment.getUserId())
+        .username(authAccountService.findUsernameByUserId(comment.getUserId()))
         .createdAt(comment.getCreatedAt())
         .lastUpdatedAt(comment.getLastUpdatedAt())
         .build();
@@ -126,7 +129,7 @@ public class CommentFacadeServiceImp implements CommentFacadeService {
     notification.setTaskId(taskId);
     activityLogService.create(notification);
 
-    return commentService.replyComment(userId, taskId, commentId, text);
+    return CommentResponse.from(commentService.replyComment(userId, taskId, commentId, text), authAccountService.findUsernameByUserId(userId));
   }
 
   void validateTaskId(String taskId) {

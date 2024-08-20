@@ -60,4 +60,10 @@ public class AuthAccountServiceImpl implements AuthAccountService {
     log.info("(updateLockPermanentById)id: {}, isLockPermanent: {}", id, isLockPermanent);
     repository.updateLockPermanentById(id, isLockPermanent);
   }
+
+  @Override
+  public String findUsernameByUserId(String userId) {
+    log.info("(findUsernameByUserId)userId: {}", userId);
+    return repository.findUsernameByUserId(userId);
+  }
 }
