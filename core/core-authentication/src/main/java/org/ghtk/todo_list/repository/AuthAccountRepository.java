@@ -31,5 +31,12 @@ public interface AuthAccountRepository extends JpaRepository<AuthAccount, String
   @Query("update AuthAccount a set a.isLockedPermanent = :isLockPermanent where a.id = :id")
   void updateLockPermanentById(String id, boolean isLockPermanent);
 
+  @Query("""
+    select a.username from AuthAccount a
+    join AuthUser au on au.accountId = a.id
+    where au.id = :userId
+  """)
+  String findUsernameByUserId(String userId);
+
 }
 
