@@ -40,6 +40,7 @@ import org.ghtk.todo_list.dto.response.UserResponse;
 import org.ghtk.todo_list.model.response.AcceptInviteResponse;
 import org.ghtk.todo_list.model.response.AcceptShareResponse;
 import org.ghtk.todo_list.service.ActivityLogService;
+import org.ghtk.todo_list.service.AuthAccountService;
 import org.ghtk.todo_list.service.AuthUserService;
 import org.ghtk.todo_list.service.ProjectService;
 import org.ghtk.todo_list.service.ProjectUserService;
@@ -55,6 +56,7 @@ public class ProjectUserFacadeServiceImpl implements ProjectUserFacadeService {
   private final ProjectUserService projectUserService;
   private final ProjectService projectService;
   private final AuthUserService authUserService;
+  private final AuthAccountService authAccountService;
   private final ShareTokenService shareTokenService;
   private final RedisCacheService redisCacheService;
   private final TaskAssigneesService taskAssigneesService;
@@ -306,6 +308,7 @@ public class ProjectUserFacadeServiceImpl implements ProjectUserFacadeService {
 
     List<UserResponse> userResponseList = authUserService.getAllUserByProject(projectId);
     for (UserResponse userResponse : userResponseList) {
+      userResponse.setUsername(authAccountService.findUsernameByUserId(userResponse.getId()));
       userResponse.setRole(projectUserService.getRoleProjectUser(userResponse.getId(), projectId));
     }
     return userResponseList;

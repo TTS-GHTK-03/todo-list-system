@@ -42,6 +42,12 @@ public class ActivityLogServiceImpl implements ActivityLogService {
   }
 
   @Override
+  public void deleteAllBySprintId(String sprintId) {
+    log.info("(deleteAllBySprintId)sprintId: {}", sprintId);
+    activityLogRepository.deleteAllBySprintId(sprintId);
+  }
+
+  @Override
   public boolean existsByActivityLogId(String activityLogId) {
     log.info("(existsByActivityLogId)activityLogId: {}", activityLogId);
     return activityLogRepository.existsById(activityLogId);

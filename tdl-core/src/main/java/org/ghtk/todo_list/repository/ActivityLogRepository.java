@@ -28,6 +28,6 @@ public interface ActivityLogRepository extends JpaRepository<ActivityLog, String
       """)
   List<ActivityLog> findAllNotifications(String userId, int end, int start);
   void deleteAllByTaskId(String taskId);
-
+  void deleteAllBySprintId(String sprintId);
   boolean existsByIdAndUserId(String activityLogId, String userId);
 }

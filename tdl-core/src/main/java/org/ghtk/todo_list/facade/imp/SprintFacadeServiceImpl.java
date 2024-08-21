@@ -249,12 +249,13 @@ public class SprintFacadeServiceImpl implements SprintFacadeService {
       taskService.updateStatus(task.getId(), TODO.toString(), userId);
       taskService.updateSprintId(projectId,task.getId(), null, userId);
     }
+
+    activityLogService.deleteAllBySprintId(id);
     sprintService.deleteById(id);
 
     var notification = new ActivityLog();
     notification.setAction(DELETE_SPRINT);
     notification.setUserId(userId);
-    notification.setSprintId(id);
     activityLogService.create(notification);
   }
 
