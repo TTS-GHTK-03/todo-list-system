@@ -398,7 +398,7 @@ public class ProjectUserFacadeServiceImpl implements ProjectUserFacadeService {
     log.info("(checkEmailAccept)email: {}", email);
     if (authUserService.existsByEmail(email)) {
       log.info("(checkEmailAccept)email: {} existed", email);
-      projectUserService.createProjectUser(userId, projectId, role);
+      projectUserService.createProjectUser(authUserService.findByEmail(email).getId(), projectId, role);
       redisCacheService.delete(INVITE_KEY + projectId, email);
       acceptInviteResponse.setStatus(UserActionStatus.ACCEPTED.toString());
 
