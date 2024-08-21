@@ -46,6 +46,7 @@ import org.ghtk.todo_list.model.response.TaskResponse;
 import org.ghtk.todo_list.model.response.TypeResponse;
 import org.ghtk.todo_list.model.response.UpdateDueDateTaskResponse;
 import org.ghtk.todo_list.service.ActivityLogService;
+import org.ghtk.todo_list.service.AuthAccountService;
 import org.ghtk.todo_list.service.AuthUserService;
 import org.ghtk.todo_list.service.CommentService;
 import org.ghtk.todo_list.service.LabelAttachedService;
@@ -69,6 +70,7 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
   private final ProjectService projectService;
   private final TaskService taskService;
   private final AuthUserService authUserService;
+  private final AuthAccountService authAccountService;
   private final SprintService sprintService;
   private final TypeService typeService;
   private final LabelService labelService;
@@ -386,7 +388,7 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
         .point(savedTask.getPoint())
         .status(savedTask.getStatus())
         .keyProjectTask(savedTask.getKeyProjectTask())
-        .userResponse(new UserResponse(user.getId(), user.getFirstName(), user.getMiddleName(),
+        .userResponse(new UserResponse(user.getId(), null, user.getFirstName(), user.getMiddleName(),
             user.getLastName(), user.getEmail(), null))
         .sprintDetailResponse(new SprintDetailResponse())
         .typeResponse(
@@ -564,8 +566,10 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
 
   private void fillData(TaskDetailResponse taskDetailResponse) {
     log.info("(fillData)taskDetailResponse: {}", taskDetailResponse);
-    UserResponse userResponse = authUserService.getUserResponseById(
-        taskDetailResponse.getUserResponse().getId());
+    UserResponse userResponse = authUserService.getUserResponseById(taskAssigneesService.findUserIdByTaskId(taskDetailResponse.getId()));
+    if(!userResponse.getId().equals(authUserService.findByUnassigned().getId())) {
+      userResponse.setUsername(authAccountService.findByUserIdWithThrow(userResponse.getId()).getUsername());
+    }
     taskDetailResponse.setUserResponse(userResponse);
     if (taskDetailResponse.getSprintDetailResponse().getSprintId() != null) {
       Sprint sprint = sprintService.findById(

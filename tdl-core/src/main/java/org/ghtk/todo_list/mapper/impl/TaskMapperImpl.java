@@ -36,7 +36,7 @@ public class TaskMapperImpl implements TaskMapper {
           .point(task.getPoint())
           .status(task.getStatus())
           .keyProjectTask(task.getKeyProjectTask())
-          .userResponse(new UserResponse(task.getUserId(), null, null, null, null, null))
+          .userResponse(null)
           .sprintDetailResponse(SprintDetailResponse.of(task.getSprintId(), null, null))
           .typeResponse(TypeResponse.of(task.getTypeId(), null, null, null))
           .labelResponseList(null)
