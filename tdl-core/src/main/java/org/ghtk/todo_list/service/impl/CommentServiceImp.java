@@ -14,6 +14,7 @@ import org.ghtk.todo_list.model.response.CreateSprintResponse;
 import org.ghtk.todo_list.model.response.TaskResponse;
 import org.ghtk.todo_list.repository.CommentRepository;
 import org.ghtk.todo_list.repository.TaskRepository;
+import org.ghtk.todo_list.service.AuthAccountService;
 import org.ghtk.todo_list.service.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,25 +26,17 @@ import org.springframework.transaction.annotation.Transactional;
 public class CommentServiceImp implements CommentService {
 
   private final CommentRepository commentRepository;
+  private final AuthAccountService authAccountService;
 
   @Override
-  public CommentResponse createComment(String userId, String taskId, String text) {
+  public Comment createComment(String userId, String taskId, String text) {
     log.info("(CreateComment)user: {}, taskId: {},", userId, taskId);
     Comment comment = new Comment();
     comment.setTaskId(taskId);
     comment.setUserId(userId);
     comment.setText(text);
 
-    Comment savedComment = commentRepository.save(comment);
-    return CommentResponse.builder()
-        .id(savedComment.getId())
-        .text(savedComment.getText())
-        .parentId(savedComment.getParentId())
-        .taskId(savedComment.getTaskId())
-        .userId(savedComment.getUserId())
-        .createdAt(savedComment.getCreatedAt())
-        .lastUpdatedAt(savedComment.getLastUpdatedAt())
-        .build();
+    return commentRepository.save(comment);
   }
 
   @Override
@@ -86,7 +79,7 @@ public class CommentServiceImp implements CommentService {
     List<Comment> comments = commentRepository.findAllByParentId(parentId);
     return comments.stream()
         .map(comment -> new CommentResponse(comment.getId(), comment.getText(),
-            comment.getParentId(), comment.getTaskId(), comment.getUserId(), comment.getCreatedAt(),
+            comment.getParentId(), comment.getTaskId(), comment.getUserId(), authAccountService.findUsernameByUserId(comment.getUserId()), comment.getCreatedAt(),
             comment.getLastUpdatedAt())).collect(Collectors.toList());
   }
 
@@ -96,7 +89,7 @@ public class CommentServiceImp implements CommentService {
     List<Comment> comments = commentRepository.findAllByTaskId(taskId);
     return comments.stream()
         .map(comment -> new CommentResponse(comment.getId(), comment.getText(),
-            comment.getParentId(), comment.getTaskId(), comment.getUserId(), comment.getCreatedAt(),
+            comment.getParentId(), comment.getTaskId(), comment.getUserId(), authAccountService.findUsernameByUserId(comment.getUserId()), comment.getCreatedAt(),
             comment.getLastUpdatedAt())).collect(Collectors.toList());
   }
 
@@ -107,23 +100,14 @@ public class CommentServiceImp implements CommentService {
   }
 
   @Override
-  public CommentResponse replyComment(String userId, String taskId, String commentId, String text) {
+  public Comment replyComment(String userId, String taskId, String commentId, String text) {
     log.info("(replyComment)userId: {}, taskId: {}, commentId: {}", userId, taskId, commentId);
     Comment comment = new Comment();
     comment.setTaskId(taskId);
     comment.setUserId(userId);
     comment.setText(text);
     comment.setParentId(commentId);
-    comment = commentRepository.save(comment);
-    return CommentResponse.builder()
-        .id(comment.getId())
-        .text(comment.getText())
-        .parentId(comment.getParentId())
-        .taskId(comment.getTaskId())
-        .userId(comment.getUserId())
-        .createdAt(comment.getCreatedAt())
-        .lastUpdatedAt(comment.getLastUpdatedAt())
-        .build();
+    return commentRepository.save(comment);
   }
 
   @Override

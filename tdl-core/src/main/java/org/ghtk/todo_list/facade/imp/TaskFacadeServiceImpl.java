@@ -104,7 +104,8 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
   public List<TaskDetailResponse> getAllTaskByProjectId(String userId, String projectId) {
     log.info("(getAllTaskByProjectId)projectId: {}", projectId);
     validateProjectId(projectId);
-    List<TaskDetailResponse> taskDetailResponseList = taskService.getAllTaskDetailByProjectId(projectId);
+    List<TaskDetailResponse> taskDetailResponseList = taskService.getAllTaskDetailByProjectId(
+        projectId);
     for (TaskDetailResponse taskDetailResponse : taskDetailResponseList) {
       log.info("(getAllTaskByProjectId)taskDetailResponse: {}", taskDetailResponse);
       fillData(taskDetailResponse);
@@ -116,7 +117,8 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
   public TaskDetailResponse getTaskByTaskId(String userId, String projectId, String taskId) {
     log.info("(getTaskByTaskId)taskId: {},projectId: {}", taskId, projectId);
     validateProjectId(projectId);
-    TaskDetailResponse taskDetailResponse = taskService.findById(taskId, taskAssigneesService.findUserIdByTaskId(taskId));
+    TaskDetailResponse taskDetailResponse = taskService.findById(taskId,
+        taskAssigneesService.findUserIdByTaskId(taskId));
     fillData(taskDetailResponse);
     return taskDetailResponse;
   }
@@ -131,7 +133,8 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
       throw new StatusTaskInvalidException();
     }
 
-    if(taskService.findById(taskId).getStatus().equals(TODO.toString()) && !status.toUpperCase().equals(IN_PROGRESS.toString())) {
+    if (taskService.findById(taskId).getStatus().equals(TODO.toString()) && !status.toUpperCase()
+        .equals(IN_PROGRESS.toString())) {
       log.error("(updateStatusTask)taskId: {} hasn't started", taskId);
       throw new TaskHasNotStartedException();
     }
@@ -178,7 +181,7 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
       log.info("(updateSprintTask)task not in sprintId ");
       var sprintProgress = sprintProgressService.findBySprintId(sprintId);
       sprintProgress.setTotalTask(sprintProgress.getTotalTask() + 1);
-      if(task.getStatus().equals(DONE.toString())) {
+      if (task.getStatus().equals(DONE.toString())) {
         sprintProgress.setCompleteTask(sprintProgress.getCompleteTask() - 1);
       }
       sprintProgressService.save(sprintProgress);
@@ -190,7 +193,7 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
       log.info("(updateSprintTask)task allocated to another sprint");
       var sprintProgress = sprintProgressService.findBySprintId(task.getSprintId());
       sprintProgress.setTotalTask(sprintProgress.getTotalTask() - 1);
-      if(task.getStatus().equals(DONE.toString())) {
+      if (task.getStatus().equals(DONE.toString())) {
         sprintProgress.setCompleteTask(sprintProgress.getCompleteTask() - 1);
       }
       sprintProgressService.save(sprintProgress);
@@ -204,7 +207,7 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
       log.info("(updateSprintTask)task out sprint");
       var sprintProgress = sprintProgressService.findBySprintId(task.getSprintId());
       sprintProgress.setTotalTask(sprintProgress.getTotalTask() - 1);
-      if(task.getStatus().equals(DONE.toString())) {
+      if (task.getStatus().equals(DONE.toString())) {
         sprintProgress.setCompleteTask(sprintProgress.getCompleteTask() - 1);
       }
       sprintProgressService.save(sprintProgress);
@@ -311,12 +314,12 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
 
     Sprint sprint = sprintService.findById(sprintId);
 
-    if(sprint.getStatus().equals(SprintStatus.COMPLETE.toString())) {
+    if (sprint.getStatus().equals(SprintStatus.COMPLETE.toString())) {
       log.error("(updateStartDateDueDateTask)sprintId: {} done", sprintId);
       throw new SprintDoneException();
     }
 
-    if(!sprint.getStatus().equals(SprintStatus.START.toString())) {
+    if (!sprint.getStatus().equals(SprintStatus.START.toString())) {
       log.error("(updateStartDateDueDateTask)sprintId: {} not start", sprintId);
       throw new SprintNotStartException();
     }
@@ -355,7 +358,7 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
   }
 
   @Override
-  public TaskResponse createTask(String userId, String projectId, String title) {
+  public TaskDetailResponse createTask(String userId, String projectId, String title) {
     log.info("(createTask)userId: {},projectId: {}", userId, projectId);
     validateProjectId(projectId);
 
@@ -365,7 +368,9 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
     task.setProjectId(projectId);
     task.setStatus(TODO.toString());
     task.setKeyProjectTask(generateKeyProjectTask(projectId));
-    task.setTypeId(typeService.findByProjectIdAndTitle(projectId, ImageConstant.STORY).getId());
+
+    Type type = typeService.findByProjectIdAndTitle(projectId, ImageConstant.STORY);
+    task.setTypeId(type.getId());
     Task savedTask = taskService.save(task);
 
     var user = authUserService.findByUnassigned();
@@ -377,14 +382,22 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
     notification.setTaskId(savedTask.getId());
     activityLogService.create(notification);
 
-    return TaskResponse.builder()
+    TaskDetailResponse taskDetailResponse = TaskDetailResponse.builder()
         .id(savedTask.getId())
         .title(savedTask.getTitle())
         .point(savedTask.getPoint())
         .status(savedTask.getStatus())
         .keyProjectTask(savedTask.getKeyProjectTask())
-        .userId(taskAssigneesService.findUserIdByTaskId(savedTask.getId()))
+        .userResponse(new UserResponse(user.getId(), null, user.getFirstName(), user.getMiddleName(),
+            user.getLastName(), user.getEmail(), null))
+        .sprintDetailResponse(new SprintDetailResponse())
+        .typeResponse(
+            TypeResponse.of(type.getId(), type.getTitle(), type.getImage(), type.getDescription()))
+        .labelResponseList(null)
         .build();
+
+    fillData(taskDetailResponse);
+    return taskDetailResponse;
   }
 
   @Override
@@ -505,7 +518,7 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
       log.error("(validateDueDateTask)dueDate: {} invalid", dueDate);
       throw new DueDateTaskInvalidStartDateException();
     }
-    if(sprint.getEndDate().equals(LocalDate.now())){
+    if (sprint.getEndDate().equals(LocalDate.now())) {
       log.error("(validateDueDateTask)dueDate: {} invalid", dueDate);
       throw new ApproachEndDateSprintException();
     }
@@ -551,15 +564,16 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
     return project.getKeyProject() + "-" + project.getCounterTask();
   }
 
-  private void fillData(TaskDetailResponse taskDetailResponse){
+  private void fillData(TaskDetailResponse taskDetailResponse) {
     log.info("(fillData)taskDetailResponse: {}", taskDetailResponse);
     UserResponse userResponse = authUserService.getUserResponseById(taskAssigneesService.findUserIdByTaskId(taskDetailResponse.getId()));
-    if(userResponse.getId() != authUserService.findByUnassigned().getId()) {
+    if(!userResponse.getId().equals(authUserService.findByUnassigned().getId())) {
       userResponse.setUsername(authAccountService.findByUserIdWithThrow(userResponse.getId()).getUsername());
     }
     taskDetailResponse.setUserResponse(userResponse);
     if (taskDetailResponse.getSprintDetailResponse().getSprintId() != null) {
-      Sprint sprint = sprintService.findById(taskDetailResponse.getSprintDetailResponse().getSprintId());
+      Sprint sprint = sprintService.findById(
+          taskDetailResponse.getSprintDetailResponse().getSprintId());
       taskDetailResponse.getSprintDetailResponse().setSprintTitle(sprint.getTitle());
       taskDetailResponse.getSprintDetailResponse().setSprintStatus(sprint.getStatus());
     }
@@ -571,7 +585,8 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
       taskDetailResponse.getTypeResponse().setDescription(type.getDescription());
     }
 
-    List<LabelResponse> labelResponseList = labelService.getAllLabelByTask(taskDetailResponse.getId());
+    List<LabelResponse> labelResponseList = labelService.getAllLabelByTask(
+        taskDetailResponse.getId());
     taskDetailResponse.setLabelResponseList(labelResponseList);
   }
 }

@@ -6,7 +6,7 @@ import org.ghtk.todo_list.model.response.CommentResponse;
 
 public interface CommentService {
 
-  CommentResponse createComment(String userId, String taskId, String text);
+  Comment createComment(String userId, String taskId, String text);
 
   CommentResponse updateComment(String userId, String taskId, String commentId, String text);
 
@@ -18,7 +18,7 @@ public interface CommentService {
 
   Comment save(Comment comment);
 
-  CommentResponse replyComment(String userId, String taskId, String commentId, String text);
+  Comment replyComment(String userId, String taskId, String commentId, String text);
 
   boolean existById(String id);
 
