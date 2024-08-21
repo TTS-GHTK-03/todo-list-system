@@ -45,9 +45,10 @@ public class TaskServiceImp implements TaskService {
     return tasks.stream()
         .map(task -> TaskDetailResponse.of(task.getId(), task.getTitle(), task.getPoint(),
             task.getStatus(), task.getKeyProjectTask(),
-            new UserResponse(task.getUserId(), null, null, null, null, null),
+            null,
             SprintDetailResponse.of(task.getSprintId(), null, null),
-            TypeResponse.of(task.getTypeId(), null, null, null), null))
+            TypeResponse.of(task.getTypeId(), null, null, null),
+            null))
         .collect(Collectors.toList());
   }
 
@@ -65,7 +66,7 @@ public class TaskServiceImp implements TaskService {
     });
 
     return TaskDetailResponse.of(task.getId(), task.getTitle(), task.getPoint(), task.getStatus(),
-        task.getKeyProjectTask(), new UserResponse(task.getUserId(), null, null, null, null, null),
+        task.getKeyProjectTask(), new UserResponse(userId, null, null, null, null, null, null),
         SprintDetailResponse.of(task.getSprintId(), null, null),
         TypeResponse.of(task.getTypeId(), null, null, null), null);
   }
