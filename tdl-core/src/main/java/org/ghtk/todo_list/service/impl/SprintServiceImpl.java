@@ -76,7 +76,7 @@ public class SprintServiceImpl implements SprintService {
 
   @Override
   public void deleteById(String id) {
-    log.info("(deleteById)");
+    log.info("(deleteById)sprintId: {}", id);
     sprintRepository.deleteById(id);
   }
 

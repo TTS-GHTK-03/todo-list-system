@@ -10,6 +10,7 @@ public interface ActivityLogService {
 
   List<ActivityLog> getAllNotifications(String userId, int page);
   void deleteAllByTaskId(String taskId);
+  void deleteAllBySprintId(String sprintId);
   boolean existsByActivityLogId(String activityLogId);
   boolean existsByActivityLogIdAndUserId(String activityLogId, String userId);
   void deleteById(String activityLogId);
