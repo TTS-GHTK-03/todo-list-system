@@ -8,6 +8,7 @@ import org.ghtk.todo_list.entity.AuthUser;
 public class AuthUserResponse {
 
   private String id;
+  private String username;
   private String firstName;
   private String middleName;
   private String lastName;
@@ -17,9 +18,10 @@ public class AuthUserResponse {
   private String gender;
   private String address;
 
-  public static AuthUserResponse from(AuthUser authUser) {
+  public static AuthUserResponse from(AuthUser authUser, String username) {
     AuthUserResponse response = new AuthUserResponse();
     response.setId(authUser.getId());
+    response.setUsername(username);
     response.setFirstName(authUser.getFirstName());
     response.setMiddleName(authUser.getMiddleName());
     response.setLastName(authUser.getLastName());

@@ -19,6 +19,7 @@ import org.ghtk.todo_list.dto.request.LoginRequest;
 import org.ghtk.todo_list.dto.request.VerifyResetPasswordRequest;
 import org.ghtk.todo_list.dto.request.RegisterRequest;
 import org.ghtk.todo_list.dto.response.ActiveLoginResponse;
+import org.ghtk.todo_list.dto.response.AuthUserResponse;
 import org.ghtk.todo_list.dto.response.LoginResponse;
 import org.ghtk.todo_list.dto.response.UnactiveLoginResponse;
 import org.ghtk.todo_list.dto.response.VerifyRegisterResponse;
@@ -210,6 +211,21 @@ public class AuthFacadeServiceImpl implements AuthFacadeService {
     redisCacheService.delete(LOGIN_FAILED_ATTEMPT_KEY, user.getEmail());
 
     return createLoginResponse(user, account);
+  }
+
+  @Override
+  public AuthUserResponse updateUserDetail(String userId, UpdateInformationRequest request) {
+    AuthUser authUser = authUserService.updateUserDetail(userId, request);
+    String username = authAccountService.findUsernameByUserId(userId);
+    return AuthUserResponse.from(authUser, username);
+  }
+
+  @Override
+  public AuthUserResponse getDetail(String userId) {
+    log.info("(getDetail)userId: {}", userId);
+    AuthUser authUser = authUserService.findById(userId);
+    String username = authAccountService.findUsernameByUserId(userId);
+    return AuthUserResponse.from(authUser, username);
   }
 
   @Override

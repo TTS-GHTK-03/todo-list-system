@@ -18,8 +18,7 @@ public interface AuthUserService {
   boolean existById(String id);
   Optional<AuthUser> findByAccountId(String accountId);
   String getUserId(String email);
-  AuthUserResponse updateUserDetail(String userId, UpdateInformationRequest request);
-  AuthUserResponse getDetail(String userId);
+  AuthUser updateUserDetail(String userId, UpdateInformationRequest request);
   UserProjection getByUserId(String userId);
   List<UserNameResponse> getNameUser(String projectId);
   UserNameResponse getNameUserById(String userId);

@@ -52,7 +52,7 @@ public class UserController {
   public BaseResponse<AuthUserResponse> updateInformation(@RequestBody @Valid UpdateInformationRequest request) {
     log.info("(updateInformation)request: {}", request.toString());
     return BaseResponse.of(HttpStatus.OK.value(), LocalDateTime.now().toString(),
-        authUserService.updateUserDetail(getUserId(), request));
+        authFacadeService.updateUserDetail(getUserId(), request));
   }
 
   @GetMapping()
@@ -61,6 +61,6 @@ public class UserController {
   public BaseResponse<AuthUserResponse> getDetail() {
     log.info("(getDetail)");
     return BaseResponse.of(HttpStatus.OK.value(), LocalDateTime.now().toString(),
-        authUserService.getDetail(getUserId()));
+        authFacadeService.getDetail(getUserId()));
   }
 }
