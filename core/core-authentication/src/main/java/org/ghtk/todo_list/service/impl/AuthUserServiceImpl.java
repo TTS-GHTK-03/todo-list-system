@@ -90,7 +90,7 @@ public class AuthUserServiceImpl implements AuthUserService {
   }
 
   @Override
-  public AuthUserResponse updateUserDetail(String userId, UpdateInformationRequest request) {
+  public AuthUser updateUserDetail(String userId, UpdateInformationRequest request) {
     log.info("(updateUserDetail)userId: {}, request: {}", userId, request);
     var user = repository
         .findById(userId)
@@ -112,18 +112,7 @@ public class AuthUserServiceImpl implements AuthUserService {
     user.setAddress(request.getAddress());
     repository.save(user);
 
-    return AuthUserResponse.from(user);
-  }
-
-  @Override
-  public AuthUserResponse getDetail(String userId) {
-    log.info("(getDetail)userId: {}", userId);
-    return AuthUserResponse.from(repository
-        .findById(userId)
-        .orElseThrow(() -> {
-          log.error("(getDetail)userId: {} not found", userId);
-          throw new UserNotFoundException();
-        }));
+    return user;
   }
 
   @Override
