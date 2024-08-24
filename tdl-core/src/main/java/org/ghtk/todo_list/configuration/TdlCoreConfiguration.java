@@ -79,11 +79,12 @@ public class TdlCoreConfiguration {
       TaskAssigneesService taskAssigneesService,
       CommentService commentService, SprintService sprintService,
       SprintProgressService sprintProgressService,
+      AuthAccountService authAccountService,
       UserService userService) {
     return new ProjectFacadeServiceImpl(projectService, projectUserService, boardService,
         authUserService, projectInformationResponseMapper, projectMapper, typeService, typeMapper,
         labelService, labelAttachedService, taskService, activityLogService, taskAssigneesService,
-        commentService, sprintService, sprintProgressService, userService);
+        commentService, sprintService, sprintProgressService, userService, authAccountService);
   }
 
   @Bean

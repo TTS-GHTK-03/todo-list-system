@@ -19,5 +19,6 @@ public class ProjectInformationResponse implements Serializable {
   private String title;
   private String keyProject;
   private String roleUser;
+  private String username;
   private List<UserNameResponse> userNameResponseList;
 }
