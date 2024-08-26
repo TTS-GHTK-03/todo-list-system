@@ -32,6 +32,7 @@ import org.ghtk.todo_list.exception.SprintNotFoundException;
 import org.ghtk.todo_list.exception.SprintNotStartException;
 import org.ghtk.todo_list.exception.StatusTaskInvalidException;
 import org.ghtk.todo_list.exception.TaskAssignmentExistsException;
+import org.ghtk.todo_list.exception.TaskHasNotSprintException;
 import org.ghtk.todo_list.exception.TaskHasNotStartedException;
 import org.ghtk.todo_list.exception.TaskNotExistUserException;
 import org.ghtk.todo_list.exception.TaskNotFoundException;
@@ -128,6 +129,12 @@ public class TaskFacadeServiceImpl implements TaskFacadeService {
       String status) {
     log.info("(updateStatusTask)taskId: {},projectId: {}", taskId, projectId);
     validateProjectId(projectId);
+
+    if(taskService.findById(taskId).getSprintId() == null) {
+      log.error("(updateStatusTask)taskId: {} hasn't sprint", taskId);
+      throw new TaskHasNotSprintException();
+    }
+
     if (!TaskStatus.isValid(status)) {
       log.error("(updateStatusTask)taskId: {},projectId: {}", taskId, projectId);
       throw new StatusTaskInvalidException();

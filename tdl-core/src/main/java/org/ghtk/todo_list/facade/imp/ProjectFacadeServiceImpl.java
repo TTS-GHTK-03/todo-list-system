@@ -43,6 +43,7 @@ import org.ghtk.todo_list.service.TaskService;
 import org.ghtk.todo_list.service.TypeService;
 import org.ghtk.todo_list.service.UserService;
 import org.springframework.data.domain.Pageable;
+import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -104,6 +105,7 @@ public class ProjectFacadeServiceImpl implements ProjectFacadeService {
   }
 
   @Override
+  @Transactional
   public Project createProject(String userId, String title) {
     log.info("(createProject)user: {}", userId);
 
@@ -147,6 +149,7 @@ public class ProjectFacadeServiceImpl implements ProjectFacadeService {
   }
 
   @Override
+  @Transactional
   public void deleteProject(String userId, String projectId) {
     log.info("(deleteProject)userId: {}, projectId: {}", userId, projectId);
     if (!projectUserService.existsByUserIdAndProjectId(userId, projectId)) {

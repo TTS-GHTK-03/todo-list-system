@@ -27,7 +27,7 @@ public class UserScheduler {
   private final ShareTokenService shareTokenService;
   private final EmailHelper emailHelper;
 
-  @Scheduled(cron = "* 0 * * * *")
+  @Scheduled(cron = "0 0 * * * *")
   public void checkSprints() {
     List<ProjectUser> projectUsers = projectUserService.getAll();
     for (ProjectUser projectUser : projectUsers) {
