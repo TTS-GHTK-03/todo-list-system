@@ -9,6 +9,6 @@ public interface ActivityLogFacadeService {
   List<NotificationResponse> getAllNotifications(String userId, String projectId, int page);
   void deleteNotification(String userId, String projectId, String activityLogId);
   List<ActivityLog> getAllActivityLogsByTaskId(String userId, String projectId, String taskId);
-  List<ActivityLog> getAllActivityLogsByUserId(String userId);
+  List<ActivityLog> getAllActivityLogsByUserId(String userId, int page);
 
 }

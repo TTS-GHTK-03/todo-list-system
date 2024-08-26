@@ -14,7 +14,13 @@ import org.springframework.transaction.annotation.Transactional;
 public interface ActivityLogRepository extends JpaRepository<ActivityLog, String> {
 
   List<ActivityLog> findAllByTaskIdOrderByCreatedAtDesc(String taskId);
-  List<ActivityLog> findAllByUserIdOrderByCreatedAtDesc(String userId);
+
+  @Query("""
+      SELECT DISTINCT al FROM ActivityLog al 
+      WHERE al.userId = :userId ORDER BY al.createdAt DESC 
+      LIMIT :end OFFSET :start
+      """)
+  List<ActivityLog> findAllByUserIdOrderByCreatedAtDesc(String userId, int end, int start);
 
   @Transactional
   @Modifying
@@ -27,7 +33,10 @@ public interface ActivityLogRepository extends JpaRepository<ActivityLog, String
       join Sprint s on al.sprintId = s.id order by al.createdAt DESC LIMIT :end OFFSET :start
       """)
   List<ActivityLog> findAllNotifications(String userId, int end, int start);
+
   void deleteAllByTaskId(String taskId);
+
   void deleteAllBySprintId(String sprintId);
+
   boolean existsByIdAndUserId(String activityLogId, String userId);
 }

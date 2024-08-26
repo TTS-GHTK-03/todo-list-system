@@ -171,6 +171,7 @@ public class ProjectFacadeServiceImpl implements ProjectFacadeService {
     var sprints = sprintService.findSprintsByProjectId(projectId);
     for (var sprint : sprints) {
       sprintProgressService.deleteAllBySprintId(sprint.getId());
+      activityLogService.deleteAllBySprintId(sprint.getId());
     }
     sprintService.deleteAllByProjectId(projectId);
     projectUserService.deleteAllByProjectId(projectId);

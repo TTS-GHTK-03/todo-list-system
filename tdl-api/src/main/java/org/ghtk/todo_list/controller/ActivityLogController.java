@@ -72,9 +72,10 @@ public class ActivityLogController {
 
   @GetMapping("/logs")
   @Operation(description = "Get all activity logs by user id")
-  public BaseResponse<List<ActivityLog>> getAllActivityLogsByUserId() {
+  public BaseResponse<List<ActivityLog>> getAllActivityLogsByUserId(
+      @Valid @RequestParam("page") int page) {
     log.info("(getAllActivityLogsByUserId)userId: {}", getUserId());
     return BaseResponse.of(HttpStatus.OK.value(), LocalDate.now().toString(),
-        activityLogFacadeService.getAllActivityLogsByUserId(getUserId()));
+        activityLogFacadeService.getAllActivityLogsByUserId(getUserId(), page));
   }
 }
