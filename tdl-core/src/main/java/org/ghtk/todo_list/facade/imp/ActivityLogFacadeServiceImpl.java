@@ -67,9 +67,9 @@ public class ActivityLogFacadeServiceImpl implements ActivityLogFacadeService {
   }
 
   @Override
-  public List<ActivityLog> getAllActivityLogsByUserId(String userId) {
+  public List<ActivityLog> getAllActivityLogsByUserId(String userId, int page) {
     log.info("(getAllActivityLogsByUserId)userId: {}", userId);
-    return activityLogService.getAllActivityLogsByUserId(userId);
+    return activityLogService.getAllActivityLogsByUserId(userId, page);
   }
 
   void validateProjectId(String projectId) {
